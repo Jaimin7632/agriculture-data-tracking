@@ -1,0 +1,49 @@
+{
+  "menu": [
+    {
+      "url": "/",
+      "name": "Dashboard",
+      "icon": "menu-icon tf-icons bx bx-home-circle",
+      "slug": "dashboard-analytics"
+    },
+    {
+      "name": "Account Settings",
+      "icon": "menu-icon tf-icons bx bx bx-dock-top",
+      "slug": "pages-account-settings",
+      "submenu": [
+        {
+          "url": "/pages/account-settings-account",
+          "name": "Account",
+          "slug": "pages-account-settings-account"
+        },
+        {
+          "url": "/pages/account-settings-notifications",
+          "name": "Notifications",
+          "slug": "pages-account-settings-notifications"
+        },
+        {
+          "url": "/pages/account-settings-connections",
+          "name": "Connections",
+          "slug": "pages-account-settings-connections"
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "icon": "menu-icon tf-icons bx bx-detail",
+      "slug": "forms",
+      "submenu": [
+        {
+          "url": "usermanagement/user-list",
+          "name": "Users List",
+          "slug": "forms-basic-inputs"
+        },
+        {
+          "url": "usermanagement/add-edit-user",
+          "name": "Add Users",
+          "slug": "forms-input-groups"
+        }
+      ]
+    }
+  ]
+}
