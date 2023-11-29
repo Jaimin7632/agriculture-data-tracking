@@ -90,7 +90,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
         ],
-        
+
         'mongodb' => [
             'driver'   => 'mongodb',
             'host'     => env('MONGO_DB_HOST', 'localhost'),
@@ -100,6 +100,7 @@ return [
             'password' => env('DB_PASSWORD', 'mypassword'),
             'options'  => [
                 'database' => 'admin', // Set the authentication database
+            ],
         ],
 
     ],
