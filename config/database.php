@@ -99,7 +99,7 @@ return [
             'username' => env('MONGO_DB_USERNAME', 'myuser'),
             'password' => env('DB_PASSWORD', 'mypassword'),
             'options'  => [
-                'database' => 'admin', // Set the authentication database
+                'database' => 'mydatabase', // Set the authentication database
             ],
         ],
 
