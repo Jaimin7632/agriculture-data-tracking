@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Models\User;
 
 class LoginBasic extends Controller
 {
@@ -31,6 +32,8 @@ class LoginBasic extends Controller
 
   public function index()
   {
+    $userData = User::all();
+    echo "<pre>"; print_r($userData); exit();
     return view('content.authentications.auth-login-basic');
   }
 
