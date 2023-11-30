@@ -99,10 +99,10 @@ return [
             'username' => env('DB_USERNAME', 'myuser'),
             'password' => env('DB_PASSWORD', 'mypassword'),
             'options'  => [
-                'database' => 'mydatabase', // Set the authentication database
+                'database' => 'admin', // Set the authentication database
             ],
         ],
-        
+
 
     ],
 
