@@ -102,6 +102,7 @@ return [
                 'database' => 'mydatabase', // Set the authentication database
             ],
         ],
+        
 
     ],
 
