@@ -4,12 +4,14 @@
       "url": "/",
       "name": "Dashboard",
       "icon": "menu-icon tf-icons bx bx-home-circle",
+      "adminaccess" : "false",
       "slug": "dashboard-analytics"
     },
     {
       "name": "Account Settings",
       "icon": "menu-icon tf-icons bx bx bx-dock-top",
       "slug": "pages-account-settings",
+      "adminaccess" : "false",
       "submenu": [
         {
           "url": "/pages/account-settings-account",
@@ -32,6 +34,7 @@
       "name": "User Management",
       "icon": "menu-icon tf-icons bx bx-detail",
       "slug": "forms",
+      "adminaccess" : "true",
       "submenu": [
         {
           "url": "usermanagement/user-list",
