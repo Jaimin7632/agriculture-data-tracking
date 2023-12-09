@@ -67,7 +67,7 @@ $navbarDetached = ($navbarDetached ?? '');
                       </div>
                     </div>
                     <div class="flex-grow-1">
-                      <span class="fw-semibold d-block">Iot</span>
+                      <span class="fw-semibold d-block">Agro Tracking System</span>
                       <small class="text-muted">User</small>
                     </div>
                   </div>
