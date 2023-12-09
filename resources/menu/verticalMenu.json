@@ -17,16 +17,6 @@
           "url": "/pages/account-settings-account",
           "name": "Account",
           "slug": "pages-account-settings-account"
-        },
-        {
-          "url": "/pages/account-settings-notifications",
-          "name": "Notifications",
-          "slug": "pages-account-settings-notifications"
-        },
-        {
-          "url": "/pages/account-settings-connections",
-          "name": "Connections",
-          "slug": "pages-account-settings-connections"
         }
       ]
     },
