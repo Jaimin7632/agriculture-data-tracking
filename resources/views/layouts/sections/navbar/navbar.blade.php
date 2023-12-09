@@ -47,7 +47,7 @@ $navbarDetached = ($navbarDetached ?? '');
 
           <!-- Place this tag where you want the button to render. -->
           <li class="nav-item lh-1 me-3">
-            <a class="github-button" href="https://github.com/themeselection/sneat-html-laravel-admin-template-free" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star themeselection/sneat-html-laravel-admin-template-free on GitHub">Star</a>
+            <a class="github-button" href="https://github.com/themeselection/sneat-html-laravel-admin-template-free" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star themeselection/sneat-html-laravel-admin-template-free on GitHub">{{$user->name}}</a>
           </li>
 
           <!-- User -->
