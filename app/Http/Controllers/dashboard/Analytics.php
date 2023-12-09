@@ -76,16 +76,16 @@ class Analytics extends Controller
           // $outputArray[$createdAt] = $sensorValues;
 
           // Soial Sensor
-          $soialSensorValues[] = ['x' => $createdAt, 'y' => $item['soialsensorvalue']];
+          $soialSensorValues[] = ['x' => $createdAt, 'y' => $item['soilSensorValue']];
 
           // Pressure Sensor
-          $pressureSensorValues[] = ['x' => $createdAt, 'y' => $item['pressuresensorvalue']];
+          $pressureSensorValues[] = ['x' => $createdAt, 'y' => $item['pressureSensorValue']];
 
           // Humidity Sensor
-          $humiditySensorValues[] = ['x' => $createdAt, 'y' => $item['humiditysensorvalue']];
+          $humiditySensorValues[] = ['x' => $createdAt, 'y' => $item['humiditySensorValue']];
 
           // Temperature Sensor
-          $temperatureSensorValues[] = ['x' => $createdAt, 'y' => $item['tempretureensorvalue']];
+          $temperatureSensorValues[] = ['x' => $createdAt, 'y' => $item['temperatureSensorValue']];
       }
 
       // echo "<pre>"; print_r($soialSensorValues); die();

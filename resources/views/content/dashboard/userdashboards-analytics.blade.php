@@ -133,7 +133,7 @@
                     },
                     series: [
                       {
-                        name: 'SoialSensorValues',
+                        name: 'SoilSensorValue',
                         data: soialSensoryValues
                       }
                     ],
@@ -230,7 +230,7 @@
                     },
                     series: [
                       {
-                        name: 'PressureSensorValues',
+                        name: 'PressureSensorValue',
                         data: pressureSensoryValues
                       }
                     ],
@@ -327,7 +327,7 @@
                     },
                     series: [
                       {
-                        name: 'HumiditySensorValues',
+                        name: 'HumiditySensorValue',
                         data: humiditySensoryValues
                       }
                     ],
@@ -424,7 +424,7 @@
                     },
                     series: [
                       {
-                        name: 'TemperatureSensorValues',
+                        name: 'TemperatureSensorValue',
                         data: temperatureSensoryValues
                       }
                     ],
