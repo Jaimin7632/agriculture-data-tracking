@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\user_management\UserManagementController;
 use App\Http\Controllers\api\SensorDataInsertApi;
+use App\Http\Controllers\dashboard\Analytics;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -46,6 +47,11 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::get('/usermanagement/add-edit-user', $controller_path . '\user_management\UserManagementController@add_edit_user')->name('add-edit-user');
 	Route::post('/usermanagement/insert-update-user', $controller_path . '\user_management\UserManagementController@insert_update_user')->name('insert-update-user');
 	// User Management End
+
+	// Graph Data Start
+	Route::post('/getgraphdata', [Analytics::class, 'getgraphdata'])->name("getgraphdata");
+
+	// Graph Data End
 
 	// layout
 	Route::get('/layouts/without-menu', $controller_path . '\layouts\WithoutMenu@index')->name('layouts-without-menu');
