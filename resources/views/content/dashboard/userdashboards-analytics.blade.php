@@ -16,13 +16,13 @@
 <div class="row">
 <!--  -->
 
-<?php 
+<?php
   if ($user->device_id != "") {
     $targetdevice_id = explode(',', $user->device_id);
     foreach ($targetdevice_id as $value) { ?>
       <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
         <div class="card" id="DeviceId" onclick="graphdata('<?php echo $value; ?>')">
-          <h5 class="card-header m-0 me-2 pb-3">Device Id: <?php echo $value; ?></h5>
+          <h5 class="card-header m-0 me-2 pb-3">Device - <?php echo $value; ?></h5>
           <div class="row row-bordered g-0" id="append_graph<?php echo $value; ?>">
             <!-- <div class="col-md-6">
                <div id="lineChart<?php echo $value; ?>" class="px-2"></div>
@@ -51,7 +51,7 @@
         dataType: 'json',
         success: function (response) {
             console.log(response);
-            
+
               // localStorage.screenname = "callcenter";
               // setCurrentScreen(localStorage.screenname);
               if(response.status == "success"){
@@ -147,6 +147,7 @@
                     xaxis: {
                       // type: 'datetime',
                       categories: soialSensorxValues,
+                      tickAmount: 5,
                       axisBorder: {
                         show: false
                       },
@@ -465,11 +466,11 @@
                   }
 
                 }
-              
+
             }
-           
+
         }
-    });   
+    });
   }
 </script>
 @endsection
