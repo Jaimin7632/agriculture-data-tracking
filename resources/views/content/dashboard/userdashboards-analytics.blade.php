@@ -99,6 +99,7 @@
                   $('#append_graph'+response.devide_id).append(divElement);
 
                   const lineChartEl = document.querySelector('#lineChart'+response.devide_id),
+                  const displayEveryNthPoint = 10;
                   lineChartConfig = {
                     chart: {
                       height: 400,
@@ -114,7 +115,7 @@
                     series: [
                       {
                         name: 'SoilSensorValue',
-                        data: soialSensoryValues
+                        data: soialSensoryValues.filter((value, index) => index % displayEveryNthPoint === 0)
                       }
                     ],
                     dataLabels: {
