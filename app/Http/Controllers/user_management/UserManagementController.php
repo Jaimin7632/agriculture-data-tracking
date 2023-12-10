@@ -81,6 +81,7 @@ class UserManagementController extends Controller
       return Validator::make($data, [
           'name' => ['required', 'string', 'max:255'],
           'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+          'country' => ['required', 'string'],
           'password' => ['required', 'string', 'min:6', 'confirmed'],
       ]);
   }
@@ -91,10 +92,75 @@ class UserManagementController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'role' => $data['role'],
+            'country' => $data['country'],
             'password' => Hash::make($data['password']),
         ]);
     }
 
-  
+    public function edit($id)
+    {
+        // Fetch the user by ID
+        $userdata = User::find($id);
+
+        // Check if the user exists
+        if (!$userdata) {
+            abort(404, 'User not found');
+        }
+
+        // Pass the user to the view
+        return view('content/usermanagement/add-edit-user', compact('userdata'));
+    }
+
+    public function update_user_via_admin(Request $request){
+
+      $post_data = $request->all();
+       // echo "<pre>"; print_r($post_data); exit();
+      $request->validate([
+          'name' => ['required', 'string', 'max:255'],
+          'email' => ['required', 'string', 'email', 'max:255'],
+          'country' => ['string'],
+          'password' => ['required', 'string', 'min:6', 'confirmed'],
+      ]);
+
+      $name = $post_data['name'];
+      $password = $post_data['password'];
+      $email = $post_data['email'];
+      $country = $post_data['country'];
+      $user_id = $post_data['user_id'];
+
+      try {
+      $user = User::find($user_id);
+      $user->update([
+            'name' => $name,
+            'email' => $email,
+            'country' => $country,
+            'password' => Hash::make($password),
+          ]);
+      } catch (Exception $ex) {
+          $message = $ex->getMessage();
+      }
+      return redirect('usermanagement/user-list');
+
+    }
+
+    public function delete_user(Request $request){
+      $post_data = $request->all();
+      // echo "<pre>"; print_r($post_data); exit();
+      $id = $post_data['user_id'];
+      $userdata = User::find($id);
+        echo "<pre>"; print_r($userdata); die();
+      /*try {
+        $userdelete = User::find($user_id);
+        $userdelete->delete();
+        $message = "SUCCESS";
+      $responseData = ['success' => 'success', 'error' => '', 'msg' => $message];
+      } catch (Exception $ex) {
+        $message = $ex->getMessage();
+        $responseData = ['success' => 'failure', 'error' => '', 'msg' => $message];
+      }
+
+      return response()->json($responseData);*/
+
+    }
 
 }

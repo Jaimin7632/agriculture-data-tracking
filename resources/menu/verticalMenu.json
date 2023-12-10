@@ -23,18 +23,18 @@
     {
       "name": "User Management",
       "icon": "menu-icon tf-icons bx bx-detail",
-      "slug": "forms",
+      "slug": "user",
       "adminaccess" : "true",
       "submenu": [
         {
           "url": "usermanagement/user-list",
           "name": "Users List",
-          "slug": "forms-basic-inputs"
+          "slug": "user-list"
         },
         {
           "url": "usermanagement/add-edit-user",
           "name": "Add Users",
-          "slug": "forms-input-groups"
+          "slug": "add-edit-user"
         }
       ]
     }

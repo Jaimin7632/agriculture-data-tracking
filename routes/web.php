@@ -5,6 +5,7 @@ use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\user_management\UserManagementController;
 use App\Http\Controllers\api\SensorDataInsertApi;
 use App\Http\Controllers\dashboard\Analytics;
+use App\Http\Controllers\pages\AccountSettingsAccount;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -46,7 +47,15 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::get('/usermanagement/user-list', $controller_path . '\user_management\UserManagementController@user_list')->name('user-list');
 	Route::get('/usermanagement/add-edit-user', $controller_path . '\user_management\UserManagementController@add_edit_user')->name('add-edit-user');
 	Route::post('/usermanagement/insert-update-user', $controller_path . '\user_management\UserManagementController@insert_update_user')->name('insert-update-user');
+	Route::get('/usermanagement/{id}/edit', [UserManagementController::class, 'edit'])->name('users.edit');
+	Route::post('/usermanagement', [UserManagementController::class, 'update_user_via_admin'])->name('update-user');
+	Route::post('/usermanagement', [UserManagementController::class, 'delete_user'])->name('delete-user');
 	// User Management End
+
+	// Account Setting Start
+	Route::post('/update-userdetails', [AccountSettingsAccount::class, 'updateUserProfile'])->name("update-userdetails");
+	Route::post('/update-user-password', [AccountSettingsAccount::class, 'updateUserPassword'])->name("update-user-password");
+	// Account Setting End
 
 	// Graph Data Start
 	Route::post('/getgraphdata', [Analytics::class, 'getgraphdata'])->name("getgraphdata");

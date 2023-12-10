@@ -8,6 +8,7 @@
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
 <script src="{{ asset(mix('assets/js/main.js')) }}"></script>
+<script src="{{asset('assets/sweet-alert2/sweetalert2.all.min.js')}}"></script>
 
 <!-- END: Theme JS-->
 <!-- Pricing Modal JS-->
