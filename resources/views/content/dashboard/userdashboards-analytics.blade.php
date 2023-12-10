@@ -155,11 +155,6 @@
                         show: false
                       },
                       labels: {
-                        show: true, // Ensure that labels are shown
-                        formatter: function (val, index) {
-                          // Show label only every 3rd index (adjust as needed)
-                          return index % 3 === 0 ? val : '';
-                        },
                         style: {
                           colors: labelColor,
                           fontSize: '13px'
