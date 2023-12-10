@@ -97,9 +97,9 @@
                   divElement.append(innerDiv);
 
                   $('#append_graph'+response.devide_id).append(divElement);
+                  const displayEveryNthPoint = 10;
 
                   const lineChartEl = document.querySelector('#lineChart'+response.devide_id),
-                  const displayEveryNthPoint = 10;
                   lineChartConfig = {
                     chart: {
                       height: 400,
