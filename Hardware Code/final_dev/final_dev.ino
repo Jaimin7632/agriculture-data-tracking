@@ -95,5 +95,5 @@ void loop() {
   Serial.println("Server disconnected");
 
   // Delay before sending next data
-  delay(60 * 1000);
+  delay(60 * 5000);
 }
