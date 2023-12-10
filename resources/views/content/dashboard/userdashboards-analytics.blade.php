@@ -97,7 +97,6 @@
                   divElement.append(innerDiv);
 
                   $('#append_graph'+response.devide_id).append(divElement);
-                  const displayEveryNthPoint = 10;
 
                   const lineChartEl = document.querySelector('#lineChart'+response.devide_id),
                   lineChartConfig = {
@@ -115,7 +114,7 @@
                     series: [
                       {
                         name: 'SoilSensorValue',
-                        data: soialSensoryValues.filter((value, index) => index % displayEveryNthPoint === 0)
+                        data: soialSensoryValues
                       }
                     ],
                     dataLabels: {
@@ -156,6 +155,11 @@
                         show: false
                       },
                       labels: {
+                        show: true, // Ensure that labels are shown
+                        formatter: function (val, index) {
+                          // Show label only every 3rd index (adjust as needed)
+                          return index % 3 === 0 ? val : '';
+                        },
                         style: {
                           colors: labelColor,
                           fontSize: '13px'
