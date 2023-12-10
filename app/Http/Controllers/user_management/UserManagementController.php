@@ -146,12 +146,10 @@ class UserManagementController extends Controller
     public function delete_user(Request $request){
       $post_data = $request->all();
       // echo "<pre>"; print_r($post_data); exit();
-      $id = $post_data['user_id'];
-      $userdata = User::find($id);
-        echo "<pre>"; print_r($userdata); die();
-      /*try {
-        $userdelete = User::find($user_id);
-        $userdelete->delete();
+      $user_id = $post_data['user_id'];
+      try {
+        $user = User::find($user_id);
+        $user->delete();
         $message = "SUCCESS";
       $responseData = ['success' => 'success', 'error' => '', 'msg' => $message];
       } catch (Exception $ex) {
@@ -159,7 +157,7 @@ class UserManagementController extends Controller
         $responseData = ['success' => 'failure', 'error' => '', 'msg' => $message];
       }
 
-      return response()->json($responseData);*/
+      return response()->json($responseData);
 
     }
 

@@ -48,8 +48,8 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::get('/usermanagement/add-edit-user', $controller_path . '\user_management\UserManagementController@add_edit_user')->name('add-edit-user');
 	Route::post('/usermanagement/insert-update-user', $controller_path . '\user_management\UserManagementController@insert_update_user')->name('insert-update-user');
 	Route::get('/usermanagement/{id}/edit', [UserManagementController::class, 'edit'])->name('users.edit');
-	Route::post('/usermanagement', [UserManagementController::class, 'update_user_via_admin'])->name('update-user');
-	Route::post('/usermanagement', [UserManagementController::class, 'delete_user'])->name('delete-user');
+	Route::post('/usermanagement/update-user', [UserManagementController::class, 'update_user_via_admin'])->name('update-user');
+	Route::post('/usermanagement/delete-user', [UserManagementController::class, 'delete_user'])->name('delete-user');
 	// User Management End
 
 	// Account Setting Start
