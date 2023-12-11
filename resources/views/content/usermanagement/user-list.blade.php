@@ -138,7 +138,7 @@ function deleteUser(user_id) {
                 },
                 success: function(response) {
                     console.log(response.status);
-                     return false;
+                     // return false;
                     if (response.success == 'success') {
                         Swal.fire({
                             icon: 'success',

@@ -36,34 +36,31 @@
 
           </div>
 
+          <div class="mb-3">
+            <label class="form-label" for="basic-default-fullname">Device Id</label>
+            <input type="text" name="device_id" value="{{ isset($userdata) ? $userdata->device_id : old('device_id') }}" class="form-control{{ $errors->has('device_id') ? ' is-invalid' : '' }}" id="basic-default-fullname" placeholder=""/>
+
+            @if ($errors->has('device_id'))
+                <span class="invalid-error" role="alert">
+                    <strong>{{ $errors->first('device_id') }}</strong>
+                </span>
+            @endif
+
+          </div>
+
           <div class="mb-3 col-md-12">
             <label class="form-label" for="country">Country</label>
+            <?php $selectedCountry = ""; if (isset($userdata) && isset($userdata->country)) {
+              $selectedCountry = $userdata->country;
+            } ?>
             <select id="country" value="{{ isset($userdata) ? $userdata->country : old('country') }}" name="country" class="select2 form-select">
               <option value="">Select</option>
-              <option value="Australia">Australia</option>
-              <option value="Bangladesh">Bangladesh</option>
-              <option value="Belarus">Belarus</option>
-              <option value="Brazil">Brazil</option>
-              <option value="Canada">Canada</option>
-              <option value="China">China</option>
-              <option value="France">France</option>
-              <option value="Germany">Germany</option>
-              <option value="India">India</option>
-              <option value="Indonesia">Indonesia</option>
-              <option value="Israel">Israel</option>
-              <option value="Italy">Italy</option>
-              <option value="Japan">Japan</option>
-              <option value="Korea">Korea, Republic of</option>
-              <option value="Mexico">Mexico</option>
-              <option value="Philippines">Philippines</option>
-              <option value="Russia">Russian Federation</option>
-              <option value="South Africa">South Africa</option>
-              <option value="Thailand">Thailand</option>
-              <option value="Turkey">Turkey</option>
-              <option value="Ukraine">Ukraine</option>
-              <option value="United Arab Emirates">United Arab Emirates</option>
-              <option value="United Kingdom">United Kingdom</option>
-              <option value="United States">United States</option>
+              <?php foreach ($countryData as $country) { ?>
+                   <option value="<?= $country->name ?>" <?= ($selectedCountry == $country->name) ? 'selected' : '' ?>>
+                      <?= $country->name ?>
+                  </option>
+              <?php } ?>
+              
             </select>
             @if ($errors->has('country'))
                 <span class="invalid-error" role="alert">
@@ -103,21 +100,26 @@
             </div>
             <div class="form-text"> You can use letters, numbers & periods </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label" for="basic-default-phone">Passsword</label>
-            <input type="password" name="password" value="{{ isset($userdata) ? $userdata->password : old('password') }}" id="basic-default-phone" class="form-control" placeholder="" />
+          <?php 
+          if (isset($userdata)) { ?>
+          <?php }else{ ?>
+            <div class="mb-3">
+              <label class="form-label" for="basic-default-phone">Passsword</label>
+              <input type="password" name="password" value="" id="basic-default-phone" class="form-control" placeholder="" />
 
-            @if ($errors->has('password'))
-                <span class="invalid-error" role="alert">
-                    <strong>{{ $errors->first('password') }}</strong>
-                </span>
-            @endif
+              @if ($errors->has('password'))
+                  <span class="invalid-error" role="alert">
+                      <strong>{{ $errors->first('password') }}</strong>
+                  </span>
+              @endif
 
-          </div>
-          <div class="mb-3">
-            <label class="form-label" for="basic-default-phone">Confirm Passsword</label>
-            <input type="password" name="password_confirmation" id="basic-default-phone" class="form-control" placeholder="" required/>
-          </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="basic-default-phone">Confirm Passsword</label>
+              <input type="password" name="password_confirmation" id="basic-default-phone" class="form-control" placeholder="" required/>
+            </div>
+          <?php } ?>
+          
 
           <button type="submit" class="btn btn-primary">Submit</button>
         </form>

@@ -9,13 +9,15 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Country;
 
 class AccountSettingsAccount extends Controller
 {
   public function index()
   {
   	$user = Auth::user();
-    return view('content.pages.pages-account-settings-account', compact('user'));
+    $countryData = Country::all();
+    return view('content.pages.pages-account-settings-account', compact('user','countryData'));
   }
 
   public function updateUserProfile(Request $request){

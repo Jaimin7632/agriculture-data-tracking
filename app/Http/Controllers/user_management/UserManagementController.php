@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use App\Models\User;
+use App\Models\Country;
 
 class UserManagementController extends Controller
 {
@@ -58,7 +59,8 @@ class UserManagementController extends Controller
   public function add_edit_user(){
 
     $user = Auth::user();
-    return view('content/usermanagement/add-edit-user', compact('user'));
+    $countryData = Country::all();
+    return view('content/usermanagement/add-edit-user', compact('user','countryData'));
 
   }
 
@@ -82,6 +84,7 @@ class UserManagementController extends Controller
           'name' => ['required', 'string', 'max:255'],
           'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
           'country' => ['required', 'string'],
+          'device_id' => ['string'],
           'password' => ['required', 'string', 'min:6', 'confirmed'],
       ]);
   }
@@ -93,6 +96,7 @@ class UserManagementController extends Controller
             'email' => $data['email'],
             'role' => $data['role'],
             'country' => $data['country'],
+            'device_id' => $data['device_id'],
             'password' => Hash::make($data['password']),
         ]);
     }
@@ -101,6 +105,7 @@ class UserManagementController extends Controller
     {
         // Fetch the user by ID
         $userdata = User::find($id);
+        $countryData = Country::all();
 
         // Check if the user exists
         if (!$userdata) {
@@ -108,7 +113,7 @@ class UserManagementController extends Controller
         }
 
         // Pass the user to the view
-        return view('content/usermanagement/add-edit-user', compact('userdata'));
+        return view('content/usermanagement/add-edit-user', compact('userdata','countryData'));
     }
 
     public function update_user_via_admin(Request $request){
@@ -117,16 +122,14 @@ class UserManagementController extends Controller
        // echo "<pre>"; print_r($post_data); exit();
       $request->validate([
           'name' => ['required', 'string', 'max:255'],
-          'email' => ['required', 'string', 'email', 'max:255'],
-          'country' => ['string'],
-          'password' => ['required', 'string', 'min:6', 'confirmed'],
+          'email' => ['required', 'string', 'email', 'max:255']
       ]);
 
       $name = $post_data['name'];
-      $password = $post_data['password'];
       $email = $post_data['email'];
       $country = $post_data['country'];
       $user_id = $post_data['user_id'];
+      $device_id = $post_data['device_id'];
 
       try {
       $user = User::find($user_id);
@@ -134,7 +137,7 @@ class UserManagementController extends Controller
             'name' => $name,
             'email' => $email,
             'country' => $country,
-            'password' => Hash::make($password),
+            'device_id' => $device_id,
           ]);
       } catch (Exception $ex) {
           $message = $ex->getMessage();
@@ -148,10 +151,9 @@ class UserManagementController extends Controller
       // echo "<pre>"; print_r($post_data); exit();
       $user_id = $post_data['user_id'];
       try {
-        $user = User::find($user_id);
-        $user->delete();
+        $user = User::where('id', $user_id)->delete();
         $message = "SUCCESS";
-      $responseData = ['success' => 'success', 'error' => '', 'msg' => $message];
+        $responseData = ['success' => 'success', 'error' => '', 'msg' => $message];
       } catch (Exception $ex) {
         $message = $ex->getMessage();
         $responseData = ['success' => 'failure', 'error' => '', 'msg' => $message];

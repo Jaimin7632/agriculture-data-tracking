@@ -58,32 +58,16 @@
 
             <div class="mb-3 col-md-12">
               <label class="form-label" for="country">Country</label>
+              <?php $selectedCountry = ""; if (isset($user) && isset($user->country)) {
+                $selectedCountry = $user->country;
+              } ?>
               <select id="country" value="{{ $user->country }}" name="country" class="select2 form-select">
                 <option value="">Select</option>
-                <option value="Australia">Australia</option>
-                <option value="Bangladesh">Bangladesh</option>
-                <option value="Belarus">Belarus</option>
-                <option value="Brazil">Brazil</option>
-                <option value="Canada">Canada</option>
-                <option value="China">China</option>
-                <option value="France">France</option>
-                <option value="Germany">Germany</option>
-                <option value="India">India</option>
-                <option value="Indonesia">Indonesia</option>
-                <option value="Israel">Israel</option>
-                <option value="Italy">Italy</option>
-                <option value="Japan">Japan</option>
-                <option value="Korea">Korea, Republic of</option>
-                <option value="Mexico">Mexico</option>
-                <option value="Philippines">Philippines</option>
-                <option value="Russia">Russian Federation</option>
-                <option value="South Africa">South Africa</option>
-                <option value="Thailand">Thailand</option>
-                <option value="Turkey">Turkey</option>
-                <option value="Ukraine">Ukraine</option>
-                <option value="United Arab Emirates">United Arab Emirates</option>
-                <option value="United Kingdom">United Kingdom</option>
-                <option value="United States">United States</option>
+                <?php foreach ($countryData as $country) { ?>
+                   <option value="<?= $country->name ?>" <?= ($selectedCountry == $country->name) ? 'selected' : '' ?>>
+                      <?= $country->name ?>
+                  </option>
+                <?php } ?>
               </select>
             </div>
 
