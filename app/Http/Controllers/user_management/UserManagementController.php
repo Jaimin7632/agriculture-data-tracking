@@ -44,6 +44,13 @@ class UserManagementController extends Controller
             $dataArr['id'] = $data->id;
             $dataArr['name'] = $data->name;
             $dataArr['email'] = $data->email;
+            $dataArr['device_id'] = $data->device_id;
+            $dataArr['status'] = $data->status;
+            $expiry_date = "";
+            if ($data->expiry_date != "") {
+              $expiry_date = date("m/d/Y",strtotime($data->expiry_date));
+            } 
+            $dataArr['expiry_date'] = $expiry_date;
             $dataArr['created_at'] =  date("m/d/Y H:i:s",strtotime($data->created_at));
             
             $finalDataArr[] = $dataArr;
@@ -84,6 +91,7 @@ class UserManagementController extends Controller
           'name' => ['required', 'string', 'max:255'],
           'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
           'country' => ['required', 'string'],
+          'status' => ['required'],
           'device_id' => ['string'],
           'password' => ['required', 'string', 'min:6', 'confirmed'],
       ]);
@@ -94,6 +102,8 @@ class UserManagementController extends Controller
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'status' => $data['status'],
+            'expiry_date' => $data['expiry_date'],
             'role' => $data['role'],
             'country' => $data['country'],
             'device_id' => $data['device_id'],
@@ -105,6 +115,7 @@ class UserManagementController extends Controller
     {
         // Fetch the user by ID
         $userdata = User::find($id);
+        $user = User::find($id);
         $countryData = Country::all();
 
         // Check if the user exists
@@ -113,7 +124,7 @@ class UserManagementController extends Controller
         }
 
         // Pass the user to the view
-        return view('content/usermanagement/add-edit-user', compact('userdata','countryData'));
+        return view('content/usermanagement/add-edit-user', compact('userdata','countryData', 'user'));
     }
 
     public function update_user_via_admin(Request $request){
@@ -122,12 +133,15 @@ class UserManagementController extends Controller
        // echo "<pre>"; print_r($post_data); exit();
       $request->validate([
           'name' => ['required', 'string', 'max:255'],
-          'email' => ['required', 'string', 'email', 'max:255']
+          'email' => ['required', 'string', 'email', 'max:255'],
+          'status' => ['required']
       ]);
 
       $name = $post_data['name'];
       $email = $post_data['email'];
+      $status = $post_data['status'];
       $country = $post_data['country'];
+      $expiry_date = $post_data['expiry_date'];
       $user_id = $post_data['user_id'];
       $device_id = $post_data['device_id'];
 
@@ -136,6 +150,8 @@ class UserManagementController extends Controller
       $user->update([
             'name' => $name,
             'email' => $email,
+            'status' => $status,
+            'expiry_date' => $expiry_date,
             'country' => $country,
             'device_id' => $device_id,
           ]);

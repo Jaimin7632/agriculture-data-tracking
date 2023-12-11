@@ -23,6 +23,8 @@ class User extends Authenticatable
         'name',
         'country',
         'device_id',
+        'status',
+        'expiry_date',
         'email',
         'password',
         'role',

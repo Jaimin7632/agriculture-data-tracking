@@ -19,7 +19,9 @@
           <th>Name</th>
           <th>Email</th>
           <th>Status</th>
-          <th>created_at</th>
+          <th>Created Date</th>
+          <th>Expiry Date</th>
+          <th>Device id</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -29,8 +31,10 @@
           <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{ $userdata['name'] }}</strong></td>
           <td>{{ $userdata['email'] }}</td>
           
-          <td><span class="badge bg-label-primary me-1">Active</span></td>
+          <td><span class="badge bg-label-primary me-1">{{ $userdata['status'] }}</span></td>
           <td><span class="badge bg-label-primary me-1">{{ $userdata['created_at'] }}</span></td>
+          <td><span class="badge bg-label-primary me-1">{{ $userdata['expiry_date'] }}</span></td>
+          <td><span class="badge bg-label-primary me-1">{{ $userdata['device_id'] }}</span></td>
           <td>
             <div class="dropdown">
               <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>

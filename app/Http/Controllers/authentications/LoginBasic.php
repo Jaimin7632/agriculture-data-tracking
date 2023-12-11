@@ -35,7 +35,14 @@ class LoginBasic extends Controller
   }
 
   protected function authenticated(Request $request, $user) {
-        // echo '<pre>'; print_r($user->role) ; exit();
+           
+         echo $user->expiry_date; 
+         echo date("Y-m-d"); 
+        if ($user->status == 'inactive' || $user->expiry_date < date("Y-m-d")) {
+            \Auth::logout();
+            return redirect(url('/login'))->with('message', 'YOUR SUBSCRIPTION EXPIRED PLEASE CONTACT ADMIN.');
+        }
+
         if ($user->role == "admin") {
             return redirect('/');
         } else {
