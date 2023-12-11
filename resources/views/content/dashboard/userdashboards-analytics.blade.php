@@ -56,6 +56,8 @@
               // setCurrentScreen(localStorage.screenname);
               if(response.status == "success"){
 
+                $('#append_graph'+response.devide_id).html("");
+
                 var devide_id = response.devide_id;
 
                 var soialSensorxValues = [];
@@ -117,6 +119,14 @@
                         data: soialSensoryValues
                       }
                     ],
+                    title: {
+                      text: 'Soil Sensor Values', // Set the title text here
+                      align: 'left',
+                      style: {
+                        fontSize: '12px',
+                        color: '#F1948A'
+                      }
+                    },
                     dataLabels: {
                       enabled: true
                     },
@@ -215,6 +225,14 @@
                         data: pressureSensoryValues
                       }
                     ],
+                    title: {
+                      text: 'Pressure Sensor Value', // Set the title text here
+                      align: 'left',
+                      style: {
+                        fontSize: '12px',
+                        color: '#C39BD3'
+                      }
+                    },
                     dataLabels: {
                       enabled: true
                     },
@@ -312,6 +330,14 @@
                         data: humiditySensoryValues
                       }
                     ],
+                    title: {
+                      text: 'Humidity Sensor Value', // Set the title text here
+                      align: 'left',
+                      style: {
+                        fontSize: '12px',
+                        color: '#52BE80'
+                      }
+                    },
                     dataLabels: {
                       enabled: true
                     },
@@ -409,6 +435,14 @@
                         data: temperatureSensoryValues
                       }
                     ],
+                    title: {
+                      text: 'Temperature Sensor Value', // Set the title text here
+                      align: 'left',
+                      style: {
+                        fontSize: '12px',
+                        color: '#E67E22'
+                      }
+                    },
                     dataLabels: {
                       enabled: true
                     },
