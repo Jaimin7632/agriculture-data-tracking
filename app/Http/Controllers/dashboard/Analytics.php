@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Jenssegers\Mongodb\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ChangeDeviceName;
 use DB;
 
 class Analytics extends Controller
@@ -108,6 +109,41 @@ class Analytics extends Controller
     //return view('content/dashboard/graph', compact('soialSensorValues'));
     return response()->json($responseData);
 
+
+  }
+
+  public function change_device_name(Request $request){
+
+    $post_data = $request->all();
+    //echo "<pre>"; print_r($post_data); exit();
+    $user_id = $post_data['user_id'];
+    $change_text = $post_data['change_text'];
+    $device_id = $post_data['device_id'];
+
+    $change_text_data = ChangeDeviceName::where('user_id', $user_id)->where('device_id', $device_id)->first();
+
+    try {
+      $change_text_data = ChangeDeviceName::where('user_id', $user_id)->where('device_id', $device_id)->first();
+      //echo "<pre>"; print_r($change_text_data); die();
+      if (empty($change_text_data)) {
+        ChangeDeviceName::create([
+            'user_id' => $user_id,
+            'device_id' => $device_id,
+            'change_name' => $change_text,
+        ]);
+      }else{
+        $updateData = ['change_name'=>$change_text, "updated_at" => date('Y-m-d H:i:s')];
+        ChangeDeviceName::where("user_id", $user_id)->where("device_id", $device_id)->update($updateData);
+      }
+      
+      $message = "SUCCESS";
+      $responseData = ['success' => 'success', 'error' => '', 'msg' => $message];
+    } catch (Exception $ex) {
+      $message = $ex->getMessage();
+      $responseData = ['success' => 'failure', 'error' => '', 'msg' => $message];
+    }
+
+    return response()->json($responseData);
 
   }
 

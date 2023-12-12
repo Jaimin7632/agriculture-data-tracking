@@ -49,7 +49,7 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::post('/usermanagement/insert-update-user', $controller_path . '\user_management\UserManagementController@insert_update_user')->name('insert-update-user');
 	Route::get('/usermanagement/{id}/edit', [UserManagementController::class, 'edit'])->name('users.edit');
 	Route::post('/usermanagement/update-user', [UserManagementController::class, 'update_user_via_admin'])->name('update-user');
-	Route::post('/usermanagement/delete-user', [UserManagementController::class, 'delete_user'])->name('delete-user');
+	Route::post('/usermanagement/delete-user-data', [UserManagementController::class, 'delete_user_data'])->name('delete-user-data');
 	// User Management End
 
 	// Account Setting Start
@@ -59,7 +59,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 	// Graph Data Start
 	Route::post('/getgraphdata', [Analytics::class, 'getgraphdata'])->name("getgraphdata");
-
+	Route::post('/change-device-name', [Analytics::class, 'change_device_name'])->name("change-device-name");
 	// Graph Data End
 
 	// layout

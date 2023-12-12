@@ -135,7 +135,7 @@ function deleteUser(user_id) {
           console.log('delete');
             $.ajax({
                 type: 'POST',
-                url: '{{ route("delete-user") }}',
+                url: '{{ route("delete-user-data") }}',
                 data: {
                     "user_id": user_id,
                     "_token": "{{ csrf_token() }}"

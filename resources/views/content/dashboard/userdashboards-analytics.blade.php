@@ -15,19 +15,43 @@
 
 <div class="row">
 <!--  -->
-
+<input type="hidden" name="user_id" id="User_Id" value="{{$user->id}}">
 <?php
   if ($user->device_id != "") {
     $targetdevice_id = explode(',', $user->device_id);
     foreach ($targetdevice_id as $value) { ?>
       <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
-        <div class="card" id="DeviceId" onclick="graphdata('<?php echo $value; ?>')">
-          <h5 class="card-header m-0 me-2 pb-3">Device - <?php echo $value; ?></h5>
+
+        <div class="card" id="DeviceId">
+          <div class="row">
+            <div class="col-md-4" onclick="graphdata('<?php echo $value; ?>')" style="cursor: pointer; color: blue;">
+              <?php 
+                $device_name = $value;
+
+                $change_text_data = \App\Models\ChangeDeviceName::where('user_id', $user->id)->where('device_id', $value)->first();
+
+                if (!empty($change_text_data)) {
+                  $device_name = $change_text_data->change_name;
+                }
+              ?>
+              <h5 class="card-header m-0 me-2 pb-3">Device - <?php echo $device_name; ?></h5>
+            </div>
+            <div class="col-md-8">
+              <input type="button" onclick="showtextbox('<?php echo $value; ?>')" id="change_device_id" class="btn btn-warning" value="Change Name" style="margin-top: 11px;">
+              <span style="margin-top: 11px; display: none;" id="change_name<?php echo $value; ?>">
+                <input type="text" name="change_name" id="name_textbox<?php echo $value; ?>" value="">
+                <input type="submit" class="btn btn-primary" name="submit" value="Change" onclick="changedevicename('<?php echo $value; ?>')">
+                <input type="button" class="btn btn-danger" name="close" value="Close" onclick="closetextbox('<?php echo $value; ?>')">
+              </span>
+            </div>
+          </div>
+          
           <div class="row row-bordered g-0" id="append_graph<?php echo $value; ?>">
             <!-- <div class="col-md-6">
                <div id="lineChart<?php echo $value; ?>" class="px-2"></div>
             </div> -->
           </div>
+          
         </div>
       </div>
     <?php }
@@ -506,6 +530,78 @@
         }
     });
   }
+
+  function showtextbox(device_id) {
+    $("#change_name"+device_id).show();
+  }
+
+  function closetextbox(device_id) {
+    $("#change_name"+device_id).hide();
+  }
+
+  function changedevicename(device_id) {
+    var device_id = device_id;
+    var user_id = $("#User_Id").val();
+    var change_text = $("#name_textbox"+device_id).val();
+    // console.log(device_id);
+    // console.log(user_id);
+    // console.log(change_text);
+
+    $.ajax({
+        type: 'POST',
+        url: '{{ route("change-device-name") }}', 
+        data: {device_id:device_id,user_id:user_id,change_text:change_text,_token:"{{ csrf_token() }}"},
+        // dataType: 'json',
+        // beforeSend: function() {
+        //     $('.loader').show();
+        // },
+        success: function (response) {
+            console.log(response);
+            //return false;
+            if (response.success == 'success') {
+                // location.reload(true);
+                Swal.fire({
+                    // title: 'You Dial Number!',
+                    title: 'Device Name Update Successfully!',
+                    icon: 'success',
+                    allowOutsideClick: false,
+                    confirmButtonText: 'Ok',
+                    customClass: {
+                        confirmButton: 'btn btn-danger ml-1'
+                    },
+                    buttonsStyling: true
+                }).then(function(result) {
+                  if (result.isConfirmed) {
+                      location.reload(true);
+                  } else {
+                      location.reload(true);
+                  }
+                });
+
+            }else{
+                Swal.fire({
+                    // title: 'You Dial Number!',
+                    title: 'Device Name Does Not Update Successfully!',
+                    icon: 'failure',
+                    allowOutsideClick: false,
+                    confirmButtonText: 'Ok',
+                    customClass: {
+                        confirmButton: 'btn btn-danger ml-1'
+                    },
+                    buttonsStyling: true
+                }).then(function(result) {
+                  if (result.isConfirmed) {
+                      location.reload(true);
+                  } else {
+                      location.reload(true);
+                  }
+                });
+            }
+            // $('.loader').fadeOut();
+        }
+    });
+  }
+
 </script>
 @endsection
 
