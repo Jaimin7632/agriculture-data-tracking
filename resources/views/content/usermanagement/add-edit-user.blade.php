@@ -39,7 +39,7 @@
           <div class="mb-3">
             <label class="form-label" for="basic-default-fullname">Device Id</label>
             <input type="button" onclick="generateUUID()" style="margin-bottom: 10px;margin-left: 10px;" class="btn rounded-pill me-2 btn-success" value="Generate Device Id">
-            <input type="text" name="device_id" value="{{ isset($userdata) ? $userdata->device_id : old('device_id') }}" class="form-control{{ $errors->has('device_id') ? ' is-invalid' : '' }}" id="hiddenUUIDs" placeholder=""/>
+            <input type="hidden" name="device_id" value="{{ isset($userdata) ? $userdata->device_id : old('device_id') }}" class="form-control{{ $errors->has('device_id') ? ' is-invalid' : '' }}" id="hiddenUUIDs" placeholder=""/>
 
             @if ($errors->has('device_id'))
                 <span class="invalid-error" role="alert">
@@ -52,7 +52,7 @@
           
 
           <div id="uuidContainer">
-            <?php if ($userdata->device_id != "") {
+            <?php if (isset($userdata) && $userdata->device_id != "") {
               $targetdevice_id = explode(',', $userdata->device_id);
               foreach ($targetdevice_id as $value) { ?>
                 <input type="text" readonly="" id="closeTextBox<?php echo $value; ?>" value="<?php echo $value; ?>">
