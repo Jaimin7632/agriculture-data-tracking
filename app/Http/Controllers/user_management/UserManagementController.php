@@ -33,7 +33,7 @@ class UserManagementController extends Controller
 
     $finalDataArr = [];
     $user = Auth::user();
-    $userData = User::all();
+    $userData = User::where('status', '!=', 'deleted')->get();;
 
     foreach ($userData as $data) {
 
@@ -144,6 +144,7 @@ class UserManagementController extends Controller
       $expiry_date = $post_data['expiry_date'];
       $user_id = $post_data['user_id'];
       $device_id = $post_data['device_id'];
+      $role = $post_data['role'];
 
       try {
       $user = User::find($user_id);
@@ -151,6 +152,7 @@ class UserManagementController extends Controller
             'name' => $name,
             'email' => $email,
             'status' => $status,
+            'role' => $role,
             'expiry_date' => $expiry_date,
             'country' => $country,
             'device_id' => $device_id,
@@ -167,7 +169,10 @@ class UserManagementController extends Controller
       // echo "<pre>"; print_r($post_data); exit();
       $user_id = $post_data['user_id'];
       try {
-        $user = User::where('id', $user_id)->delete();
+        $user = User::find($user_id);
+        $user->update([
+            'status' => 'deleted',
+          ]);
         $message = "SUCCESS";
         $responseData = ['success' => 'success', 'error' => '', 'msg' => $message];
       } catch (Exception $ex) {
