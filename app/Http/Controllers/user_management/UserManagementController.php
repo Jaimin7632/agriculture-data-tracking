@@ -81,7 +81,7 @@ class UserManagementController extends Controller
     // echo "<pre>"; print_r($user); exit();
     // $this->guard()->login($user);
 
-    return redirect('/');
+    return redirect('usermanagement/user-list');
   }
 
   protected function validator(array $data)

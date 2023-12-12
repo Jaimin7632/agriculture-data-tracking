@@ -194,7 +194,7 @@ function generateUUID() {
 
 function closeDeviceId(DeviceId){
 
-  alert(DeviceId);
+  //alert(DeviceId);
   const closeButton = document.getElementById("closeButton"+DeviceId);
   const closeTextBox = document.getElementById("closeTextBox"+DeviceId);
   console.log(closeButton);
