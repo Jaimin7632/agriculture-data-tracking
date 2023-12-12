@@ -1,6 +1,6 @@
 @extends('layouts/contentNavbarLayout')
 
-@section('title', ' Vertical Layouts - Forms')
+@section('title', isset($userdata) ? 'Edit User' : 'Add User')
 
 @section('content')
 <style type="text/css">
