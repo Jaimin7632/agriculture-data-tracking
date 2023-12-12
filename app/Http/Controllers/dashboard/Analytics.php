@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Jenssegers\Mongodb\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ChangeDeviceName;
+use App\Models\User;
+use App\Models\SensorData;
+use Carbon\Carbon;
 use DB;
 
 class Analytics extends Controller
@@ -22,7 +25,13 @@ class Analytics extends Controller
     // return view('content.dashboard.dashboards-analytics');
     $user = Auth::user();
     if ($user->role == 'admin') {
-       return view('content/dashboard/dashboards-analytics', compact('user'));
+       $totalusercount = User::count();
+       $activeusercount = User::where('status', 'active')->count();
+       $inactiveusercount = User::where('status', 'inactive')->count();
+       $adminusercount = User::where('role', 'admin')->count();
+       $sensordatacount = SensorData::count();
+       $uniqueDeviceCount = SensorData::where('created_at', '>=', 2)->groupBy('device_id')->distinct()->count('device_id');
+       return view('content/dashboard/dashboards-analytics', compact('user','totalusercount','activeusercount','inactiveusercount','adminusercount','sensordatacount','uniqueDeviceCount'));
     }else{
        return view('content/dashboard/userdashboards-analytics', compact('user'));
     }
