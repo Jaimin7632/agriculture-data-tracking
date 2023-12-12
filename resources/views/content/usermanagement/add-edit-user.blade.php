@@ -38,7 +38,8 @@
 
           <div class="mb-3">
             <label class="form-label" for="basic-default-fullname">Device Id</label>
-            <input type="text" name="device_id" value="{{ isset($userdata) ? $userdata->device_id : old('device_id') }}" class="form-control{{ $errors->has('device_id') ? ' is-invalid' : '' }}" id="basic-default-fullname" placeholder=""/>
+            <input type="button" onclick="generateUUID()" style="margin-bottom: 10px;margin-left: 10px;" class="btn rounded-pill me-2 btn-success" value="Generate Device Id">
+            <input type="text" name="device_id" value="{{ isset($userdata) ? $userdata->device_id : old('device_id') }}" class="form-control{{ $errors->has('device_id') ? ' is-invalid' : '' }}" id="hiddenUUIDs" placeholder=""/>
 
             @if ($errors->has('device_id'))
                 <span class="invalid-error" role="alert">
@@ -48,8 +49,20 @@
 
           </div>
 
+          
+
+          <div id="uuidContainer">
+            <?php if ($userdata->device_id != "") {
+              $targetdevice_id = explode(',', $userdata->device_id);
+              foreach ($targetdevice_id as $value) { ?>
+                <input type="text" readonly="" id="closeTextBox<?php echo $value; ?>" value="<?php echo $value; ?>">
+                <input type="button" class="closeButton" id="closeButton<?php echo $value; ?>" style="color: red;" onclick='closeDeviceId(`{{ $value }}`)' value="✖">
+              <?php }
+            } ?>
+          </div>
+
           <div class="mb-3 col-md-12">
-            <label class="form-label" for="country">Country</label>
+            <label class="form-label" style="margin-top: 10px" for="country">Country</label>
             <?php $selectedCountry = ""; if (isset($userdata) && isset($userdata->country)) {
               $selectedCountry = $userdata->country;
             } ?>
@@ -153,3 +166,95 @@
 </div>
 
 @endsection
+
+<!-- <script>
+
+function generateAndAppendUUID() {
+    // Generate a UUID
+    const uuid = generateUUID();
+
+    // Get the text box
+    const textBox = document.getElementById('uuidTextBox');
+
+    // Append the generated UUID, adding a comma if there are existing IDs
+    textBox.value = textBox.value ? `${textBox.value},${uuid}` : uuid;
+}
+
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 8 | 0,
+            v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(8);
+    });
+}
+
+</script> -->
+
+<script>
+
+function closeDeviceId(DeviceId){
+
+  alert(DeviceId);
+  const closeButton = document.getElementById("closeButton"+DeviceId);
+  const closeTextBox = document.getElementById("closeTextBox"+DeviceId);
+  console.log(closeButton);
+  //closeButton.addEventListener("click", function() {
+    // Remove the textbox and update the hidden field
+    // textbox.remove();
+    closeButton.remove();
+    closeTextBox.remove();
+  //});  
+  updateHiddenField();
+}  
+function generateUUID() {
+
+  // Generate UUID
+  const uuid = generateUUIDString();
+
+  // Create a new textbox to display the UUID
+  const textbox = document.createElement("input");
+  textbox.type = "text";
+  textbox.value = uuid;
+  textbox.readOnly = true;
+
+  // Create a close button
+  const closeButton = document.createElement("button");
+  // closeButton.textContent = "Close";
+  closeButton.innerHTML = "&#10006;"; // HTML entity for a cross (✖)
+  closeButton.style.color = "red";
+  closeButton.addEventListener("click", function() {
+    // Remove the textbox and update the hidden field
+    textbox.remove();
+    closeButton.remove();
+    updateHiddenField();
+  });
+
+  // Append the textbox and close button to the container
+  const container = document.getElementById("uuidContainer");
+  container.appendChild(textbox);
+  container.appendChild(closeButton);
+
+  // Update the hidden field
+  updateHiddenField();
+}
+
+function updateHiddenField() {
+  const uuidTextboxes = document.querySelectorAll("#uuidContainer input[type='text']");
+  const uuids = Array.from(uuidTextboxes).map(textbox => textbox.value).join(',');
+
+  // Update the hidden field with comma-separated UUIDs
+  document.getElementById("hiddenUUIDs").value = uuids;
+}
+
+function generateUUIDString() {
+  let result = '';
+  const characters = '0123456789';
+  const charactersLength = 8;
+
+  for (let i = 0; i < 8; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
+}
+</script>
