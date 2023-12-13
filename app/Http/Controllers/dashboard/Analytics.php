@@ -24,14 +24,26 @@ class Analytics extends Controller
   {
     // return view('content.dashboard.dashboards-analytics');
     $user = Auth::user();
+
     if ($user->role == 'admin') {
+       $currentDate = Carbon::now();
        $totalusercount = User::count();
        $activeusercount = User::where('status', 'active')->count();
        $inactiveusercount = User::where('status', 'inactive')->count();
        $adminusercount = User::where('role', 'admin')->count();
+       $inactiveusers= User::where('status', 'inactive')->get()->toArray();
+       // echo "<pre>"; print_r($inactiveusers); die();
        $sensordatacount = SensorData::count();
-       $uniqueDeviceCount = SensorData::where('created_at', '>=', 2)->groupBy('device_id')->distinct()->count('device_id');
-       return view('content/dashboard/dashboards-analytics', compact('user','totalusercount','activeusercount','inactiveusercount','adminusercount','sensordatacount','uniqueDeviceCount'));
+        $futureDate1 = $currentDate->subDays(2);
+        $twoDaysAgo = $futureDate1->format('Y-m-d');
+       $uniqueDeviceCount = SensorData::where('created_at', '>=', $twoDaysAgo)->groupBy('device_id')->distinct()->count('device_id');
+        // Calculate the date 30 days from now
+        
+        $futureDate = $currentDate->addDays(30);
+        $formattedFutureDate = $futureDate->format('Y-m-d');
+        $expiryusers = User::whereBetween('expiry_date', [date('Y-m-d'), $formattedFutureDate])->get()->toArray();
+        
+       return view('content/dashboard/dashboards-analytics', compact('user','totalusercount','activeusercount','inactiveusercount','adminusercount','sensordatacount','uniqueDeviceCount','inactiveusers','expiryusers'));
     }else{
        return view('content/dashboard/userdashboards-analytics', compact('user'));
     }

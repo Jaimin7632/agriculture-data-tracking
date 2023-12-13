@@ -153,4 +153,81 @@
   </div>
 </div>
 
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-6 mb-4">
+    <span class="fw-semibold d-block mb-1">In 30 Days Expiry Users</span>
+    <!-- <div class="card"> -->
+      <table id="expiry_user" class="table table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Created Date</th>
+                <th>Expiry Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php 
+            foreach ($expiryusers as $key => $value) { ?>
+              <tr>
+                  <td><?php echo $value['name'] ?></td>
+                  <td><?php echo $value['email'] ?></td>
+                  <td><?php echo \Carbon\Carbon::parse($value['created_at'])->format('Y-m-d H:i:s'); ?></td>
+                  <td><?php echo $value['expiry_date'] ?></td>
+              </tr>
+            <?php }
+          ?>
+            </tbody>
+        <tfoot>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Created Date</th>
+                <th>Expiry Date</th>
+            </tr>
+        </tfoot>
+      </table>
+    <!-- </div> -->
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-6 mb-4">
+    <span class="fw-semibold d-block mb-1">In Active Users</span>
+    <table id="inactive_user" class="table table-striped" style="width:100%">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Created Date</th>
+                <th>Expiry Date</th>
+            </tr>
+        </thead>
+        <tbody>
+          <?php 
+            foreach ($inactiveusers as $key => $value) { ?>
+              <tr>
+                  <td><?php echo $value['name'] ?></td>
+                  <td><?php echo $value['email'] ?></td>
+                  <td><?php echo \Carbon\Carbon::parse($value['created_at'])->format('Y-m-d H:i:s'); ?></td>
+                  <td><?php echo $value['expiry_date'] ?></td>
+              </tr>
+            <?php }
+          ?>
+            </tbody>
+        <tfoot>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Created Date</th>
+                <th>Expiry Date</th>
+            </tr>
+        </tfoot>
+      </table>
+  </div>
+</div>
+
+
+
 @endsection
+
