@@ -170,10 +170,10 @@
             <?php 
             foreach ($expiryusers as $key => $value) { ?>
               <tr>
-                  <td><?php echo $value['name'] ?></td>
-                  <td><?php echo $value['email'] ?></td>
+                  <td><?php echo $value['name']; ?></td>
+                  <td><?php echo $value['email']; ?></td>
                   <td><?php echo \Carbon\Carbon::parse($value['created_at'])->format('Y-m-d H:i:s'); ?></td>
-                  <td><?php echo $value['expiry_date'] ?></td>
+                  <td><?php echo $value['expiry_date']; ?></td>
               </tr>
             <?php }
           ?>
@@ -207,10 +207,10 @@
           <?php 
             foreach ($inactiveusers as $key => $value) { ?>
               <tr>
-                  <td><?php echo $value['name'] ?></td>
-                  <td><?php echo $value['email'] ?></td>
+                  <td><?php echo $value['name']; ?></td>
+                  <td><?php echo $value['email']; ?></td>
                   <td><?php echo \Carbon\Carbon::parse($value['created_at'])->format('Y-m-d H:i:s'); ?></td>
-                  <td><?php echo $value['expiry_date'] ?></td>
+                  <td><?php echo $value['expiry_date']; ?></td>
               </tr>
             <?php }
           ?>
