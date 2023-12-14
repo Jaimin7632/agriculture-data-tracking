@@ -12,42 +12,44 @@
 <!-- Basic Bootstrap Table -->
 <div class="card">
   <h5 class="card-header">Users List</h5>
-  <div class="table-responsive text-nowrap">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Status</th>
-          <th>Created Date</th>
-          <th>Expiry Date</th>
-          <th>Device id</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody class="table-border-bottom-0">
-      	@foreach ($finalDataArr as $userdata)
-        <tr>
-          <td><i class="fab fa-angular fa-lg text-danger me-3"></i> <strong>{{ $userdata['name'] }}</strong></td>
-          <td>{{ $userdata['email'] }}</td>
-          
-          <td><span class="badge bg-label-primary me-1">{{ $userdata['status'] }}</span></td>
-          <td><span class="badge bg-label-primary me-1">{{ $userdata['created_at'] }}</span></td>
-          <td><span class="badge bg-label-primary me-1">{{ $userdata['expiry_date'] }}</span></td>
-          <td><span class="badge bg-label-primary me-1">{{ $userdata['device_id'] }}</span></td>
-          <td>
-            <div class="dropdown">
-              <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="{{ route('users.edit', $userdata['id']) }}"><i class="bx bx-edit-alt me-1"></i> Edit</a>
-                <a class="dropdown-item" onclick='deleteUser(`{{ $userdata["id"] }}`)' href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Delete</a>
-              </div>
-            </div>
-          </td>
-        </tr>
-        @endforeach
+  <div class="table-responsive text-nowrap container">
+    
+
+    <table id="users_list" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Created Date</th>
+                <th>Expiry Date</th>
+                <th>Device id</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($finalDataArr as $userdata)
+              <tr>
+                  <td>{{ $userdata['name'] }}</td>
+                  <td>{{ $userdata['email'] }}</td>
+                  <td>{{ $userdata['status'] }}</td>
+                  <td>{{ $userdata['created_at'] }}</td>
+                  <td>{{ $userdata['expiry_date'] }}</td>
+                  <td>{{ $userdata['device_id'] }}</td>
+                  <td>
+                    <div class="dropdown">
+                      <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="bx bx-dots-vertical-rounded"></i></button>
+                      <div class="dropdown-menu">
+                        <a class="dropdown-item" href="{{ route('users.edit', $userdata['id']) }}"><i class="bx bx-edit-alt me-1"></i> Edit</a>
+                        <a class="dropdown-item" onclick='deleteUser(`{{ $userdata["id"] }}`)' href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Delete</a>
+                      </div>
+                    </div>
+                  </td>
+              </tr>
+            @endforeach
       </tbody>
     </table>
+
   </div>
 </div>
 <!--/ Basic Bootstrap Table -->

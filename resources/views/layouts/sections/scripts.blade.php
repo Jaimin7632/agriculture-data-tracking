@@ -19,6 +19,9 @@
   $(document).ready( function () {
       $('#inactive_user').DataTable();
   });
+  $(document).ready( function () {
+      $('#users_list').DataTable();
+  });
 </script>
 <!-- END: Theme JS-->
 <!-- Pricing Modal JS-->
