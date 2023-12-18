@@ -112,7 +112,7 @@
       <div class="card-body">
         <div class="card-title d-flex align-items-start justify-content-between">
           <div class="avatar flex-shrink-0">
-            <img src="{{asset('assets/img/icons/unicons/activeuser.png')}}" alt="Credit Card" class="rounded">
+            <img src="{{asset('assets/img/icons/unicons/totalsensor.jpg')}}" alt="Credit Card" class="rounded">
           </div>
           <div class="dropdown">
             <button class="btn p-0" type="button" id="cardOpt6" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -134,7 +134,7 @@
       <div class="card-body">
         <div class="card-title d-flex align-items-start justify-content-between">
           <div class="avatar flex-shrink-0">
-            <img src="{{asset('assets/img/icons/unicons/inactive.png')}}" alt="Credit Card" class="rounded">
+            <img src="{{asset('assets/img/icons/unicons/last2days.png')}}" alt="Credit Card" class="rounded">
           </div>
           <div class="dropdown">
             <button class="btn p-0" type="button" id="cardOpt6" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -146,7 +146,7 @@
             </div>
           </div>
         </div>
-        <span>Last 2 Days Unique Device Count</span>
+        <span>Last 2 Days Active Device</span>
         <h3 class="card-title text-nowrap mb-1">{{$uniqueDeviceCount}}</h3>
       </div>
     </div>
