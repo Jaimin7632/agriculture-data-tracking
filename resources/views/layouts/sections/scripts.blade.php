@@ -11,6 +11,7 @@
 <script src="{{asset('assets/sweet-alert2/sweetalert2.all.min.js')}}"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<!-- <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script> -->
 
 <script type="text/javascript">
   $(document).ready( function () {
@@ -22,6 +23,20 @@
   $(document).ready( function () {
       $('#users_list').DataTable();
   });
+  	/*function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,es',  // Specify included languages (English and Spanish)
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
+        }, 'google_translate_element');
+    }
+
+    document.getElementById('languageSelector').addEventListener('change', function () {
+        var selectedLanguage = this.value;
+        // Change the Google Translate Element language
+        google.translate.translatePage(selectedLanguage);
+    });*/
 </script>
 <!-- END: Theme JS-->
 <!-- Pricing Modal JS-->

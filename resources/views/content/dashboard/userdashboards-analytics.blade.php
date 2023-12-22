@@ -24,7 +24,7 @@
 
         <div class="card" id="DeviceId">
           <div class="row">
-            <div class="col-md-4" onclick="graphdata('<?php echo $value; ?>')" style="cursor: pointer; color: blue;">
+            <div class="col-md-4 graphDiv" device-id ="<?php echo $value; ?>" style="cursor: pointer; color: blue;">
               <?php 
                 $device_name = $value;
 
@@ -66,6 +66,19 @@
 <script src="{{asset('assets/js/dashboards-analytics.js')}}"></script>
 
 <script type="text/javascript">
+
+  $(document).ready(function() {
+  // Function to handle div click
+  $('.graphDiv').on('click', function() {
+    var device_id = $(this).attr('device-id');
+    graphdata(device_id); // Replace 'your_device_id' with the actual device ID
+    // Call the function every 10 seconds
+    setInterval(function() {
+      graphdata(device_id); // Replace 'your_device_id' with the actual device ID
+    }, 10000);
+  });
+
+  });
   function graphdata(device_id) {
     //alert(device_id);
     $.ajax({

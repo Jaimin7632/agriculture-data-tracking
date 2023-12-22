@@ -21,7 +21,7 @@
         <h5 class="mb-0">{{ isset($userdata) ? 'Edit User' : 'Add User' }}</h5> 
       </div>
       <div class="card-body">
-        <form method="POST" action="{{ isset($userdata) ? route('update-user', $userdata->id) : route('insert-update-user') }}">
+        <form method="POST" action="{{ isset($userdata) ? route('update-user', $userdata->id) : route('insert-update-user') }}" id="change_lang">
           @csrf
           <input type="hidden" name="user_id" value="{{ isset($userdata) ? $userdata->id : '' }}">
           <div class="mb-3">
@@ -258,3 +258,4 @@ function generateUUIDString() {
   return result;
 }
 </script>
+
