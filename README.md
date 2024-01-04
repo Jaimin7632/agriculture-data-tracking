@@ -44,9 +44,9 @@
 2. Update the necessary configurations in the server code.
 3. Run the server code to initiate the communication.
 
-![Alt Text](/images/1.jpeg)
-![Alt Text](/images/2.jpeg)
-![Alt Text](/images/3.jpeg)
+![Alt Text](images/1.jpeg)
+![Alt Text](images/2.jpeg)
+![Alt Text](images/3.jpeg)
 
 
 ---
