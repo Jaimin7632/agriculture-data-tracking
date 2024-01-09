@@ -128,7 +128,16 @@
       @endforeach
     @endif
 
-
+    <li class="menu-item">
+      <a href="#">
+        <select id="languageSelector" style="display: none;">
+          <option>Select Language</option>
+          <option value="en">English</option>
+          <option value="es">Spanish</option>
+        </select>
+        <div id="google_translate_element"></div>
+      </a>
+    </li>
     
   </ul>
 

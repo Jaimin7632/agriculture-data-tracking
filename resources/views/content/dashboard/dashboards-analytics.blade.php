@@ -16,13 +16,7 @@
 
 @section('content')
 
-<!-- <select id="languageSelector" style="display: none;">
-    <option>Select Language</option>
-    <option value="en">English</option>
-    <option value="es">Spanish</option>
-</select>
 
-<div id="google_translate_element"></div> -->
 
 <div class="row">
   <div class="col-lg-4 col-md-12 col-6 mb-4">
