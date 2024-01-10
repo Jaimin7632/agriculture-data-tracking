@@ -67,35 +67,61 @@ class Analytics extends Controller
       //echo "<pre>"; print_r($sensor_data); die();
       $outputArray = [];
 
+      $sensorConfig = [
+          'soilSensor' => 'soilSensorValue',
+          'pressureSensor' => 'pressureSensorValue',
+          'humiditySensor' => 'humiditySensorValue',
+          'temperatureSensor' => 'temperatureSensorValue',
+          'temperatureSensorasas' => 'temperatureSensorValue',
+          // Add more sensors as needed
+      ];
+
+      $sensorConfig = [
+          'soilSensor' => ['key' => 'soilSensorValue', 'type' => 'multi', 'color' => '#FF5733'],
+          'pressureSensor' => ['key' => 'pressureSensorValue', 'type' => 'multi', 'color' => '#33FF57'],
+          'humiditySensor' => ['key' => 'humiditySensorValue', 'type' => 'multi', 'color' => '#5733FF'],
+          'temperatureSensor' => ['key' => 'temperatureSensorValue', 'type' => 'multi', 'color' => '#FF33C7'],
+          // 'newSensor' => ['key' => 'temperatureSensorValue', 'type' => 'single'],
+          // Add more sensors as needed
+      ];
+
+      foreach ($sensor_data as $item) {
+          $createdAt = $item['created_at'];
+
+          // Initialize an array to store sensor values dynamically
+          $sensorValues = [];
+          $sensorColors = [];
+
+          // Iterate over the sensor configuration
+          /*foreach ($sensorConfig as $sensorName => $sensorValueKey) {
+
+            $sensorValueKey = $sensorValueKey['type'];
+            $sensorValueType = $sensorValueKey['key'];
+            echo "<pre>"; print_r($sensorValueKey); die();
+              // Add sensor values to the dynamically generated array
+              // $sensorValues[$sensorName][] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
+              $sensorValues[$sensorName][] = ['x' => $createdAt, 'y' => $item[$sensorValueKey], 'type' => $sensorValueType];
+              // $sensorValues[$sensorDetails['type']][$sensorName][] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
+          }*/
+
+          foreach ($sensorConfig as $sensorName => $sensorDetails) {
+              $sensorValueKey = $sensorDetails['key'];
+              $sensorValueType = $sensorDetails['type'];
+              $sensorValueColor = $sensorDetails['color'];
+
+              // Add sensor values to the dynamically generated array
+              $sensorValues[$sensorName]['data'][] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
+              $sensorValues[$sensorName]['color'] = $sensorValueColor;
+          }
+
+          // Now, $sensorValues contains values for all sensors dynamically
+          // You can access values using $sensorValues['soilSensor'], $sensorValues['pressureSensor'], etc.
+      }
+
+        // echo "<pre>"; print_r($sensorValues); die();
+
       foreach ($sensor_data as $item) {
            $createdAt = $item['created_at'];
-
-          // // Create an array for sensor values
-          // $sensorValues = [
-          //     'soialsensorvalue' => $item['soialsensorvalue'],
-          //     'pressuresensorvalue' => $item['pressuresensorvalue'],
-          //     'humiditysensorvalue' => $item['humiditysensorvalue'],
-          //     'tempretureensorvalue' => $item['tempretureensorvalue'],
-          // ];
-
-          // $leadData['x']  = $createdAt;
-          // $leadData['y']  = $item['soialsensorvalue'];
-          // $soialSensorValues[]    = $leadData;
-
-          // $leadData1['x']  = $createdAt;
-          // $leadData1['y']  = $item['pressuresensorvalue'];
-          // $pressureSensorValues[]    = $leadData1;
-
-          // $leadData2['x']  = $createdAt;
-          // $leadData2['y']  = $item['humiditysensorvalue'];
-          // $humiditySensorValues[]    = $leadData2;
-
-          // $leadData3['x']  = $createdAt;
-          // $leadData3['y']  = $item['tempretureensorvalue'];
-          // $temperatureSensorValues[]    = $leadData3;
-
-          // Add the sensor values to the output array using created_at as the key
-          // $outputArray[$createdAt] = $sensorValues;
 
           // Soial Sensor
           $soialSensorValues[] = ['x' => $createdAt, 'y' => $item['soilSensorValue']];
@@ -110,19 +136,12 @@ class Analytics extends Controller
           $temperatureSensorValues[] = ['x' => $createdAt, 'y' => $item['temperatureSensorValue']];
       }
 
-      // echo "<pre>"; print_r($soialSensorValues); die();
-
-      // foreach ($outputArray as $createdAt => $sensorValues) {
-      //     // Extract values for each sensor type
-      //     $soialSensorValues[$createdAt] = $sensorValues['soialsensorvalue'];
-      //     $pressureSensorValues[$createdAt] = $sensorValues['pressuresensorvalue'];
-      //     $humiditySensorValues[$createdAt] = $sensorValues['humiditysensorvalue'];
-      //     $temperatureSensorValues[$createdAt] = $sensorValues['tempretureensorvalue'];
-      // }
       
         $message = "success";
         $success = "success";
-        $data = ['soialSensorValues' => $soialSensorValues, 'pressureSensorValues' => $pressureSensorValues, 'humiditySensorValues' => $humiditySensorValues, 'temperatureSensorValues' => $temperatureSensorValues];
+        // $data = ['soialSensorValues' => $soialSensorValues, 'pressureSensorValues' => $pressureSensorValues, 'humiditySensorValues' => $humiditySensorValues, 'temperatureSensorValues' => $temperatureSensorValues];
+
+        $data = ['sensordata' => $sensorValues];
     }
     //  echo "<pre>"; print_r($data); die();
      $responseData = ['status' => $success, 'msg' => $message, 'data' => $data, 'devide_id' => $device_id];

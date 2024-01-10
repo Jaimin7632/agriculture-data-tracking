@@ -87,36 +87,149 @@
         data: {device_id:device_id,_token:"{{ csrf_token() }}"},
         dataType: 'json',
         success: function (response) {
-            console.log(response);
+            // console.log(response);
 
               // localStorage.screenname = "callcenter";
               // setCurrentScreen(localStorage.screenname);
               if(response.status == "success"){
 
+                var sensorData = response.data.sensordata;
+                console.log(sensorData);
+
                 $('#append_graph'+response.devide_id).html("");
-
                 var devide_id = response.devide_id;
+                // Iterate over each sensor
+                $.each(sensorData, function(sensorName, sensorValues) {
+                    console.log("Sensor Name: " + sensorName);
+                    console.log("Sensor Value: " + sensorValues.color);
+                    var readableSensorName = convertSensorName(sensorName);
+                    var sensorxvalue = [];
+                    var sensoryvalue = [];
+                    // Iterate over each sensor value
 
-                var soialSensorxValues = [];
-                var soialSensoryValues = [];
-                var pressureSensorxValues = [];
-                var pressureSensoryValues = [];
-                var humiditySensorxValues = [];
-                var humiditySensoryValues = [];
-                var temperatureSensorxValues = [];
-                var temperatureSensoryValues = [];
+                    let cardColor, headingColor, axisColor, shadeColor, borderColor, legendColor, chartColors, labelColor ;
 
-                let cardColor, headingColor, axisColor, shadeColor, borderColor, legendColor, chartColors, labelColor ;
+                    cardColor = config.colors.white;
+                    headingColor = config.colors.headingColor;
+                    axisColor = config.colors.axisColor;
+                    borderColor = config.colors.borderColor;
+                    legendColor = config.colors.legendColor;
+                    chartColors = config.colors.chartColors;
+                    labelColor  = config.colors.labelColor;
 
-                  cardColor = config.colors.white;
-                  headingColor = config.colors.headingColor;
-                  axisColor = config.colors.axisColor;
-                  borderColor = config.colors.borderColor;
-                  legendColor = config.colors.legendColor;
-                  chartColors = config.colors.chartColors;
-                  labelColor  = config.colors.labelColor;
+                    var divElement = $('<div>', {
+                        id: 'lineChart'+sensorName+response.devide_id,
+                        class: 'px-2 col-md-6'
+                    });
 
-                if (response.data.soialSensorValues != "") {
+                    var innerDiv = $('<div>', {
+                        'class': 'px-2'
+                    });
+
+                    divElement.append(innerDiv);
+
+                    $('#append_graph'+response.devide_id).append(divElement);
+
+                    $.each(sensorValues.data, function(index, value) {
+                        console.log("X: " + value.x + ", Y: " + value.y);
+                        // Do something with the value
+
+                        if (response.data != "") {
+
+                          sensorxvalue.push(value.x);
+                          sensoryvalue.push(value.y);
+
+                          const lineChartEl = document.querySelector('#lineChart'+sensorName+response.devide_id),
+                          lineChartConfig = {
+                            chart: {
+                              height: 400,
+                              type: 'line',
+                              parentHeightOffset: 0,
+                              zoom: {
+                                enabled: false
+                              },
+                              toolbar: {
+                                show: false
+                              }
+                            },
+                            series: [
+                              {
+                                name: readableSensorName,
+                                data: sensoryvalue
+                              }
+                            ],
+                            title: {
+                              text: readableSensorName, // Set the title text here
+                              align: 'left',
+                              style: {
+                                fontSize: '12px',
+                                color: sensorValues.color
+                              }
+                            },
+                            dataLabels: {
+                              enabled: true
+                            },
+                            stroke: {
+                              curve: 'smooth'
+                            },
+                            legend: {
+                              show: true,
+                              position: 'top',
+                              horizontalAlign: 'start',
+                              labels: {
+                                colors: legendColor,
+                                useSeriesColors: false
+                              }
+                            },
+                            colors: [sensorValues.color],
+                            grid: {
+                              borderColor: borderColor,
+                              xaxis: {
+                                lines: {
+                                  show: true
+                                }
+                              }
+                            },
+                            tooltip: {
+                              shared: false
+                            },
+                            xaxis: {
+                              // type: 'datetime',
+                              categories: sensorxvalue,
+                              tickAmount: 5,
+                              axisBorder: {
+                                show: false
+                              },
+                              axisTicks: {
+                                show: false
+                              },
+                              labels: {
+                                style: {
+                                  colors: labelColor,
+                                  fontSize: '13px'
+                                }
+                              }
+                            },
+                            yaxis: {
+                              labels: {
+                                style: {
+                                  colors: labelColor,
+                                  fontSize: '13px'
+                                }
+                              }
+                            }
+                          };
+                          if (typeof lineChartEl !== undefined && lineChartEl !== null) {
+                            const lineChart = new ApexCharts(lineChartEl, lineChartConfig);
+                            lineChart.render();
+                          }
+
+                        }
+
+                    });
+                });
+
+                /*if (response.data.soialSensorValues != "") {
                   console.log(response.data.soialSensorValues);
 
                   for (var c = 0; c < response.data.soialSensorValues.length; c++) {
@@ -536,12 +649,17 @@
                     lineChart.render();
                   }
 
-                }
+                }*/
 
             }
 
         }
     });
+  }
+
+  function convertSensorName(sensorName) {
+      // Split the sensor name by camel case and join with space
+      return sensorName.replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase();
   }
 
   function showtextbox(device_id) {

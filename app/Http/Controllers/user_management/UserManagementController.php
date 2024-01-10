@@ -127,6 +127,16 @@ class UserManagementController extends Controller
         return view('content/usermanagement/add-edit-user', compact('userdata','countryData', 'user'));
     }
 
+    public function dashboard($id){
+      $userdata = User::find($id);
+      $user = User::find($id);
+      // Check if the user exists
+      if (!$userdata) {
+          abort(404, 'User not found');
+      }
+      return view('content/usermanagement/user-dashboard', compact('userdata', 'user'));
+    }
+
     public function update_user_via_admin(Request $request){
 
       $post_data = $request->all();
