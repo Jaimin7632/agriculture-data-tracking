@@ -50,6 +50,7 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::get('/usermanagement/{id}/edit', [UserManagementController::class, 'edit'])->name('users.edit');
 	Route::post('/usermanagement/update-user', [UserManagementController::class, 'update_user_via_admin'])->name('update-user');
 	Route::post('/usermanagement/delete-user-data', [UserManagementController::class, 'delete_user_data'])->name('delete-user-data');
+	Route::get('/usermanagement/{id}/dashboard', [UserManagementController::class, 'dashboard'])->name('users.dashboard');
 	// User Management End
 
 	// Account Setting Start
