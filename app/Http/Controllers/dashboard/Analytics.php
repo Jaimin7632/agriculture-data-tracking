@@ -67,23 +67,7 @@ class Analytics extends Controller
       //echo "<pre>"; print_r($sensor_data); die();
       $outputArray = [];
 
-      $sensorConfig = [
-          'soilSensor' => 'soilSensorValue',
-          'pressureSensor' => 'pressureSensorValue',
-          'humiditySensor' => 'humiditySensorValue',
-          'temperatureSensor' => 'temperatureSensorValue',
-          'temperatureSensorasas' => 'temperatureSensorValue',
-          // Add more sensors as needed
-      ];
-
-      $sensorConfig = [
-          'soilSensor' => ['key' => 'soilSensorValue', 'type' => 'multi', 'color' => '#FF5733'],
-          'pressureSensor' => ['key' => 'pressureSensorValue', 'type' => 'multi', 'color' => '#33FF57'],
-          'humiditySensor' => ['key' => 'humiditySensorValue', 'type' => 'multi', 'color' => '#5733FF'],
-          'temperatureSensor' => ['key' => 'temperatureSensorValue', 'type' => 'multi', 'color' => '#FF33C7'],
-          // 'newSensor' => ['key' => 'temperatureSensorValue', 'type' => 'single'],
-          // Add more sensors as needed
-      ];
+      $sensorConfig = config('global');
 
       foreach ($sensor_data as $item) {
           $createdAt = $item['created_at'];
