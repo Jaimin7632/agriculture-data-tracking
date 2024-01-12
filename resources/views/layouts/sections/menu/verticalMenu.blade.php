@@ -129,7 +129,7 @@
     @endif
 
     <li class="menu-item">
-      <a href="#">
+      <a href="#" class="menu-link">
         <select id="languageSelector" style="display: none;">
           <option>Select Language</option>
           <option value="en">English</option>

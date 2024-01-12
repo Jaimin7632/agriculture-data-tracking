@@ -15,7 +15,7 @@
 
 <link rel="stylesheet" href="{{ asset('assets/sweet-alert2/sweetalert2.min.css') }}" />
 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" />
+<link rel="stylesheet" href="{{ asset('assets/datatable/css/dataTables.bootstrap5.min.css') }}" />
 
 <!-- Vendor Styles -->
 @yield('vendor-style')

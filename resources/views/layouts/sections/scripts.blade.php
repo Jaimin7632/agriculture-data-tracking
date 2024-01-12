@@ -9,8 +9,8 @@
 <!-- BEGIN: Theme JS-->
 <script src="{{ asset(mix('assets/js/main.js')) }}"></script>
 <script src="{{asset('assets/sweet-alert2/sweetalert2.all.min.js')}}"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="{{asset('assets/datatable/js/jquery.dataTables.min.js')}}"></script>
+<script src="{{asset('assets/datatable/js/dataTables.bootstrap5.min.js')}}"></script>
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <script type="text/javascript">
