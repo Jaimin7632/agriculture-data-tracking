@@ -51,7 +51,9 @@
                <div id="lineChart<?php echo $value; ?>" class="px-2"></div>
             </div> -->
           </div>
-          
+
+          <div class="row row-bordered g-0 append_graph_single" id="append_graph_single<?php echo $value; ?>">
+          </div>
         </div>
       </div>
     <?php }
@@ -94,12 +96,16 @@
               if(response.status == "success"){
 
                 var sensorData = response.data.sensordata;
-                console.log(sensorData);
+                var sensorconfig = response.sensorconfig;
+                console.log(sensorconfig);
 
                 $('#append_graph'+response.devide_id).html("");
                 var devide_id = response.devide_id;
                 // Iterate over each sensor
                 $.each(sensorData, function(sensorName, sensorValues) {
+                    if (sensorconfig[sensorName]['type'] != 'multi'){
+                      return true;
+                    }
                     console.log("Sensor Name: " + sensorName);
                     console.log("Sensor Value: " + sensorValues.color);
                     var readableSensorName = convertSensorName(sensorName);
@@ -227,6 +233,132 @@
                         }
 
                     });
+                });
+                
+                
+                $('#append_graph_single'+response.devide_id).html("");
+                $.each(sensorData, function(sensorName, sensorValue) {
+                    if (sensorconfig[sensorName]['type'] != 'single'){
+                      return true;
+                    }
+
+                     var cardHtml = `
+                      <div class="card">
+                        <div class="card-body">
+                          <div class="card-title d-flex align-items-start justify-content-between">
+                          </div>
+                          <span class="fw-semibold d-block mb-1" style="color:${sensorValue.color}">${sensorName}</span>
+                          <h5 class="card-title mb-2">X:${sensorValue.data.x}</h5>
+                          <h5 class="card-title mb-2">Y:${sensorValue.data.y}</h5>
+                        </div>
+                      </div>
+                    `;
+
+                    // Append the HTML content to the container
+
+                    $('#append_graph_single'+response.devide_id).append(cardHtml);
+
+                    console.log("X: " + sensorValue.data.x + ", Y: " + sensorValue.data.y);
+
+                    $('.sname').text(sensorName);
+                    $('.svalue').text(sensorValue.data.x +','+ sensorValue.data.y);
+                    /*$.each(sensorValues.data, function(index, value) {
+                        console.log("X: " + value.x + ", Y: " + value.y);
+                        // Do something with the value
+
+                        if (response.data != "") {
+
+                          sensorxvalue.push(value.x);
+                          sensoryvalue.push(value.y);
+
+                          const lineChartEl = document.querySelector('#lineChart'+sensorName+response.devide_id),
+                          lineChartConfig = {
+                            chart: {
+                              height: 400,
+                              type: 'line',
+                              parentHeightOffset: 0,
+                              zoom: {
+                                enabled: false
+                              },
+                              toolbar: {
+                                show: false
+                              }
+                            },
+                            series: [
+                              {
+                                name: readableSensorName,
+                                data: sensoryvalue
+                              }
+                            ],
+                            title: {
+                              text: readableSensorName, // Set the title text here
+                              align: 'left',
+                              style: {
+                                fontSize: '12px',
+                                color: sensorValues.color
+                              }
+                            },
+                            dataLabels: {
+                              enabled: true
+                            },
+                            stroke: {
+                              curve: 'smooth'
+                            },
+                            legend: {
+                              show: true,
+                              position: 'top',
+                              horizontalAlign: 'start',
+                              labels: {
+                                colors: legendColor,
+                                useSeriesColors: false
+                              }
+                            },
+                            colors: [sensorValues.color],
+                            grid: {
+                              borderColor: borderColor,
+                              xaxis: {
+                                lines: {
+                                  show: true
+                                }
+                              }
+                            },
+                            tooltip: {
+                              shared: false
+                            },
+                            xaxis: {
+                              // type: 'datetime',
+                              categories: sensorxvalue,
+                              tickAmount: 5,
+                              axisBorder: {
+                                show: false
+                              },
+                              axisTicks: {
+                                show: false
+                              },
+                              labels: {
+                                style: {
+                                  colors: labelColor,
+                                  fontSize: '13px'
+                                }
+                              }
+                            },
+                            yaxis: {
+                              labels: {
+                                style: {
+                                  colors: labelColor,
+                                  fontSize: '13px'
+                                }
+                              }
+                            }
+                          };
+                          if (typeof lineChartEl !== undefined && lineChartEl !== null) {
+                            const lineChart = new ApexCharts(lineChartEl, lineChartConfig);
+                            lineChart.render();
+                          }
+
+                        }
+
+                    });*/
                 });
 
                 /*if (response.data.soialSensorValues != "") {

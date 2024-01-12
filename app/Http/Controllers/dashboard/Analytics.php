@@ -93,9 +93,14 @@ class Analytics extends Controller
               $sensorValueType = $sensorDetails['type'];
               $sensorValueColor = $sensorDetails['color'];
 
+              if ($sensorValueType == 'single') {
+                $sensorValues[$sensorName]['data'] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
+              }else{
+                $sensorValues[$sensorName]['data'][] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
+              }
               // Add sensor values to the dynamically generated array
-              $sensorValues[$sensorName]['data'][] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
               $sensorValues[$sensorName]['color'] = $sensorValueColor;
+              // $sensorValues[$sensorName]['type'] = $sensorValueType;
           }
 
           // Now, $sensorValues contains values for all sensors dynamically
@@ -128,7 +133,7 @@ class Analytics extends Controller
         $data = ['sensordata' => $sensorValues];
     }
     //  echo "<pre>"; print_r($data); die();
-     $responseData = ['status' => $success, 'msg' => $message, 'data' => $data, 'devide_id' => $device_id];
+     $responseData = ['status' => $success, 'msg' => $message, 'data' => $data, 'devide_id' => $device_id, 'sensorconfig' => $sensorConfig];
 
     //return view('content/dashboard/graph', compact('soialSensorValues'));
     return response()->json($responseData);
