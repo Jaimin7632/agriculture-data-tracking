@@ -59,6 +59,8 @@
                <div id="lineChart<?php echo $value; ?>" class="px-2"></div>
             </div> -->
           </div>
+          <div class="row row-bordered g-0 append_graph_single" id="append_graph_single<?php echo $value; ?>">
+          </div>
           
         </div>
       </div>
@@ -110,12 +112,16 @@
               if(response.status == "success"){
 
                 var sensorData = response.data.sensordata;
-                console.log(sensorData);
+                var sensorconfig = response.sensorconfig;
+                console.log(sensorconfig);
 
                 $('#append_graph'+response.devide_id).html("");
                 var devide_id = response.devide_id;
                 // Iterate over each sensor
                 $.each(sensorData, function(sensorName, sensorValues) {
+                    if (sensorconfig[sensorName]['type'] != 'multi'){
+                      return true;
+                    }
                     console.log("Sensor Name: " + sensorName);
                     console.log("Sensor Value: " + sensorValues.color);
                     var readableSensorName = convertSensorName(sensorName);
@@ -243,6 +249,33 @@
                         }
 
                     });
+                });
+                
+                
+                $('#append_graph_single'+response.devide_id).html("");
+                $.each(sensorData, function(sensorName, sensorValue) {
+                    if (sensorconfig[sensorName]['type'] != 'single'){
+                      return true;
+                    }
+
+                     var cardHtml = `
+                      <div class="card">
+                        <div class="card-body">
+                          <div class="card-title d-flex align-items-start justify-content-between">
+                          </div>
+                          <span class="fw-semibold d-block mb-1" style="color:${sensorValue.color}">${sensorName}</span>
+                          <h5 class="card-title mb-2">X:${sensorValue.data.x}</h5>
+                          <h5 class="card-title mb-2">Y:${sensorValue.data.y}</h5>
+                        </div>
+                      </div>
+                    `;
+
+                    // Append the HTML content to the container
+
+                    $('#append_graph_single'+response.devide_id).append(cardHtml);
+
+                    console.log("X: " + sensorValue.data.x + ", Y: " + sensorValue.data.y);
+                    
                 });
 
             }
