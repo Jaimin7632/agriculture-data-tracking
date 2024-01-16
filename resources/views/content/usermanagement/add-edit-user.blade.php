@@ -55,7 +55,7 @@
             <?php if (isset($userdata) && $userdata->device_id != "") {
               $targetdevice_id = explode(',', $userdata->device_id);
               foreach ($targetdevice_id as $value) { ?>
-                <input type="text" readonly="" id="closeTextBox<?php echo $value; ?>" value="<?php echo $value; ?>">
+                <input type="text" class="deviceIdInput" id="closeTextBox<?php echo $value; ?>" value="<?php echo $value; ?>">
                 <input type="button" class="closeButton" id="closeButton<?php echo $value; ?>" style="color: red;" onclick='closeDeviceId(`{{ $value }}`)' value="✖">
               <?php }
             } ?>
@@ -189,8 +189,9 @@ function generateUUID() {
 }
 
 </script> -->
-
+<script src="{{ asset(mix('assets/vendor/libs/jquery/jquery.js')) }}"></script>
 <script>
+
 
 function closeDeviceId(DeviceId){
 
@@ -214,8 +215,10 @@ function generateUUID() {
   // Create a new textbox to display the UUID
   const textbox = document.createElement("input");
   textbox.type = "text";
+  textbox.className = "deviceIdInput";
+  textbox.id = "closeTextBox"+uuid;
   textbox.value = uuid;
-  textbox.readOnly = true;
+  // textbox.readOnly = true;
 
   // Create a close button
   const closeButton = document.createElement("button");
@@ -226,6 +229,10 @@ function generateUUID() {
     // Remove the textbox and update the hidden field
     textbox.remove();
     closeButton.remove();
+    updateHiddenField();
+  });
+
+  textbox.addEventListener("input", function() {
     updateHiddenField();
   });
 
@@ -257,5 +264,16 @@ function generateUUIDString() {
 
   return result;
 }
+
+$(document).ready(function() {
+  $('.deviceIdInput').on('change', function() {
+      var newValue = $(this).val();
+      // console.log('New value:', newValue);
+      updateHiddenField();
+      // You can perform additional actions here based on the new value
+      // For example, update other elements or send the new value to the server
+  });
+});
+
 </script>
 
