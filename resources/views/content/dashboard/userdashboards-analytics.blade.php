@@ -77,7 +77,7 @@
     // Call the function every 10 seconds
     setInterval(function() {
       graphdata(device_id); // Replace 'your_device_id' with the actual device ID
-    }, 10000);
+    }, 60000);
   });
 
   });
