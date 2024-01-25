@@ -30,7 +30,7 @@
         <tbody>
             @foreach ($finalDataArr as $userdata)
               <tr>
-                  <td>{{ $userdata['name'] }}</td>
+                  <td><a style="color: #696cff" class="dropdown-item" href="{{ route('users.dashboard', $userdata['id']) }}">{{ $userdata['name'] }}</a></td>
                   <td>{{ $userdata['email'] }}</td>
                   <td>{{ $userdata['status'] }}</td>
                   <td>{{ $userdata['created_at'] }}</td>
@@ -42,7 +42,7 @@
                       <div class="dropdown-menu">
                         <a class="dropdown-item" href="{{ route('users.edit', $userdata['id']) }}"><i class="bx bx-edit-alt me-1"></i> Edit</a>
                         <a class="dropdown-item" onclick='deleteUser(`{{ $userdata["id"] }}`)' href="javascript:void(0);"><i class="bx bx-trash me-1"></i> Delete</a>
-                        <a class="dropdown-item" href="{{ route('users.dashboard', $userdata['id']) }}"><i class="menu-icon tf-icons bx bx-home-circle"></i> User Dashboard</a>
+                        <!-- <a class="dropdown-item" href="{{ route('users.dashboard', $userdata['id']) }}"><i class="menu-icon tf-icons bx bx-home-circle"></i> User Dashboard</a> -->
                       </div>
                     </div>
                   </td>
