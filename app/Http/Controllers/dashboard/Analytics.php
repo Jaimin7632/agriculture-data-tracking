@@ -61,21 +61,20 @@ class Analytics extends Controller
      
     $device_id = $post_data['device_id'];
     if (!empty($device_id)) {
-      $sensor_data = DB::table('sensor_data')
-       ->where('device_id', $device_id)
-       ->get()->toArray();
-      //echo "<pre>"; print_r($sensor_data); die();
+       // echo $post_data['device_id']; die();
+      $sensor_data = SensorData::where('device_id', $device_id)->get()->toArray();
+
       $outputArray = [];
 
       $sensorConfig = config('global');
-
+      $sensorValues = [];
+      $sensorColors = [];
       foreach ($sensor_data as $item) {
-          $createdAt = $item['created_at'];
-
+          $formattedDateTime = $item['created_at'];
+          $dateTime = new \DateTime($formattedDateTime);
+          $createdAt = $dateTime->format('Y-m-d H:i:s');
           // Initialize an array to store sensor values dynamically
-          $sensorValues = [];
-          $sensorColors = [];
-
+          
           foreach ($sensorConfig as $sensorName => $sensorDetails) {
               $sensorValueKey = $sensorDetails['key'];
               $sensorValueType = $sensorDetails['type'];
@@ -97,7 +96,7 @@ class Analytics extends Controller
 
         $data = ['sensordata' => $sensorValues];
     }
-    
+
      $responseData = ['status' => $success, 'msg' => $message, 'data' => $data, 'devide_id' => $device_id, 'sensorconfig' => $sensorConfig];
 
     //return view('content/dashboard/graph', compact('soialSensorValues'));

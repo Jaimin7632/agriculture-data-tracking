@@ -73,6 +73,7 @@
   // Function to handle div click
   $('.graphDiv').on('click', function() {
     var device_id = $(this).attr('device-id');
+    // console.log(device_id); 
     graphdata(device_id); // Replace 'your_device_id' with the actual device ID
     // Call the function every 10 seconds
     setInterval(function() {
@@ -97,8 +98,8 @@
 
                 var sensorData = response.data.sensordata;
                 var sensorconfig = response.sensorconfig;
-                console.log(sensorconfig);
-
+                
+ 
                 $('#append_graph'+response.devide_id).html("");
                 var devide_id = response.devide_id;
                 // Iterate over each sensor
@@ -106,8 +107,8 @@
                     if (sensorconfig[sensorName]['type'] != 'multi'){
                       return true;
                     }
-                    console.log("Sensor Name: " + sensorName);
-                    console.log("Sensor Value: " + sensorValues.color);
+                    /*console.log("Sensor Name: " + sensorName);
+                    console.log("Sensor Value: " + sensorValues.color);*/
                     var readableSensorName = convertSensorName(sensorName);
                     var sensorxvalue = [];
                     var sensoryvalue = [];
@@ -125,7 +126,7 @@
 
                     var divElement = $('<div>', {
                         id: 'lineChart'+sensorName+response.devide_id,
-                        class: 'px-2 col-md-6'
+                        class: 'px-2 col-md-12'
                     });
 
                     var innerDiv = $('<div>', {
@@ -137,13 +138,18 @@
                     $('#append_graph'+response.devide_id).append(divElement);
 
                     $.each(sensorValues.data, function(index, value) {
-                        console.log("X: " + value.x + ", Y: " + value.y);
+                        sensorxvalue.push(value.x);
+                        sensoryvalue.push(value.y);
+                    });
+
+                    /*$.each(sensorValues.data, function(index, value) {*/
+                        // console.log("X: " + value.x + ", Y: " + value.y);
                         // Do something with the value
 
                         if (response.data != "") {
 
-                          sensorxvalue.push(value.x);
-                          sensoryvalue.push(value.y);
+                          console.log(sensorxvalue);
+                          console.log(sensoryvalue); 
 
                           const lineChartEl = document.querySelector('#lineChart'+sensorName+response.devide_id),
                           lineChartConfig = {
@@ -232,8 +238,8 @@
 
                         }
 
-                    });
-                });
+                    /*});*/
+                }); 
                 
                 
                 $('#append_graph_single'+response.devide_id).html("");

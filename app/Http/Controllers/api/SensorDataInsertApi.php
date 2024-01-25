@@ -30,6 +30,11 @@ class SensorDataInsertApi extends Controller
         $data = $request->all();
         $data['updated_at'] = '';
         $data['created_at'] = date('Y-m-d H:i:s');
+        if(isset( $request['device_id'] )){ 
+            $device_id = $request['device_id'];
+            $data['device_id'] = (string) $request['device_id'];
+        }
+        // echo "<pre>"; print_r($request->all()); die();
         try {
             // Your API logic here
             $insertData = DB::collection('sensor_data')->insert($data);
