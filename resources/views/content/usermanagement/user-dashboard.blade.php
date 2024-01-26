@@ -163,7 +163,7 @@
                     // Last Y Value
                     var lastYValue = $('<h3>', {
                       text: sensorValues.data[sensorValues.data.length - 1].y,
-                      style: 'color: #ccc; font-size: 28px;'  // Adjust font-size as needed
+                      style: 'color: #4c4e4f; font-size: 28px;'  // Adjust font-size as needed
                     });
 
                     // Append elements to the container
