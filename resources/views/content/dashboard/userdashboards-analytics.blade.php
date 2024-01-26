@@ -25,7 +25,7 @@
         <div class="card" id="DeviceId">
           <div class="row">
             <div class="col-md-4 graphDiv" device-id ="<?php echo $value; ?>" style="cursor: pointer; color: blue;">
-              <?php 
+              <?php
                 $device_name = $value;
 
                 $change_text_data = \App\Models\ChangeDeviceName::where('user_id', $user->id)->where('device_id', $value)->first();
@@ -45,7 +45,7 @@
               </span>
             </div>
           </div>
-          
+
           <div class="row row-bordered g-0" id="append_graph<?php echo $value; ?>">
             <!-- <div class="col-md-6">
                <div id="lineChart<?php echo $value; ?>" class="px-2"></div>
@@ -73,7 +73,7 @@
   // Function to handle div click
   $('.graphDiv').on('click', function() {
     var device_id = $(this).attr('device-id');
-    // console.log(device_id); 
+    // console.log(device_id);
     graphdata(device_id); // Replace 'your_device_id' with the actual device ID
     // Call the function every 10 seconds
     setInterval(function() {
@@ -98,8 +98,8 @@
 
                 var sensorData = response.data.sensordata;
                 var sensorconfig = response.sensorconfig;
-                
- 
+
+
                 $('#append_graph'+response.devide_id).html("");
                 var devide_id = response.devide_id;
                 // Iterate over each sensor
@@ -128,12 +128,17 @@
                         id: 'lineChart'+sensorName+response.devide_id,
                         class: 'px-2 col-md-12'
                     });
-
-                    var innerDiv = $('<div>', {
-                        'class': 'px-2'
+                    var chartTitle = $('<h3>', {
+                      text: readableSensorName,
+                      style: 'color: ' + sensorValues.color
+                    });
+                    var lastYValue = $('<h3>', {
+                      text: sensoryvalue[sensoryvalue.length - 1],
+                      style: 'color: black'
                     });
 
-                    divElement.append(innerDiv);
+                    divElement.append(chartTitle);
+                    divElement.append(lastYValue);
 
                     $('#append_graph'+response.devide_id).append(divElement);
 
@@ -149,7 +154,7 @@
                         if (response.data != "") {
 
                           console.log(sensorxvalue);
-                          console.log(sensoryvalue); 
+                          console.log(sensoryvalue);
 
                           const lineChartEl = document.querySelector('#lineChart'+sensorName+response.devide_id),
                           lineChartConfig = {
@@ -239,9 +244,9 @@
                         }
 
                     /*});*/
-                }); 
-                
-                
+                });
+
+
                 $('#append_graph_single'+response.devide_id).html("");
                 $.each(sensorData, function(sensorName, sensorValue) {
                     if (sensorconfig[sensorName]['type'] != 'single'){
@@ -297,7 +302,7 @@
 
     $.ajax({
         type: 'POST',
-        url: '{{ route("change-device-name") }}', 
+        url: '{{ route("change-device-name") }}',
         data: {device_id:device_id,user_id:user_id,change_text:change_text,_token:"{{ csrf_token() }}"},
         // dataType: 'json',
         // beforeSend: function() {
