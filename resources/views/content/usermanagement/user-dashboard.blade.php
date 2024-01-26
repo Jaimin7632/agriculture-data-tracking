@@ -141,7 +141,8 @@
 
                     var divElement = $('<div>', {
                         id: 'lineChart'+sensorName+response.devide_id,
-                        class: 'px-2 col-md-12'
+                        class: 'px-2 col-md-12',
+                        style: 'margin: 20px 0px;'
                     });
 
                     var divElement = $('<div>', {
@@ -162,7 +163,7 @@
                     // Last Y Value
                     var lastYValue = $('<h3>', {
                       text: sensorValues.data[sensorValues.data.length - 1].y,
-                      style: 'color: black; font-size: 20px;'  // Adjust font-size as needed
+                      style: 'color: #ccc; font-size: 28px;'  // Adjust font-size as needed
                     });
 
                     // Append elements to the container
