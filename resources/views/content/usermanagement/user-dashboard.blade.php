@@ -148,17 +148,30 @@
                         id: 'lineChart'+sensorName+response.devide_id,
                         class: 'px-2 col-md-12'
                     });
-                    var chartTitle = $('<h3>', {
-                      text: readableSensorName,
-                      style: 'color: ' + sensorValues.color
-                    });
-                    var lastYValue = $('<h3>', {
-                      text: sensorValues.data[sensorValues.data.length - 1].y,
-                      style: 'color: black'
+                    // Create a container div for centering
+                    var container = $('<div>', {
+                      style: 'text-align: center; margin-top: 20px;'  // Adjust margin as needed
                     });
 
-                    divElement.append(chartTitle);
-                    divElement.append(lastYValue);
+                    // Chart Title
+                    var chartTitle = $('<h3>', {
+                      text: readableSensorName,
+                      style: 'color: black; font-size: 24px; margin-bottom: 10px;'  // Adjust font-size and margin as needed
+                    });
+
+                    // Last Y Value
+                    var lastYValue = $('<h3>', {
+                      text: sensorValues.data[sensorValues.data.length - 1].y,
+                      style: 'color: black; font-size: 20px;'  // Adjust font-size as needed
+                    });
+
+                    // Append elements to the container
+                    container.append(chartTitle);
+                    container.append(lastYValue);
+
+                    // Append the container to the 'divElement'
+                    divElement.append(container);
+
 
                     $('#append_graph'+response.devide_id).append(divElement);
 
@@ -195,7 +208,9 @@
                                 data: sensoryvalue
                               }
                             ],
-                            title: false,
+                            title: {
+                              enabled: false
+                            },
                             dataLabels: {
                               enabled: true
                             },
