@@ -1,10 +1,10 @@
 <div class="row">
 <!--  -->
 <input type="hidden" name="user_id" id="User_Id" value="{{$user->id}}">
-<?php
+<?php $authuser = Auth::user();
   if ($user->device_id != "") {
     $targetdevice_id = explode(',', $user->device_id); ?>
-    <?php if ($user->role == 'admin') { ?>
+    <?php if ($authuser->role == 'admin') { ?>
     <div class="col-12 col-lg-12">
       <div id="DeviceId">
         <div class="row">
@@ -30,7 +30,7 @@
               ?>
               <h5 class="card-header m-0 me-2 pb-3">Device - <?php echo $device_name; ?></h5>
             </div>
-            <?php if ($user->role == 'user') { ?>
+            <?php if ($authuser->role == 'user') { ?>
               <div class="col-md-8">
                 <input type="button" onclick="showtextbox('<?php echo $value; ?>')" id="change_device_id" class="btn btn-warning" value="Change Name" style="margin-top: 11px;">
                 <span style="margin-top: 11px; display: none;" id="change_name<?php echo $value; ?>">
