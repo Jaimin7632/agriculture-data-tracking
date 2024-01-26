@@ -153,7 +153,7 @@
                       style: 'color: ' + sensorValues.color
                     });
                     var lastYValue = $('<h3>', {
-                      text: sensoryvalue[sensoryvalue.length - 1],
+                      text: sensorValues.data[sensorValues.data.length - 1].y,
                       style: 'color: black'
                     });
 
@@ -195,14 +195,7 @@
                                 data: sensoryvalue
                               }
                             ],
-                            title: {
-                              text: readableSensorName, // Set the title text here
-                              align: 'left',
-                              style: {
-                                fontSize: '12px',
-                                color: sensorValues.color
-                              }
-                            },
+                            title: false,
                             dataLabels: {
                               enabled: true
                             },
