@@ -128,17 +128,12 @@
                         id: 'lineChart'+sensorName+response.devide_id,
                         class: 'px-2 col-md-12'
                     });
-                    var chartTitle = $('<h3>', {
-                      text: readableSensorName,
-                      style: 'color: ' + sensorValues.color
-                    });
-                    var lastYValue = $('<h3>', {
-                      text: sensoryvalue[sensoryvalue.length - 1],
-                      style: 'color: black'
+
+                    var innerDiv = $('<div>', {
+                        'class': 'px-2'
                     });
 
-                    divElement.append(chartTitle);
-                    divElement.append(lastYValue);
+                    divElement.append(innerDiv);
 
                     $('#append_graph'+response.devide_id).append(divElement);
 
