@@ -57,15 +57,15 @@
             </div>
 
             <div class="mb-3 col-md-12">
-              <label class="form-label" for="country">Country</label>
-              <?php $selectedCountry = ""; if (isset($user) && isset($user->country)) {
-                $selectedCountry = $user->country;
+              <label class="form-label" for="timezone">TimeZone</label>
+              <?php $selectedCountry = ""; if (isset($user) && isset($user->timezone)) {
+                $selectedCountry = $user->timezone;
               } ?>
-              <select id="country" value="{{ $user->country }}" name="country" class="select2 form-select">
+              <select id="timezone" value="{{ $user->timezone }}" name="timezone" class="select2 form-select">
                 <option value="">Select</option>
                 <?php foreach ($countryData as $country) { ?>
-                   <option value="<?= $country->name ?>" <?= ($selectedCountry == $country->name) ? 'selected' : '' ?>>
-                      <?= $country->name ?>
+                   <option value="<?= $country->timezone ?>" <?= ($selectedCountry == $country->timezone) ? 'selected' : '' ?>>
+                      <?= $country->timezone ?>
                   </option>
                 <?php } ?>
               </select>
@@ -275,7 +275,7 @@
         var fullname = $("#fullname").val();
         var email = $("#email").val();
         var user_id = $("#user_id").val();
-        var country = $("#country").val();
+        var timezone = $("#timezone").val();
 
         console.log(fullname);
         console.log(email);
@@ -283,7 +283,7 @@
         $.ajax({
             type: 'POST',
             url: '{{ route("update-userdetails") }}', 
-            data: {fullname:fullname,user_id:user_id,country:country,email:email,_token:"{{ csrf_token() }}"},
+            data: {fullname:fullname,user_id:user_id,timezone:timezone,email:email,_token:"{{ csrf_token() }}"},
             // dataType: 'json',
             // beforeSend: function() {
             //     $('.loader').show();

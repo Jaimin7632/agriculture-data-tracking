@@ -31,20 +31,20 @@ class AccountSettingsAccount extends Controller
     $request->validate([
         'fullname' => ['required', 'string', 'max:255'],
         'email' => ['required', 'string', 'email', 'max:255'],
-        'country' => ['required', 'string'],
+        // 'country' => ['required', 'string'],
     ]);
 
     $fullname = $post_data['fullname'];
     $user_id = $post_data['user_id'];
     $email = $post_data['email'];
-    $country = $post_data['country'];
+    $timezone = $post_data['timezone'];
 
     try {
 	 	$user = User::find($user_id);
 	 	$user->update([
         	'name' => $fullname,
         	'email' => $email,
-        	'country' => $country,
+        	'timezone' => $timezone,
         ]);
         $message = "SUCCESS";
         $responseData = ['success' => 'success', 'error' => '', 'msg' => $message];

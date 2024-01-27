@@ -90,9 +90,9 @@ class UserManagementController extends Controller
       return Validator::make($data, [
           'name' => ['required', 'string', 'max:255'],
           'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-          'country' => ['required', 'string'],
+          // 'timezone' => ['required', 'string'],
           'status' => ['required'],
-          'device_id' => ['string'],
+          'device_id' => ['nullable','string'],
           'password' => ['required', 'string', 'min:6', 'confirmed'],
       ]);
   }
@@ -105,7 +105,7 @@ class UserManagementController extends Controller
             'status' => $data['status'],
             'expiry_date' => $data['expiry_date'],
             'role' => $data['role'],
-            'country' => $data['country'],
+            'timezone' => $data['timezone'],
             'device_id' => $data['device_id'],
             'password' => Hash::make($data['password']),
         ]);
@@ -150,7 +150,7 @@ class UserManagementController extends Controller
       $name = $post_data['name'];
       $email = $post_data['email'];
       $status = $post_data['status'];
-      $country = $post_data['country'];
+      $timezone = $post_data['timezone'];
       $expiry_date = $post_data['expiry_date'];
       $user_id = $post_data['user_id'];
       $device_id = $post_data['device_id'];
@@ -164,7 +164,7 @@ class UserManagementController extends Controller
             'status' => $status,
             'role' => $role,
             'expiry_date' => $expiry_date,
-            'country' => $country,
+            'timezone' => $timezone,
             'device_id' => $device_id,
           ]);
       } catch (Exception $ex) {

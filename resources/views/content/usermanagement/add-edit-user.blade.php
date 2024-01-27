@@ -62,22 +62,22 @@
           </div>
 
           <div class="mb-3 col-md-12">
-            <label class="form-label" style="margin-top: 10px" for="country">Country</label>
-            <?php $selectedCountry = ""; if (isset($userdata) && isset($userdata->country)) {
-              $selectedCountry = $userdata->country;
+            <label class="form-label" style="margin-top: 10px" for="timezone">TimeZone</label>
+            <?php $selectedCountry = ""; if (isset($userdata) && isset($userdata->timezone)) {
+              $selectedCountry = $userdata->timezone;
             } ?>
-            <select id="country" value="{{ isset($userdata) ? $userdata->country : old('country') }}" name="country" class="select2 form-select">
+            <select id="timezone" value="{{ isset($userdata) ? $userdata->timezone : old('timezone') }}" name="timezone" class="select2 form-select">
               <option value="">Select</option>
               <?php foreach ($countryData as $country) { ?>
-                   <option value="<?= $country->name ?>" <?= ($selectedCountry == $country->name) ? 'selected' : '' ?>>
-                      <?= $country->name ?>
+                   <option value="<?= $country->timezone ?>" <?= ($selectedCountry == $country->timezone) ? 'selected' : '' ?>>
+                      <?= $country->timezone ?>
                   </option>
               <?php } ?>
               
             </select>
-            @if ($errors->has('country'))
+            @if ($errors->has('timezone'))
                 <span class="invalid-error" role="alert">
-                    <strong>{{ $errors->first('country') }}</strong>
+                    <strong>{{ $errors->first('timezone') }}</strong>
                 </span>
             @endif
           </div>

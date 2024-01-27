@@ -22,6 +22,7 @@ class User extends Authenticatable
         'id',
         'name',
         'country',
+        'timezone',
         'device_id',
         'status',
         'expiry_date',

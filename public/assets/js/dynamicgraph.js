@@ -198,14 +198,15 @@ var getGraphDataRoute = window.get_graph_data_route || '';
                       return true;
                     }
 
-                     var cardHtml = `
+                     var cardHtml = `<hr>
                       <div class="card">
-                        <div class="card-body">
+                        <div class="card-body" style="text-align: center">
                           <div class="card-title d-flex align-items-start justify-content-between">
                           </div>
-                          <span class="fw-semibold d-block mb-1" style="color:${sensorValue.color}">${sensorName}</span>
-                          <h5 class="card-title mb-2">X:${sensorValue.data.x}</h5>
-                          <h5 class="card-title mb-2">Y:${sensorValue.data.y}</h5>
+                          <h3 class="fw-semibold d-block mb-1" style="font-size: 24px;">${sensorName}</h3>
+                          <h3 class="card-title mb-2" style="font-size: 34px;">${sensorValue.data.y}</h5></h3>
+                          <h3 class="card-title mb-2" style="font-size: 12px;">${sensorValue.data.x}</h5></h3>
+                          <h3 class="card-title mb-2" style="font-size: 24px;">${sensorValue.data.address}</h5></h3>
                         </div>
                       </div>
                     `;

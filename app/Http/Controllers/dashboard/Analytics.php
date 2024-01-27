@@ -9,8 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ChangeDeviceName;
 use App\Models\User;
 use App\Models\SensorData;
+use App\Models\Country;
 use Carbon\Carbon;
 use DB;
+use GuzzleHttp\Client;
 
 class Analytics extends Controller
 {
@@ -51,6 +53,9 @@ class Analytics extends Controller
   }
 
   public function getgraphdata(Request $request){
+
+    $authuser = Auth::user();
+
     $message = "Failure";
     $sensor_data = [];
     $soialSensorValues = [];
@@ -73,6 +78,8 @@ class Analytics extends Controller
           $formattedDateTime = $item['created_at'];
           $dateTime = new \DateTime($formattedDateTime);
           $createdAt = $dateTime->format('Y-m-d H:i:s');
+          
+          $changedateBycountry =  Country::changedateBytimezone($createdAt, $authuser->timezone);
           // Initialize an array to store sensor values dynamically
           
           foreach ($sensorConfig as $sensorName => $sensorDetails) {
@@ -91,7 +98,24 @@ class Analytics extends Controller
               }
           }
       }
-          
+      
+      // Check if 'location' key exists
+      if (isset($sensorValues['location'])) {
+          // Accessing 'location' data
+          $locationData = $sensorValues['location']['data'];
+          $xValue = $locationData['x'];
+          $yValue = $locationData['y'];
+
+          $coordinates = explode(',', $yValue);
+          $latitude = $coordinates[0];
+          $longitude = $coordinates[1];
+
+          $address = $this->getAddressFromCoordinates($latitude,$longitude);
+          $LocationAddress = $address->original['address'];
+          $sensorValues['location']['data'] = ['x' => $createdAt, 'y' => $sensorValues['location']['data']['y'], 'address' => $LocationAddress];
+      } else {
+          //echo "Location does not exist.\n";
+      }
         $message = "success";
         $success = "success";
 
@@ -99,11 +123,8 @@ class Analytics extends Controller
     }
 
      $responseData = ['status' => $success, 'msg' => $message, 'data' => $data, 'devide_id' => $device_id, 'sensorconfig' => $sensorConfig];
-
     //return view('content/dashboard/graph', compact('soialSensorValues'));
     return response()->json($responseData);
-
-
   }
 
   public function change_device_name(Request $request){
@@ -140,6 +161,32 @@ class Analytics extends Controller
     return response()->json($responseData);
 
   }
+
+  public function getAddressFromCoordinates($latitude, $longitude)
+    {
+        // Set the Nominatim API endpoint
+        $apiEndpoint = 'https://nominatim.openstreetmap.org/reverse';
+
+        // Set parameters for the API request
+        $params = [
+            'format' => 'json',
+            'lat' => $latitude,
+            'lon' => $longitude,
+        ];
+
+        // Use Guzzle to make the API request
+        $client = new Client();
+        $response = $client->get($apiEndpoint, ['query' => $params]);
+        $data = json_decode($response->getBody(), true);
+
+        // Check if the response contains an address
+        if (isset($data['display_name'])) {
+            $address = $data['display_name'];
+            return response()->json(['address' => $address]);
+        } else {
+            return response()->json(['error' => 'Unable to fetch address.']);
+        }
+    }
 
 
 }
