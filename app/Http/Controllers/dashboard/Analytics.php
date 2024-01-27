@@ -67,6 +67,7 @@ class Analytics extends Controller
       $outputArray = [];
 
       $sensorConfig = config('global');
+      echo "<pre>"; print_r($sensorConfig); die();
       $sensorValues = [];
       $sensorColors = [];
       foreach ($sensor_data as $item) {
@@ -91,7 +92,7 @@ class Analytics extends Controller
               }
           }
       }
-          echo "<pre>"; print_r($sensorConfig); die();
+          
 
         $message = "success";
         $success = "success";
