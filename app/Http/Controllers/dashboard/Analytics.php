@@ -91,7 +91,7 @@ class Analytics extends Controller
               }
           }
       }
-          echo "<pre>"; print_r($sensorValues); die();
+          echo "<pre>"; print_r($sensorConfig); die();
 
         $message = "success";
         $success = "success";
