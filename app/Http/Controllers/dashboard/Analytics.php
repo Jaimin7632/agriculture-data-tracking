@@ -82,7 +82,7 @@ class Analytics extends Controller
 
               if (array_key_exists($sensorValueKey, $item)) {
                 if ($sensorValueType == 'single') {
-                $sensorValues[$sensorName]['data'] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
+                  $sensorValues[$sensorName]['data'] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
                 }else{
                   $sensorValues[$sensorName]['data'][] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
                 }
