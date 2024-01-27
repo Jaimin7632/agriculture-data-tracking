@@ -57,13 +57,13 @@ var getGraphDataRoute = window.get_graph_data_route || '';
 
                     var divElement = $('<div>', {
                         id: 'lineChart'+sensorName+response.devide_id,
-                        class: 'px-2 col-md-12',
-                        style: 'margin: 20px 0px;'
+                        class: 'px-2 col-12',
+                        style: 'margin: 40px 0px;'
                     });
 
                     var divElement = $('<div>', {
                         id: 'lineChart'+sensorName+response.devide_id,
-                        class: 'px-2 col-md-12'
+                        class: 'px-2 col-12'
                     });
                     // Create a container div for centering
                     var container = $('<div>', {
@@ -197,16 +197,16 @@ var getGraphDataRoute = window.get_graph_data_route || '';
                     if (sensorconfig[sensorName]['type'] != 'single'){
                       return true;
                     }
-
+                    var senosor_name = convertSensorName(sensorName);
                      var cardHtml = `<hr>
                       <div class="card">
                         <div class="card-body" style="text-align: center">
                           <div class="card-title d-flex align-items-start justify-content-between">
                           </div>
-                          <h3 class="fw-semibold d-block mb-1" style="font-size: 24px;">${sensorName}</h3>
-                          <h3 class="card-title mb-2" style="font-size: 34px;">${sensorValue.data.y}</h5></h3>
-                          <h3 class="card-title mb-2" style="font-size: 12px;">${sensorValue.data.x}</h5></h3>
-                          <h3 class="card-title mb-2" style="font-size: 24px;">${sensorValue.data.address}</h5></h3>
+                          <h3 class="mb-1" style="font-size: 24px; color:black">`+senosor_name+`</h3>
+                          <h3 class="mb-2" style="font-size: 34px; color: #4c4e4f">${sensorValue.data.y}</h5></h3>
+                          <h3 class="mb-2" style="font-size: 12px; color:black">${sensorValue.data.x}</h5></h3>
+                          <h3 class="mb-2" style="font-size: 24px; color: #4c4e4f">${sensorValue.data.address}</h5></h3>
                         </div>
                       </div>
                     `;
@@ -238,65 +238,3 @@ var getGraphDataRoute = window.get_graph_data_route || '';
     $("#change_name"+device_id).hide();
   }
 
-  function changedevicename(device_id) {
-    var device_id = device_id;
-    var user_id = $("#User_Id").val();
-    var change_text = $("#name_textbox"+device_id).val();
-    // console.log(device_id);
-    // console.log(user_id);
-    // console.log(change_text);
-
-    $.ajax({
-        type: 'POST',
-        url: '{{ route("change-device-name") }}',
-        data: {device_id:device_id,user_id:user_id,change_text:change_text,_token:"{{ csrf_token() }}"},
-        // dataType: 'json',
-        // beforeSend: function() {
-        //     $('.loader').show();
-        // },
-        success: function (response) {
-            console.log(response);
-            //return false;
-            if (response.success == 'success') {
-                // location.reload(true);
-                Swal.fire({
-                    // title: 'You Dial Number!',
-                    title: 'Device Name Update Successfully!',
-                    icon: 'success',
-                    allowOutsideClick: false,
-                    confirmButtonText: 'Ok',
-                    customClass: {
-                        confirmButton: 'btn btn-danger ml-1'
-                    },
-                    buttonsStyling: true
-                }).then(function(result) {
-                  if (result.isConfirmed) {
-                      location.reload(true);
-                  } else {
-                      location.reload(true);
-                  }
-                });
-
-            }else{
-                Swal.fire({
-                    // title: 'You Dial Number!',
-                    title: 'Device Name Does Not Update Successfully!',
-                    icon: 'failure',
-                    allowOutsideClick: false,
-                    confirmButtonText: 'Ok',
-                    customClass: {
-                        confirmButton: 'btn btn-danger ml-1'
-                    },
-                    buttonsStyling: true
-                }).then(function(result) {
-                  if (result.isConfirmed) {
-                      location.reload(true);
-                  } else {
-                      location.reload(true);
-                  }
-                });
-            }
-            // $('.loader').fadeOut();
-        }
-    });
-  }
