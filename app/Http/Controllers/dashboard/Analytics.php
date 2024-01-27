@@ -80,7 +80,7 @@ class Analytics extends Controller
               $sensorValueType = $sensorDetails['type'];
               $sensorValueColor = $sensorDetails['color'];
 
-              if (array_key_exists($sensorName, $sensorValues)) {
+              if (array_key_exists($sensorValueKey, $item)) {
                 if ($sensorValueType == 'single') {
                 $sensorValues[$sensorName]['data'] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
                 }else{
