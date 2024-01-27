@@ -6,6 +6,6 @@ return [
           'humiditySensor' => ['key' => 'humiditySensorValue', 'type' => 'multi', 'color' => '#5733FF'],
           'temperatureSensor' => ['key' => 'temperatureSensorValue', 'type' => 'multi', 'color' => '#FF33C7'],
           'location' => ['key' => 'location', 'type' => 'single', 'color' => '#E31A1A'],
-          // Add more sensors as needed
+          // Add more sensors as needed here
       ]
 ?>
