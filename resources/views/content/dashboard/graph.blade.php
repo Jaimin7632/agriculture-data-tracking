@@ -77,7 +77,6 @@
 
 </div>
 
-@section('page-script')
 <script type="text/javascript">
 
   function changedevicename(device_id) {
@@ -148,5 +147,3 @@
   }
 
 </script>
-
-@endsection
