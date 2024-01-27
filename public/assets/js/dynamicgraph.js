@@ -78,7 +78,7 @@ var getGraphDataRoute = window.get_graph_data_route || '';
 
                     // Last Y Value
                     var lastYValue = $('<h3>', {
-                      text: sensorValues.data[sensorValues.data.length - 1].y,
+                      text: Math.round(sensorValues.data[sensorValues.data.length - 1].y) + ' ' + sensorconfig[sensorName]['unit'],
                       style: 'color: #4c4e4f; font-size: 34px;'  // Adjust font-size as needed
                     });
 
