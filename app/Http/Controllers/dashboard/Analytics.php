@@ -90,6 +90,7 @@ class Analytics extends Controller
                 $sensorValues[$sensorName]['color'] = $sensorValueColor;
               }
           }
+          echo "<pre>"; print_r($sensorValues); die();
       }
 
         $message = "success";
