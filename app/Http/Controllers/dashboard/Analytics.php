@@ -80,15 +80,16 @@ class Analytics extends Controller
               $sensorValueType = $sensorDetails['type'];
               $sensorValueColor = $sensorDetails['color'];
 
-              if ($sensorValueType == 'single') {
+              if (array_key_exists($sensorName, $sensorValues)) {
+                if ($sensorValueType == 'single') {
                 $sensorValues[$sensorName]['data'] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
-              }else{
-                $sensorValues[$sensorName]['data'][] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
+                }else{
+                  $sensorValues[$sensorName]['data'][] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
+                }
+                // Add sensor values to the dynamically generated array
+                $sensorValues[$sensorName]['color'] = $sensorValueColor;
               }
-              // Add sensor values to the dynamically generated array
-              $sensorValues[$sensorName]['color'] = $sensorValueColor;
           }
-
       }
 
         $message = "success";
