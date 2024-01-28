@@ -21,7 +21,7 @@ class Analytics extends Controller
     {
         $this->middleware('auth');
     }
-    
+
   public function index()
   {
     // return view('content.dashboard.dashboards-analytics');
@@ -40,11 +40,11 @@ class Analytics extends Controller
         $twoDaysAgo = $futureDate1->format('Y-m-d');
        $uniqueDeviceCount = SensorData::where('created_at', '>=', $twoDaysAgo)->groupBy('device_id')->distinct()->count('device_id');
         // Calculate the date 30 days from now
-        
+
         $futureDate = $currentDate->addDays(30);
         $formattedFutureDate = $futureDate->format('Y-m-d');
         $expiryusers = User::whereBetween('expiry_date', [date('Y-m-d'), $formattedFutureDate])->get()->toArray();
-        
+
        return view('content/dashboard/dashboards-analytics', compact('user','totalusercount','activeusercount','inactiveusercount','adminusercount','sensordatacount','uniqueDeviceCount','inactiveusers','expiryusers'));
     }else{
        return view('content/dashboard/userdashboards-analytics', compact('user'));
@@ -63,7 +63,7 @@ class Analytics extends Controller
     $humiditySensorValues = [];
     $temperatureSensorValues = [];
     $post_data = $request->all();
-     
+
     $device_id = $post_data['device_id'];
     if (!empty($device_id)) {
        // echo $post_data['device_id']; die();
@@ -78,10 +78,10 @@ class Analytics extends Controller
           $formattedDateTime = $item['created_at'];
           $dateTime = new \DateTime($formattedDateTime);
           $createdAt = $dateTime->format('Y-m-d H:i:s');
-          
+
           $changedateBycountry =  Country::changedateBytimezone($createdAt, $authuser->timezone);
           // Initialize an array to store sensor values dynamically
-          
+
           foreach ($sensorConfig as $sensorName => $sensorDetails) {
               $sensorValueKey = $sensorDetails['key'];
               $sensorValueType = $sensorDetails['type'];
@@ -89,16 +89,16 @@ class Analytics extends Controller
 
               if (array_key_exists($sensorValueKey, $item)) {
                 if ($sensorValueType == 'single') {
-                  $sensorValues[$sensorName]['data'] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
+                  $sensorValues[$sensorName]['data'] = ['x' => $changedateBycountry, 'y' => $item[$sensorValueKey]];
                 }else{
-                  $sensorValues[$sensorName]['data'][] = ['x' => $createdAt, 'y' => $item[$sensorValueKey]];
+                  $sensorValues[$sensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $item[$sensorValueKey]];
                 }
                 // Add sensor values to the dynamically generated array
                 $sensorValues[$sensorName]['color'] = $sensorValueColor;
               }
           }
       }
-      
+
       // Check if 'location' key exists
       if (isset($sensorValues['location'])) {
           // Accessing 'location' data
@@ -112,7 +112,7 @@ class Analytics extends Controller
 
           $address = $this->getAddressFromCoordinates($latitude,$longitude);
           $LocationAddress = $address->original['address'];
-          $sensorValues['location']['data'] = ['x' => $createdAt, 'y' => $sensorValues['location']['data']['y'], 'address' => $LocationAddress];
+          $sensorValues['location']['data'] = ['x' => $xValue, 'y' => $yValue, 'address' => $LocationAddress];
       } else {
           //echo "Location does not exist.\n";
       }
@@ -150,7 +150,7 @@ class Analytics extends Controller
         $updateData = ['change_name'=>$change_text, "updated_at" => date('Y-m-d H:i:s')];
         ChangeDeviceName::where("user_id", $user_id)->where("device_id", $device_id)->update($updateData);
       }
-      
+
       $message = "SUCCESS";
       $responseData = ['success' => 'success', 'error' => '', 'msg' => $message];
     } catch (Exception $ex) {
