@@ -6,6 +6,7 @@ const char wifiPass[] = "blackqr_7632";
 // Sensor pins
 const int soilSensorPin = 32;  // A0 is equivalent to 0
 const int pressureSensorPin = 36;  // A1 is equivalent to 1
+const float pressureMaxRange = 0.2; // set pressure sensor range in MPa
 
 // Server details
 const char server[] = "16.171.60.141";
@@ -190,14 +191,16 @@ void loop() {
         disableGPS();
     // end gps
 
-    // Create JSON object
-    DynamicJsonDocument jsonDocument(256);
-    jsonDocument["device_id"] = device_id;
-    jsonDocument["soilSensorValue"] = soilSensorValue;
-    jsonDocument["pressureSensorValue"] = pressureSensorValue;
-    jsonDocument["humiditySensorValue"] = humiditySensorValue;
-    jsonDocument["temperatureSensorValue"] = temperatureSensorValue;
-    jsonDocument["location"] = locationString;
+
+
+  // Create JSON object
+  DynamicJsonDocument jsonDocument(256);
+  jsonDocument["device_id"] = device_id;
+  jsonDocument["soilSensorValue"] = ((1 - (soilSensorValue/4095)) * 100);
+  jsonDocument["pressureSensorValue"] = (pressureMaxRange/1023) * pressureSensorValue;
+  jsonDocument["humiditySensorValue"] = humiditySensorValue;
+  jsonDocument["temperatureSensorValue"] = temperatureSensorValue;
+  jsonDocument["location"] = locationString;
 
     // Serialize JSON to string
     String jsonString;
