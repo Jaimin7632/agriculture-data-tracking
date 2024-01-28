@@ -109,7 +109,7 @@ class Analytics extends Controller
           $coordinates = explode(',', $yValue);
           $latitude = $coordinates[0];
           $longitude = $coordinates[1];
-          $latLongStr = 'Latitude: '.$latitude.'° N'.', Longitude: '.$longitude.'° W'
+          $latLongStr = 'Latitude: '.$latitude.'° N'.', Longitude: '.$longitude.'° W';
 
           $address = $this->getAddressFromCoordinates($latitude,$longitude);
           $LocationAddress = $address->original['address'];
