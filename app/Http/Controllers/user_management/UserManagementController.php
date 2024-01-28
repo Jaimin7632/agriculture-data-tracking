@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use App\Models\User;
-use App\Models\Country;
+use App\Models\Timezones;
 
 class UserManagementController extends Controller
 {
@@ -66,8 +66,8 @@ class UserManagementController extends Controller
   public function add_edit_user(){
 
     $user = Auth::user();
-    $countryData = Country::all();
-    return view('content/usermanagement/add-edit-user', compact('user','countryData'));
+    $timezones = Timezones::all();
+    return view('content/usermanagement/add-edit-user', compact('user','timezones'));
 
   }
 
@@ -116,7 +116,7 @@ class UserManagementController extends Controller
         // Fetch the user by ID
         $userdata = User::find($id);
         $user = User::find($id);
-        $countryData = Country::all();
+        $timezones = Timezones::all();
 
         // Check if the user exists
         if (!$userdata) {
@@ -124,7 +124,7 @@ class UserManagementController extends Controller
         }
 
         // Pass the user to the view
-        return view('content/usermanagement/add-edit-user', compact('userdata','countryData', 'user'));
+        return view('content/usermanagement/add-edit-user', compact('userdata','timezones', 'user'));
     }
 
     public function dashboard($id){

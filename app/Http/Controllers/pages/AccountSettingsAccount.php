@@ -9,15 +9,15 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
-use App\Models\Country;
+use App\Models\Timezones;
 
 class AccountSettingsAccount extends Controller
 {
   public function index()
   {
   	$user = Auth::user();
-    $countryData = Country::all();
-    return view('content.pages.pages-account-settings-account', compact('user','countryData'));
+    $timezones = Timezones::all();
+    return view('content.pages.pages-account-settings-account', compact('user','timezones'));
   }
 
   public function updateUserProfile(Request $request){

@@ -58,14 +58,14 @@
 
             <div class="mb-3 col-md-12">
               <label class="form-label" for="timezone">TimeZone</label>
-              <?php $selectedCountry = ""; if (isset($user) && isset($user->timezone)) {
-                $selectedCountry = $user->timezone;
+              <?php $selectedTimezones = ""; if (isset($user) && isset($user->timezone)) {
+                $selectedTimezones = $user->timezone;
               } ?>
               <select id="timezone" value="{{ $user->timezone }}" name="timezone" class="select2 form-select">
                 <option value="">Select</option>
-                <?php foreach ($countryData as $country) { ?>
-                   <option value="<?= $country->timezone ?>" <?= ($selectedCountry == $country->timezone) ? 'selected' : '' ?>>
-                      <?= $country->timezone ?>
+                <?php foreach ($timezones as $time_zone) { ?>
+                   <option value="<?= $time_zone->timezone ?>" <?= ($selectedTimezones == $time_zone->timezone) ? 'selected' : '' ?>>
+                      <?= '(' . $time_zone->utc_offset . ') ' . $time_zone->timezone ?>
                   </option>
                 <?php } ?>
               </select>
