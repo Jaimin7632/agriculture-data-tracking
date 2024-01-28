@@ -27,10 +27,10 @@ class Country extends Authenticatable
     ];
 
     public static function changedateBytimezone($createdat = "", $timezone = ""){
-        
+
         try {
-            $fromTimezone = 'UTC';
-            $carbonDate = Carbon::parse($createdat, $fromTimezone);
+
+            $carbonDate = Carbon::parse($createdat, $timezone);
             $convertedDate = $createdat;
             if ($timezone != "") {
                 $convertedDate = $carbonDate->setTimezone($timezone);
@@ -39,7 +39,7 @@ class Country extends Authenticatable
         } catch (Exception $ex) {
             return $createdat;
         }
-        
+
     }
 
 }

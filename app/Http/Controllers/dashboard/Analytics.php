@@ -79,7 +79,7 @@ class Analytics extends Controller
           $dateTime = new \DateTime($formattedDateTime);
           $createdAt = $dateTime->format('Y-m-d H:i:s');
 
-          $changedateBycountry =  Country::changedateBytimezone($createdAt, $authuser->timezone);
+          $changedateBycountry =  Country::changedateBytimezone($dateTime, $authuser->timezone)->format('Y-m-d H:i:s');
           // Initialize an array to store sensor values dynamically
 
           foreach ($sensorConfig as $sensorName => $sensorDetails) {
