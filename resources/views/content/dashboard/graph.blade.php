@@ -32,7 +32,7 @@
             </div>
             <?php if ($authuser->role == 'user') { ?>
               <div class="col-md-8 text-end ">
-                <button type="button" class="btn btn-outline-primary m-3" data-bs-toggle="modal" data-bs-target="#changeNameModal<?php echo $value; ?>" >
+                <button type="button" class="btn btn-outline-secondary m-3" data-bs-toggle="modal" data-bs-target="#changeNameModal<?php echo $value; ?>" >
                     Customize Name
                 </button>
 
@@ -58,7 +58,7 @@
                 </div>
             </div>
             <?php } ?>
-            
+
           </div>
 
           <div class="row row-bordered g-0" id="append_graph<?php echo $value; ?>">
