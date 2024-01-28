@@ -109,10 +109,11 @@ class Analytics extends Controller
           $coordinates = explode(',', $yValue);
           $latitude = $coordinates[0];
           $longitude = $coordinates[1];
+          $latLongStr = 'Latitude: '.$latitude.'° N'.', Longitude: '.$longitude.'° W'
 
           $address = $this->getAddressFromCoordinates($latitude,$longitude);
           $LocationAddress = $address->original['address'];
-          $sensorValues['location']['data'] = ['x' => $xValue, 'y' => $yValue, 'address' => $LocationAddress];
+          $sensorValues['location']['data'] = ['x' => $latLongStr, 'y' => $yValue, 'address' => $LocationAddress];
       } else {
           //echo "Location does not exist.\n";
       }
