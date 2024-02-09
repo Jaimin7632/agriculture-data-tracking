@@ -61,6 +61,7 @@ Route::group(['middleware' => ['auth']], function () {
 	// Graph Data Start
 	Route::post('/getgraphdata', [Analytics::class, 'getgraphdata'])->name("getgraphdata");
 	Route::post('/change-device-name', [Analytics::class, 'change_device_name'])->name("change-device-name");
+	Route::post('/get-show-summary', [Analytics::class, 'get_show_summary'])->name("get-show-summary");
 	// Graph Data End
 
 	// layout

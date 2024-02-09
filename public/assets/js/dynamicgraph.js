@@ -3,34 +3,53 @@ var getGraphDataRoute = window.get_graph_data_route || '';
 
 // $(document).ready(function() {
   // Function to handle div click
-  $('.graphDiv').on('click', function() {
+var intervalID = null; // Initialize the interval ID variable
+
+$('.graphDiv').on('click', function() {
     var device_id = $(this).attr('device-id');
+    $('.append_graph_blank').html("");
+    $('.append_graph_single').html("");
+    $('#spinner'+device_id).show();
+    var from_date = $(".from_date").val();
+    var to_date = $(".to_date").val();
     console.log(device_id);
-    graphdata(device_id); // Replace 'your_device_id' with the actual device ID
-    // Call the function every 10 seconds
-    setInterval(function() {
-      graphdata(device_id); // Replace 'your_device_id' with the actual device ID
-    }, 60000);
-  });
+    
+    // Call the function
+    graphdata(device_id, from_date, to_date);
+    
+    // Clear previous interval, if any
+    clearInterval(intervalID);
+    
+    // Start a new interval
+    intervalID = setInterval(function() {
+        graphdata(device_id, from_date, to_date);
+    }, 50000);
+});
+
 
 // });
-  function graphdata(device_id) {
+  function graphdata(device_id,from_date,to_date) {
     $.ajax({
         type: 'post',
         url: getGraphDataRoute,
-        data: {device_id:device_id,_token:csrfToken},
+        data: {device_id:device_id,from_date:from_date,to_date:to_date,_token:csrfToken},
         dataType: 'json',
         success: function (response) {
             // console.log(response);
-
+              $('#spinner'+device_id).hide();
               // localStorage.screenname = "callcenter";
               // setCurrentScreen(localStorage.screenname);
               if(response.status == "success"){
-
+                $('.no_data_found').hide();
+                $('.no_data_found'+response.devide_id).hide();
                 var sensorData = response.data.sensordata;
                 var sensorconfig = response.sensorconfig;
-
-
+                console.log(sensorData);
+                if ($.isEmptyObject(sensorData)) {
+                    $('.no_data_found').show();
+                    $('.no_data_found'+response.devide_id).show();
+                    return false;
+                }
                 $('#append_graph'+response.devide_id).html("");
                 var devide_id = response.devide_id;
                 // Iterate over each sensor
@@ -38,9 +57,15 @@ var getGraphDataRoute = window.get_graph_data_route || '';
                     if (sensorconfig[sensorName]['type'] != 'multi'){
                       return true;
                     }
-                    /*console.log("Sensor Name: " + sensorName);
-                    console.log("Sensor Value: " + sensorValues.color);*/
+                    // console.log("Sensor Name: " + sensorName);
+                    // console.log("Sensor Value: " + sensorValues.color);
+                    // console.log("Sensor Value: " + sensorValues.icon);
                     var readableSensorName = convertSensorName(sensorName);
+                    if (readableSensorName == 'HUMIDITY SENSOR') {
+                      readableSensorName = 'AIR '+readableSensorName;
+                    }else if(readableSensorName == 'TEMPERATURE SENSOR'){
+                      readableSensorName = 'AIR '+readableSensorName;
+                    }
                     var sensorxvalue = [];
                     var sensoryvalue = [];
                     // Iterate over each sensor value
@@ -71,9 +96,13 @@ var getGraphDataRoute = window.get_graph_data_route || '';
                     });
 
                     // Chart Title
+                    // var chartTitle = $('<h3>', {
+                    //   text: readableSensorName,
+                    //   style: 'color: '+sensorValues.color+'; font-size: 24px; margin-bottom: 10px;'  // Adjust font-size and margin as needed
+                    // });
                     var chartTitle = $('<h3>', {
-                      text: readableSensorName,
-                      style: 'color: black; font-size: 24px; margin-bottom: 10px;'  // Adjust font-size and margin as needed
+                      html: '<i class="' + sensorValues.icon + '"></i> '  + readableSensorName, // Icon HTML added before the text
+                      style: 'color: ' + sensorValues.color + '; font-size: 24px; margin-bottom: 10px;' // Adjust font-size and margin as needed
                     });
 
                     // Last Y Value

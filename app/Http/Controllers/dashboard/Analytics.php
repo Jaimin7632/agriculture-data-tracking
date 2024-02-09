@@ -65,9 +65,23 @@ class Analytics extends Controller
     $post_data = $request->all();
 
     $device_id = $post_data['device_id'];
+    $fromDate = $post_data['from_date'];
+    $toDate = $post_data['to_date'];
     if (!empty($device_id)) {
        // echo $post_data['device_id']; die();
-      $sensor_data = SensorData::where('device_id', $device_id)->get()->toArray();
+      if ($fromDate != '' && $toDate != '') {
+          $fromDate .= ' 00:00:00'; // Concatenate time for start of the day
+          $toDate .= ' 23:59:59'; // Concatenate time for end of the day
+          $sensor_data = SensorData::where('device_id', $device_id)
+              ->whereBetween('created_at', [$fromDate, $toDate])
+              ->get()
+              ->toArray();
+      } else {
+          $sensor_data = SensorData::where('device_id', $device_id)
+              ->get()
+              ->toArray();
+      }
+      // $sensor_data = SensorData::where('device_id', $device_id)->whereBetween('created_at', [$fromDate, $toDate])->get()->toArray();
 
       $outputArray = [];
 
@@ -86,6 +100,7 @@ class Analytics extends Controller
               $sensorValueKey = $sensorDetails['key'];
               $sensorValueType = $sensorDetails['type'];
               $sensorValueColor = $sensorDetails['color'];
+              $sensorValueIcon = $sensorDetails['icon'];
 
               if (array_key_exists($sensorValueKey, $item)) {
                 if ($sensorValueType == 'single') {
@@ -95,6 +110,7 @@ class Analytics extends Controller
                 }
                 // Add sensor values to the dynamically generated array
                 $sensorValues[$sensorName]['color'] = $sensorValueColor;
+                $sensorValues[$sensorName]['icon'] = $sensorValueIcon;
               }
           }
       }
@@ -189,5 +205,113 @@ class Analytics extends Controller
         }
     }
 
+    public function get_show_summary(Request $request){
+
+      $post_data = $request->all();
+      
+      $user_id = $post_data['user_id'];
+      $device_id = $post_data['device_id'];
+
+      $user_sensor_data = SensorData::where('device_id', $device_id)->get()->toArray();
+      
+
+      $highestValues = array(
+          'Soil Sensor' => array('max_value' => 0, 'max_date' => null, 'min_value' => PHP_INT_MAX, 'min_date' => null),
+          'Pressure Sensor' => array('max_value' => 0, 'max_date' => null, 'min_value' => PHP_INT_MAX, 'min_date' => null),
+          'Humidity Sensor' => array('max_value' => 0, 'max_date' => null, 'min_value' => PHP_INT_MAX, 'min_date' => null),
+          'Temperature Sensor' => array('max_value' => 0, 'max_date' => null, 'min_value' => PHP_INT_MAX, 'min_date' => null)
+      );
+
+
+      // Iterate over sensor data array to find highest and lowest values and their dates
+      foreach ($user_sensor_data as $data) {
+          // Soil Sensor
+          if ($data['soilSensorValue'] > $highestValues['Soil Sensor']['max_value']) {
+              $highestValues['Soil Sensor']['max_value'] = $data['soilSensorValue'].' %';
+              $dateTime = new \DateTime($data['created_at']);
+              $created_at = $dateTime->format('Y-m-d H:i:s');
+              $highestValues['Soil Sensor']['max_date'] = $created_at;
+          }
+          if ($data['soilSensorValue'] < $highestValues['Soil Sensor']['min_value']) {
+              $highestValues['Soil Sensor']['min_value'] = $data['soilSensorValue'].' %';
+              $dateTime = new \DateTime($data['created_at']);
+              $created_at = $dateTime->format('Y-m-d H:i:s');
+              $highestValues['Soil Sensor']['min_date'] = $created_at;
+          }
+          // Pressure Sensor
+          if ($data['pressureSensorValue'] > $highestValues['Pressure Sensor']['max_value']) {
+              $highestValues['Pressure Sensor']['max_value'] = $data['pressureSensorValue'].' Pa';
+              $dateTime = new \DateTime($data['created_at']);
+              $created_at = $dateTime->format('Y-m-d H:i:s');
+              $highestValues['Pressure Sensor']['max_date'] = $created_at;
+          }
+          if ($data['pressureSensorValue'] < $highestValues['Pressure Sensor']['min_value']) {
+              $highestValues['Pressure Sensor']['min_value'] = $data['pressureSensorValue'].' Pa';
+              $dateTime = new \DateTime($data['created_at']);
+              $created_at = $dateTime->format('Y-m-d H:i:s');
+              $highestValues['Pressure Sensor']['min_date'] = $created_at;
+          }
+          // Humidity Sensor
+          if ($data['humiditySensorValue'] > $highestValues['Humidity Sensor']['max_value']) {
+              $highestValues['Humidity Sensor']['max_value'] = $data['humiditySensorValue'].' %';
+              $dateTime = new \DateTime($data['created_at']);
+              $created_at = $dateTime->format('Y-m-d H:i:s');
+              $highestValues['Humidity Sensor']['max_date'] = $created_at;
+          }
+          if ($data['humiditySensorValue'] < $highestValues['Humidity Sensor']['min_value']) {
+              $highestValues['Humidity Sensor']['min_value'] = $data['humiditySensorValue'].' %';
+              $dateTime = new \DateTime($data['created_at']);
+              $created_at = $dateTime->format('Y-m-d H:i:s');
+              $highestValues['Humidity Sensor']['min_date'] = $created_at;
+          }
+          // Temperature Sensor
+          if ($data['temperatureSensorValue'] > $highestValues['Temperature Sensor']['max_value']) {
+              $highestValues['Temperature Sensor']['max_value'] = $data['temperatureSensorValue'].' °C';
+              $dateTime = new \DateTime($data['created_at']);
+              $created_at = $dateTime->format('Y-m-d H:i:s');
+              $highestValues['Temperature Sensor']['max_date'] = $created_at;
+          }
+          if ($data['temperatureSensorValue'] < $highestValues['Temperature Sensor']['min_value']) {
+              $highestValues['Temperature Sensor']['min_value'] = $data['temperatureSensorValue'].' °C';
+              $dateTime = new \DateTime($data['created_at']);
+              $created_at = $dateTime->format('Y-m-d H:i:s');
+              $highestValues['Temperature Sensor']['min_date'] = $created_at;
+          }
+      }
+
+      // Generate HTML table structure
+      $html = '<table class="table table-bordered">';
+      $html .= '<thead>';
+      $html .= '<tr style="text-align:center; font-family:math">';
+      $html .= '<th>Sensor Name</th>';
+      $html .= '<th>Max Value</th>';
+      $html .= '<th>Max Date</th>';
+      $html .= '<th>Min Value</th>';
+      $html .= '<th>Min Date</th>';
+      $html .= '</tr>';
+      $html .= '</thead>';
+      $html .= '<tbody>';
+
+      // Add rows for each sensor type
+      foreach ($highestValues as $sensor => $data) {
+          $html .= '<tr style="text-align:center;">';
+          $html .= '<td>' . $sensor . '</td>';
+          $html .= '<td>' . $data['max_value'] . '</td>';
+          $html .= '<td>' . $data['max_date'] . '</td>';
+          $html .= '<td>' . $data['min_value'] . '</td>';
+          $html .= '<td>' . $data['min_date'] . '</td>';
+          $html .= '</tr>';
+      }
+
+      $html .= '</tbody>';
+      $html .= '</table>';
+
+      // Return HTML table structure as part of AJAX response
+      // echo $html; die();
+      $responseData = ['success' => 'success', 'error' => '', 'html' => $html];
+      return response()->json($responseData);
+
+
+    }
 
 }
