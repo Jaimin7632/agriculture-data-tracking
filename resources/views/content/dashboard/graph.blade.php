@@ -38,39 +38,13 @@
 
     <?php } ?>
 
-    <div class="col-12 mb-4">
-      <div class="card">
-        <!-- <h5 class="card-header">Flatpickr</h5> -->
-        <div class="card-body">
-          <div class="row">
-            <!-- Date Picker-->
-            <div class="col-md-6 col-12 mb-4">
-              <label for="flatpickr-date" class="form-label">From Date</label>
-              <input class="form-control from_date" type="date" value="2021-06-18T12:30:00" id="html5-datetime-local-input" />
-            </div>
-            <!-- /Date Picker -->
-
-            <!-- Time Picker-->
-            <div class="col-md-6 col-12 mb-4">
-              <label for="flatpickr-date" class="form-label">To Date</label>
-              <input class="form-control to_date" type="date" value="2021-06-18T12:30:00" id="html5-datetime-local-input" />
-            </div>
-            <!-- /Time Picker -->
-            <!-- <div class="col-md-4 col-12 mb-4">
-              <label for="flatpickr-date" class="form-label"></label>
-              <button type="submit" id="datefilter" class="btn btn-primary m-4">Submit</button>
-            </div> -->
-          </div>
-        </div>
-      </div>
-    </div>
 
     <?php foreach ($targetdevice_id as $value) { ?>
       <div class="col-12 col-lg-12 order-2 order-md-3 order-lg-2 mb-4">
 
         <div class="card" id="DeviceId">
           <div class="row">
-            <div class="col-md-3 graphDiv" device-id ="<?php echo $value; ?>" style="cursor: pointer; color: blue;">
+            <div class="col-md-3 d-flex justify-content-start align-items-center graphDiv" device-id ="<?php echo $value; ?>" style="cursor: pointer; color: blue;">
               <?php
                 $device_name = $value;
 
@@ -84,14 +58,14 @@
               <span class="no_data_found">
               <h6 class="card-header m-0 me-2 pb-3 no_data_found<?php echo $value; ?>" style="display: none;"></h6></span>
             </div>
-            <div class="col-md-1">
+            <div class="col-md-1 d-flex justify-content-end align-items-center">
               <div class="spinner-border m-3" id="spinner<?php echo $value; ?>" role="status" style="color: blue; display: none;">
                 <span class="visually-hidden">Loading...</span>
               </div>
             </div>
 
-            <div class="col-md-4 text-end ">
-                <button type="button" class="btn btn-outline-secondary m-3 show_summary" data-bs-toggle="modal" onclick="show_summary('<?php echo $value; ?>')" data-bs-target="#summury<?php echo $value; ?>">Show Summary</button>
+            <div class="col-md-2 d-flex justify-content-end align-items-center">
+                <button type="button" class="btn btn-outline-secondary m-3 show_summary" data-bs-toggle="modal" onclick="show_summary('<?php echo $value; ?>')" data-bs-target="#summury<?php echo $value; ?>">Summary</button>
 
                 <!-- Modal -->
                 <div class="modal fade" id="summury<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
@@ -112,10 +86,75 @@
                 </div>
             </div>
 
+            <div class="col-md-2 d-flex justify-content-end align-items-center ">
+                <button type="button" class="btn btn-outline-secondary m-3" data-bs-toggle="modal" data-bs-target="#datefilter<?php echo $value; ?>">Date Filter</button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="datefilter<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document" style="max-width: 57rem">
+                        <div class="modal-content">
+                            <div class="card-body">
+                              <div class="row">
+                                <div class="col-md-6 col-12 mb-4">
+                                  <div class="modal-header" style="padding: 0rem 0rem 0rem;">
+                                      <span for="flatpickr-date" class="form-label">From Date</span>
+                                  </div>
+                                  
+                                  <input class="form-control from_date" type="date" value="2021-06-18T12:30:00" id="html5-datetime-local-input" />
+                                </div>
+                                <div class="col-md-6 col-12 mb-4">
+                                  <div class="modal-header" style="padding: 0rem 0rem 0rem;">
+                                      <span for="flatpickr-date" class="form-label">To Date</span>
+                                  </div>
+                                  <input class="form-control to_date" type="date" value="2021-06-18T12:30:00" id="html5-datetime-local-input" />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" device-id="<?php echo $value; ?>" class="btn btn-primary datefilter">Submit</button>
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-2 d-flex justify-content-end align-items-center">
+                <button type="button" class="btn btn-outline-secondary m-3" data-bs-toggle="modal" data-bs-target="#exportdata<?php echo $value; ?>">Export Data</button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="exportdata<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document" style="max-width: 57rem">
+                        <div class="modal-content">
+                            <div class="card-body">
+                              <div class="row">
+                                <div class="col-md-6 col-12 mb-4">
+                                  <div class="modal-header" style="padding: 0rem 0rem 0rem;">
+                                      <span for="flatpickr-date" class="form-label">From Date</span>
+                                  </div>
+                                  
+                                  <input class="form-control from_date_export<?php echo $value; ?>" type="date" value="2021-06-18T12:30:00" id="html5-datetime-local-input" />
+                                </div>
+                                <div class="col-md-6 col-12 mb-4">
+                                  <div class="modal-header" style="padding: 0rem 0rem 0rem;">
+                                      <span for="flatpickr-date" class="form-label">To Date</span>
+                                  </div>
+                                  <input class="form-control to_date_export<?php echo $value; ?>" type="date" value="2021-06-18T12:30:00" id="html5-datetime-local-input" />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" onclick="datefilterexport('<?php echo $value; ?>')">Export</button>
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <?php if ($authuser->role == 'user') { ?>
-              <div class="col-md-4 text-end ">
+              <div class="col-md-2 d-flex justify-content-end align-items-center ">
                 <button type="button" class="btn btn-outline-secondary m-3" data-bs-toggle="modal" data-bs-target="#changeNameModal<?php echo $value; ?>" >
-                    Customize Name
+                    Customize
                 </button>
 
                 <!-- Modal -->
@@ -138,7 +177,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+              </div>
             <?php } ?>
 
           </div>
@@ -267,6 +306,44 @@
                 // });
             }
             // $('.loader').fadeOut();
+        }
+    });
+
+  }
+
+  function datefilterexport(device_id) {
+    var device_id = device_id;
+    var user_id = $("#User_Id").val();
+    var from_date = $(".from_date_export"+device_id).val();
+    var to_date = $(".to_date_export"+device_id).val();
+    console.log(from_date);
+    console.log(to_date);
+    // console.log(user_id);
+    // console.log(change_text);
+    $.ajax({
+        type: 'POST',
+        url: '{{ route("file-export") }}',
+        data: {device_id:device_id,user_id:user_id,from_date:from_date,to_date:to_date,_token:"{{ csrf_token() }}"},
+        success: function (response) {
+          $("#exportdata"+device_id).modal('hide');
+            if (response.status === 'failure') {
+                // Show alert message if no data found
+                alert(response.message);
+            } else {
+                // If data found, proceed with downloading
+                $("#exportdata" + device_id).modal('hide');
+                // Create a temporary link element
+                var link = document.createElement('a');
+                link.href = URL.createObjectURL(new Blob([response]));
+                link.setAttribute('download', 'sensor_data.csv');
+
+                // Trigger the click event on the link to start the download
+                document.body.appendChild(link);
+                link.click();
+
+                // Clean up
+                document.body.removeChild(link);
+            }
         }
     });
 

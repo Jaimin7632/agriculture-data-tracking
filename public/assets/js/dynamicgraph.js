@@ -21,11 +21,33 @@ $('.graphDiv').on('click', function() {
     clearInterval(intervalID);
     
     // Start a new interval
+    // intervalID = setInterval(function() {
+    //     graphdata(device_id, from_date, to_date);
+    // }, 50000);
+});
+
+
+$('.datefilter').on('click', function() {
+    var device_id = $(this).attr('device-id');
+    $('.append_graph_blank').html("");
+    $('.append_graph_single').html("");
+    $('#spinner'+device_id).show();
+    $('#datefilter'+device_id).modal('hide');
+    var from_date = $(".from_date").val();
+    var to_date = $(".to_date").val();
+    console.log(device_id);
+    
+    // Call the function
+    graphdata(device_id, from_date, to_date);
+    
+    // Clear previous interval, if any
+    clearInterval(intervalID);
+    
+    // Start a new interval
     intervalID = setInterval(function() {
         graphdata(device_id, from_date, to_date);
     }, 50000);
 });
-
 
 // });
   function graphdata(device_id,from_date,to_date) {
@@ -101,7 +123,7 @@ $('.graphDiv').on('click', function() {
                     //   style: 'color: '+sensorValues.color+'; font-size: 24px; margin-bottom: 10px;'  // Adjust font-size and margin as needed
                     // });
                     var chartTitle = $('<h3>', {
-                      html: '<i class="' + sensorValues.icon + '"></i> '  + readableSensorName, // Icon HTML added before the text
+                      html: '<img style="width: 50px; height: auto;" src=' + sensorValues.icon + '> '  + readableSensorName, // Icon HTML added before the text
                       style: 'color: ' + sensorValues.color + '; font-size: 24px; margin-bottom: 10px;' // Adjust font-size and margin as needed
                     });
 
