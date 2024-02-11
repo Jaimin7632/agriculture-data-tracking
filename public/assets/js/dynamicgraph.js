@@ -117,13 +117,14 @@ $('.datefilter').on('click', function() {
                       style: 'text-align: center; margin-top: 20px;'  // Adjust margin as needed
                     });
 
+                    var imageUrl = baseUrl +'/'+ sensorValues.icon;
                     // Chart Title
                     // var chartTitle = $('<h3>', {
                     //   text: readableSensorName,
                     //   style: 'color: '+sensorValues.color+'; font-size: 24px; margin-bottom: 10px;'  // Adjust font-size and margin as needed
                     // });
                     var chartTitle = $('<h3>', {
-                      html: '<img style="width: 50px; height: auto;" src=' + sensorValues.icon + '> '  + readableSensorName, // Icon HTML added before the text
+                      html: '<img style="width: 50px; height: auto;" src="' + imageUrl + '"> '  + readableSensorName, // Icon HTML added before the text
                       style: 'color: ' + sensorValues.color + '; font-size: 24px; margin-bottom: 10px;' // Adjust font-size and margin as needed
                     });
 

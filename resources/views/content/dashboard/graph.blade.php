@@ -200,6 +200,8 @@
 
 <script type="text/javascript">
 
+  var baseUrl = "{{ url('/') }}";
+  
   function changedevicename(device_id) {
     $("#changeNameModal"+device_id).modal('hide');
     var device_id = device_id;
