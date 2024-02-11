@@ -1,25 +1,17 @@
-#include <WiFi.h>
-#include <ArduinoHttpClient.h>
 #include <ArduinoJson.h>
 #include <Adafruit_AHTX0.h>
 
 #define TINY_GSM_USE_GPRS true
-#define TINY_GSM_USE_WIFI false
+
 
 const char device_id[] = "41241112";
-// Your WiFi connection credentials
-const char wifiSSID[] = "BlackQR";
-const char wifiPass[] = "blackqr_7632";
-
 // Sensor pins
 const int soilSensorPin = 32;  // A0 is equivalent to 0
 const int pressureSensorPin = 36;  // A1 is equivalent to 1
 const float pressureMaxRange = 0.2; // set pressure sensor range in MPa
 
 // Server details
-const char server[] = "16.171.60.141";
-const int port = 8000;
-const char endpoint[] = "/api/sensordatastore";
+const char endpoint[] = "http://16.171.60.141:8000/api/sensordatastore";
 
 
 #if TINY_GSM_USE_GPRS
@@ -36,11 +28,7 @@ const char endpoint[] = "/api/sensordatastore";
   TinyGsm modem(SerialAT);
   #endif
 
-#else
-  WiFiClient client;
-  HttpClient http(client, server, port);
 #endif
-
 
 // Sensor data
 float soilSensorValue;
@@ -50,12 +38,12 @@ float temperatureSensorValue;
 
 Adafruit_AHTX0 aht;
 
-
 void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
     String jsonString;
     serializeJson(jsonDocument, jsonString);
 
     Serial.print("Sending JSON data: ");
+    Serial.print(server_url);
     Serial.println(jsonString);
 
     // Initialize HTTPS
@@ -72,6 +60,7 @@ void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
     modem.https_add_header("Accept-Encoding", "gzip, deflate, br");
     modem.https_set_accept_type("application/json");
     modem.https_set_user_agent("TinyGSM/LilyGo-A76XX");
+    modem.https_add_header("Content-Type", "application/json");
 
     String post_body = jsonString;
 
@@ -95,50 +84,14 @@ void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
 
 }
 
-void sendJsonData(const char* endpoint, DynamicJsonDocument& jsonDocument) {
-    String jsonString;
-    serializeJson(jsonDocument, jsonString);
 
-    Serial.print("Sending JSON data: ");
-    Serial.println(jsonString);
-
-    HTTPClient http;
-
-    // Perform HTTP POST request
-    int err = http.begin(endpoint);
-    if (err != 1) {
-        Serial.println("Failed to connect");
-        delay(10000);
-        return;
-    }
-
-    http.addHeader("Content-Type", "application/json");
-
-    int httpCode = http.POST(jsonString);
-
-    if (httpCode > 0) {
-        Serial.print("Response status code: ");
-        Serial.println(httpCode);
-
-        if (httpCode == HTTP_CODE_OK) {
-            Serial.println("Data sent successfully");
-        } else {
-            Serial.println("Failed to send data");
-        }
-    } else {
-        Serial.println("Error in HTTP request");
-    }
-
-    http.end();
-    Serial.println("Server disconnected");
-}
 
 void setup() {
     Serial.begin(115200);
 
     #if TINY_GSM_USE_GPRS
     // start sim part
-      SerialAT.begin(9600, SERIAL_8N1, MODEM_RX_PIN, MODEM_TX_PIN);
+      SerialAT.begin(115200, SERIAL_8N1, MODEM_RX_PIN, MODEM_TX_PIN);
       #ifdef BOARD_POWERON_PIN
           pinMode(BOARD_POWERON_PIN, OUTPUT);
           digitalWrite(BOARD_POWERON_PIN, HIGH);
@@ -192,6 +145,17 @@ void setup() {
               }
               delay(1000);
           }
+
+
+          #ifndef TINY_GSM_MODEM_SIM7672
+            if (!modem.setNetworkMode(MODEM_NETWORK_AUTO)) {
+                Serial.println("Set network mode failed!");
+            }
+            String mode = modem.getNetworkModes();
+            Serial.print("Current network mode : ");
+            Serial.println(mode);
+          #endif
+
           // Check network registration status and network signal status
           int16_t sq ;
           Serial.print("Wait for the modem to register with the network.");
@@ -241,15 +205,6 @@ void setup() {
           String ipAddress = modem.getLocalIP();
           Serial.print("Network IP:"); Serial.println(ipAddress);
     // end sim part
-    #else
-      // Connect to WiFi
-      Serial.println("Connecting to WiFi...");
-      WiFi.begin(wifiSSID, wifiPass);
-      while (WiFi.status() != WL_CONNECTED) {
-          delay(1000);
-          Serial.print(".");
-      }
-      Serial.println("\nConnected to WiFi");
     #endif
 
 
@@ -279,13 +234,11 @@ void loop() {
     jsonDocument["pressureSensorValue"] = (pressureMaxRange/1023) * pressureSensorValue;
     jsonDocument["humiditySensorValue"] = humiditySensorValue;
     jsonDocument["temperatureSensorValue"] = temperatureSensorValue;
-    jsonDocument["location"] = '';
+    jsonDocument["location"] = "0,0";
 
     #if TINY_GSM_USE_GPRS
       sendJsonModem(endpoint, jsonDocument);
-    #else
-      sendJsonData(endpoint, jsonDocument);
     #endif
-    // Delay before sending next data
-    delay(60 * 15000);
+    // 15 min Delay before sending next data
+    delay(60 * 1000 * 15);
 }
