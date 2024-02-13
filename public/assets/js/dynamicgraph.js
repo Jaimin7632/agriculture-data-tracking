@@ -246,36 +246,49 @@ $('.datefilter').on('click', function() {
 
                 $('#append_graph_single'+response.devide_id).html("");
                 $.each(sensorData, function(sensorName, sensorValue) {
-                    if (sensorconfig[sensorName]['type'] != 'single'){
-                      return true;
-                    }
-                    var senosor_name = convertSensorName(sensorName);
-                     var cardHtml = `<hr>
-                      <div class="card">
+                if (sensorconfig[sensorName]['type'] != 'single') {
+                    return true; // Skip to the next iteration if the sensor type is not 'single'
+                }
+
+                var sensor_name = convertSensorName(sensorName);
+                var mapContainerId = 'map_' + sensorName; // Unique identifier for each map container
+                var cardHtml = `<hr>
+                    <div class="card">
                         <div class="card-body" style="text-align: center">
-                          <div class="card-title d-flex align-items-start justify-content-between">
-                          </div>
-                          <h3 class="mb-1" style="font-size: 24px; color:black">`+senosor_name+`</h3>
-                          <h3 class="mb-2" style="font-size: 34px; color: #4c4e4f">${sensorValue.data.y}</h5></h3>
-                          <h3 class="mb-2" style="font-size: 12px; color:black">${sensorValue.data.x}</h5></h3>
-                          <h3 class="mb-2" style="font-size: 24px; color: #4c4e4f">${sensorValue.data.address}</h5></h3>
+                            <div class="card-title d-flex align-items-start justify-content-between">
+                            </div>
+                            <h3 class="mb-1" style="font-size: 24px; color:black">${sensor_name}</h3>
+                            <h3 class="mb-2" style="font-size: 34px; color: #4c4e4f">${sensorValue.data.y}</h3>
+                            <h3 class="mb-2" style="font-size: 12px; color:black">${sensorValue.data.x}</h3>
+                            <h3 class="mb-2" style="font-size: 24px; color: #4c4e4f">${sensorValue.data.address}</h3>
+                            <div id="${mapContainerId}" style="height: 400px;"></div> <!-- Use the unique map container id -->
                         </div>
-                      </div>
-                    `;
+                    </div>`;
 
-                    // Append the HTML content to the container
+                // Append the HTML content to the container
+                $('#append_graph_single' + response.devide_id).append(cardHtml);
 
-                    $('#append_graph_single'+response.devide_id).append(cardHtml);
+                // Initialize the map for this sensor
+                var map = L.map(mapContainerId).setView([sensorValue.data.Latitude, sensorValue.data.Longitude], 13);
 
-                    console.log("X: " + sensorValue.data.x + ", Y: " + sensorValue.data.y);
+                // Add a tile layer (OSM) to the map
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
 
-                });
+                // Add a marker to the map
+                var marker = L.marker([sensorValue.data.Latitude, sensorValue.data.Longitude]).addTo(map);
+
+                console.log("X: " + sensorValue.data.x + ", Y: " + sensorValue.data.y);
+            });
+
 
             }
 
         }
     });
   }
+
 
   function convertSensorName(sensorName) {
       // Split the sensor name by camel case and join with space
