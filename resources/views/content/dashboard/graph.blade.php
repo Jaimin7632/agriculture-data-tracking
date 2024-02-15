@@ -87,7 +87,7 @@
             </div>
 
             <div class="col-md-2 d-flex justify-content-end align-items-center ">
-                <button type="button" class="btn btn-outline-secondary m-3" data-bs-toggle="modal" data-bs-target="#datefilter<?php echo $value; ?>">Date Filter</button>
+                <button type="button" class="btn btn-outline-secondary m-3" data-bs-toggle="modal" data-bs-target="#datefilter<?php echo $value; ?>">Filter</button>
 
                 <!-- Modal -->
                 <div class="modal fade" id="datefilter<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
@@ -120,7 +120,7 @@
             </div>
 
             <div class="col-md-2 d-flex justify-content-end align-items-center">
-                <button type="button" class="btn btn-outline-secondary m-3" data-bs-toggle="modal" data-bs-target="#exportdata<?php echo $value; ?>">Export Data</button>
+                <button type="button" class="btn btn-outline-secondary m-3" data-bs-toggle="modal" data-bs-target="#exportdata<?php echo $value; ?>">Export</button>
 
                 <!-- Modal -->
                 <div class="modal fade" id="exportdata<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
