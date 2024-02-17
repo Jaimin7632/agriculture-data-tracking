@@ -21,9 +21,9 @@ $('.graphDiv').on('click', function() {
     clearInterval(intervalID);
     
     // Start a new interval
-    // intervalID = setInterval(function() {
-    //     graphdata(device_id, from_date, to_date);
-    // }, 50000);
+    intervalID = setInterval(function() {
+        graphdata(device_id, from_date, to_date);
+    }, 50000);
 });
 
 
