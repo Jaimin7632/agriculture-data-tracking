@@ -44,7 +44,7 @@
 
         <div class="card" id="DeviceId">
           <div class="row">
-            <div class="col-md-3 d-flex justify-content-start align-items-center graphDiv" device-id ="<?php echo $value; ?>" style="cursor: pointer; color: blue;">
+            <div class="col-md-3 d-flex justify-content-start align-items-center graphDiv" device-id="<?php echo $value; ?>" style="cursor: pointer; color: blue;">
               <?php
                 $device_name = $value;
 
@@ -56,16 +56,18 @@
               ?>
               <h5 class="card-header m-0 me-2 pb-3 device_name_text">Device - <?php echo $device_name; ?></h5>
               <span class="no_data_found">
-              <h6 class="card-header m-0 me-2 pb-3 no_data_found<?php echo $value; ?>" style="display: none;"></h6></span>
+                  <h6 class="card-header m-0 me-2 pb-3 no_data_found<?php echo $value; ?>" style="display: none;"></h6>
+              </span>
             </div>
             <div class="col-md-1 d-flex justify-content-end align-items-center">
-              <div class="spinner-border m-3" id="spinner<?php echo $value; ?>" role="status" style="color: blue; display: none;">
-                <span class="visually-hidden">Loading...</span>
-              </div>
+                <div class="spinner-border m-3" id="spinner<?php echo $value; ?>" role="status" style="color: blue; display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
             </div>
 
             <div class="col-md-2 d-flex justify-content-end align-items-center">
-                <button type="button" class="btn btn-outline-secondary m-3 show_summary" data-bs-toggle="modal" onclick="show_summary('<?php echo $value; ?>')" data-bs-target="#summury<?php echo $value; ?>">Summary</button>
+              <button type="button" class="btn btn-outline-secondary m-3 show_summary" data-bs-toggle="modal" onclick="show_summary('<?php echo $value; ?>')" data-bs-target="#summury<?php echo $value; ?>">Summary</button>
+
 
                 <!-- Modal -->
                 <div class="modal fade" id="summury<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">

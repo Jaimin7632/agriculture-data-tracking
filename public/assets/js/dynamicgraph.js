@@ -208,15 +208,15 @@ $('.datefilter').on('click', function() {
                               shared: false
                             },
                             xaxis: {
-                              // type: 'datetime',
+                              //type: 'datetime',
                               categories: sensorxvalue,
-                              tickAmount: 5,
-                              axisBorder: {
-                                show: false
-                              },
-                              axisTicks: {
-                                show: false
-                              },
+                              //tickAmount: 5,
+                              // axisBorder: {
+                              //   show: false
+                              // },
+                              // axisTicks: {
+                              //   show: false
+                              // },
                               labels: {
                                 style: {
                                   colors: labelColor,
@@ -225,6 +225,7 @@ $('.datefilter').on('click', function() {
                               }
                             },
                             yaxis: {
+                              //type: 'datetime',
                               labels: {
                                 style: {
                                   colors: labelColor,

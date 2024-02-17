@@ -75,10 +75,11 @@ class Analytics extends Controller
           $toDate .= ' 23:59:59'; // Concatenate time for end of the day
           $sensor_data = SensorData::where('device_id', $device_id)
               ->whereBetween('created_at', [$fromDate, $toDate])
+              ->limit(15)
               ->get()
               ->toArray();
       } else {
-          $sensor_data = SensorData::where('device_id', $device_id)
+          $sensor_data = SensorData::where('device_id', $device_id)->limit(15)
               ->get()
               ->toArray();
       }
