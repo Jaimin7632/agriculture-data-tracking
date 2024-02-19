@@ -124,7 +124,7 @@ $('.datefilter').on('click', function() {
                     //   style: 'color: '+sensorValues.color+'; font-size: 24px; margin-bottom: 10px;'  // Adjust font-size and margin as needed
                     // });
                     var chartTitle = $('<h3>', {
-                      html: '<img style="width: 50px; height: auto;" src="' + imageUrl + '"> '  + readableSensorName, // Icon HTML added before the text
+                      html: sensorValues.icon  + readableSensorName, // Icon HTML added before the text
                       style: 'color: ' + sensorValues.color + '; font-size: 24px; margin-bottom: 10px;' // Adjust font-size and margin as needed
                     });
 
