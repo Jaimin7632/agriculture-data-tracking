@@ -130,6 +130,7 @@ class UserManagementController extends Controller
     public function dashboard($id){
       $userdata = User::find($id);
       $user = User::find($id);
+      
       // Check if the user exists
       if (!$userdata) {
           abort(404, 'User not found');

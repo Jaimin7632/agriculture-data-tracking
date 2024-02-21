@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ChangeDeviceName;
 use App\Models\User;
 use App\Models\SensorData;
+use App\Models\Setalarm;
 use App\Models\Country;
 use Carbon\Carbon;
 use DB;
@@ -466,6 +467,42 @@ class Analytics extends Controller
           $str = " $str";
       }
       if (strstr($str, '"')) $str = '"' . str_replace('"', '""', $str) . '"';
+  }
+
+  public function updateAlarm(Request $request){
+
+    $settings = $request->input('settings');
+    
+    $user_id = $request->input('user_id');
+    $device_id = $request->input('device_id');
+    $allSensorData = [];
+      foreach ($settings as $setting) {
+          // Update or create the setting in the database
+        $sensorName = $setting['sensorName'];
+        $minValue = $setting['minValue'];
+        $maxValue = $setting['maxValue'];
+
+        $sensorData = [
+            'sensor_name' => $sensorName,
+            'min_value' => $minValue,
+            'max_value' => $maxValue
+        ];
+
+        $allSensorData[] = $sensorData;
+          
+      }
+
+      $alarmData = json_encode($allSensorData);
+
+      Setalarm::updateOrCreate(
+          ['user_id' => $user_id, 'device_id' => $device_id],
+          ['alarmdata' => $alarmData]
+      );
+      // die();
+      // return response()->json(['success' => true]);
+      $responseData = ['success' => 'success', 'error' => ''];
+      return response()->json($responseData);
+
   }
 
 }
