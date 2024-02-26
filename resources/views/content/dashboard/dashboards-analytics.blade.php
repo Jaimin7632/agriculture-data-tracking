@@ -31,12 +31,12 @@
               <i class="bx bx-dots-vertical-rounded"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="cardOpt3">
-              <a class="dropdown-item" href="javascript:void(0);">View More</a>
-              <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+              <a class="dropdown-item" href="javascript:void(0);">Ver más</a>
+              <a class="dropdown-item" href="javascript:void(0);">Borrar</a>
             </div>
           </div>
         </div>
-        <span class="fw-semibold d-block mb-1">Total User</span>
+        <span class="fw-semibold d-block mb-1">Usuario total</span>
         <h3 class="card-title mb-2">{{$totalusercount}}</h3>
       </div>
     </div>
@@ -53,12 +53,12 @@
               <i class="bx bx-dots-vertical-rounded"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="cardOpt6">
-              <a class="dropdown-item" href="javascript:void(0);">View More</a>
-              <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+              <a class="dropdown-item" href="javascript:void(0);">Ver más</a>
+              <a class="dropdown-item" href="javascript:void(0);">Borrar</a>
             </div>
           </div>
         </div>
-        <span>Active User</span>
+        <span>Usuario activo</span>
         <h3 class="card-title text-nowrap mb-1">{{$activeusercount}}</h3>
       </div>
     </div>
@@ -75,12 +75,12 @@
               <i class="bx bx-dots-vertical-rounded"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="cardOpt6">
-              <a class="dropdown-item" href="javascript:void(0);">View More</a>
-              <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+              <a class="dropdown-item" href="javascript:void(0);">Ver más</a>
+              <a class="dropdown-item" href="javascript:void(0);">Borrar</a>
             </div>
           </div>
         </div>
-        <span>In Active User</span>
+        <span>En usuario activo</span>
         <h3 class="card-title text-nowrap mb-1">{{$inactiveusercount}}</h3>
       </div>
     </div>
@@ -100,12 +100,12 @@
               <i class="bx bx-dots-vertical-rounded"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="cardOpt3">
-              <a class="dropdown-item" href="javascript:void(0);">View More</a>
-              <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+              <a class="dropdown-item" href="javascript:void(0);">Ver más</a>
+              <a class="dropdown-item" href="javascript:void(0);">Borrar</a>
             </div>
           </div>
         </div>
-        <span class="fw-semibold d-block mb-1">Total Admin User</span>
+        <span class="fw-semibold d-block mb-1">Usuario administrador total</span>
         <h3 class="card-title mb-2">{{$adminusercount}}</h3>
       </div>
     </div>
@@ -122,12 +122,12 @@
               <i class="bx bx-dots-vertical-rounded"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="cardOpt6">
-              <a class="dropdown-item" href="javascript:void(0);">View More</a>
-              <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+              <a class="dropdown-item" href="javascript:void(0);">Ver más</a>
+              <a class="dropdown-item" href="javascript:void(0);">Borrar</a>
             </div>
           </div>
         </div>
-        <span>Total Sensor Data</span>
+        <span>Datos totales del sensor</span>
         <h3 class="card-title text-nowrap mb-1">{{$sensordatacount}}</h3>
       </div>
     </div>
@@ -144,12 +144,12 @@
               <i class="bx bx-dots-vertical-rounded"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="cardOpt6">
-              <a class="dropdown-item" href="javascript:void(0);">View More</a>
-              <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+              <a class="dropdown-item" href="javascript:void(0);">Ver más</a>
+              <a class="dropdown-item" href="javascript:void(0);">Borrar</a>
             </div>
           </div>
         </div>
-        <span>Last 2 Days Active Device</span>
+        <span>Dispositivo activo de los últimos 2 días</span>
         <h3 class="card-title text-nowrap mb-1">{{$uniqueDeviceCount}}</h3>
       </div>
     </div>
@@ -158,15 +158,15 @@
 
 <div class="row">
   <div class="col-lg-12 col-md-12 col-6 mb-4">
-    <span class="fw-semibold d-block mb-1">In 30 Days Expiry Users</span>
+    <span class="fw-semibold d-block mb-1">Usuarios con vencimiento de 30 días</span>
     <!-- <div class="card"> -->
       <table id="expiry_user" class="table table-striped" style="width:100%">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Created Date</th>
-                <th>Expiry Date</th>
+                <th>Nombre</th>
+                <th>Correo electrónico</th>
+                <th>Fecha de creación</th>
+                <th>Fecha de caducidad</th>
             </tr>
         </thead>
         <tbody>
@@ -183,10 +183,10 @@
             </tbody>
         <tfoot>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Created Date</th>
-                <th>Expiry Date</th>
+                <th>Nombre</th>
+                <th>Correo electrónico</th>
+                <th>Fecha de creación</th>
+                <th>Fecha de caducidad</th>
             </tr>
         </tfoot>
       </table>
@@ -200,10 +200,10 @@
     <table id="inactive_user" class="table table-striped" style="width:100%">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Created Date</th>
-                <th>Expiry Date</th>
+                <th>Nombre</th>
+                <th>Correo electrónico</th>
+                <th>Fecha de creación</th>
+                <th>Fecha de caducidad</th>
             </tr>
         </thead>
         <tbody>
@@ -220,10 +220,10 @@
             </tbody>
         <tfoot>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Created Date</th>
-                <th>Expiry Date</th>
+                <th>Nombre</th>
+                <th>Correo electrónico</th>
+                <th>Fecha de creación</th>
+                <th>Fecha de caducidad</th>
             </tr>
         </tfoot>
       </table>

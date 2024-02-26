@@ -2,20 +2,20 @@
   "menu": [
     {
       "url": "/",
-      "name": "Dashboard",
+      "name": "Panel",
       "icon": "menu-icon tf-icons bx bx-home-circle",
       "adminaccess" : "false",
       "slug": "dashboard-analytics"
     },
     {
-      "name": "Account Settings",
+      "name": "Configuraciones de la cuenta",
       "icon": "menu-icon tf-icons bx bx bx-dock-top",
       "slug": "pages-account-settings",
       "adminaccess" : "false",
       "submenu": [
         {
           "url": "/pages/account-settings-account",
-          "name": "Account",
+          "name": "Cuenta",
           "slug": "pages-account-settings-account"
         }
       ]

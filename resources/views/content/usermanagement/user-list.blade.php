@@ -6,25 +6,25 @@
 <link rel="stylesheet" href="../assets/css/tabulator.min.css">
 <link rel="stylesheet" href="../assets/sweet-alert2/sweetalert2.min.css">
 <h4 class="fw-bold py-3 mb-4">
-  <span class="text-muted fw-light">Users /</span> Users List
+  <span class="text-muted fw-light">Usuarios /</span> Lista de usuarios
 </h4>
 
 <!-- Basic Bootstrap Table -->
 <div class="card">
-  <h5 class="card-header">Users List</h5>
+  <h5 class="card-header">Lista de usuarios</h5>
   <div class="table-responsive text-nowrap container">
     
 
     <table id="users_list" class="table table-striped">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Status</th>
-                <th>Created Date</th>
-                <th>Expiry Date</th>
-                <th>Device id</th>
-                <th>Actions</th>
+                <th>Nombre</th>
+                <th>Correo electrónico</th>
+                <th>Estado</th>
+                <th>Fecha de creación</th>
+                <th>Fecha de caducidad</th>
+                <th>ID del dispositivo</th>
+                <th>Comportamiento</th>
             </tr>
         </thead>
         <tbody>

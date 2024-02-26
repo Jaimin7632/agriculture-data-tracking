@@ -21,8 +21,8 @@
             </a>
           </div>
           <!-- /Logo -->
-          <h4 class="mb-2">Welcome to {{config('variables.templateName')}}! 👋</h4>
-          <p class="mb-4">Please sign-in to your account and start the adventure</p>
+          <h4 class="mb-2">Bienvenida a {{config('variables.templateName')}}! 👋</h4>
+          <p class="mb-4">Inicie sesión en su cuenta y comience la aventura.</p>
 
           @if(session('message'))
               <div class="alert alert-info">
@@ -33,7 +33,7 @@
           <form id="formAuthentication" class="mb-3" action="{{ route('login') }}" method="POST">
             @csrf
             <div class="mb-3">
-              <label for="email" class="form-label">Email or Username</label>
+              <label for="email" class="form-label">Correo electrónico o nombre de usuario</label>
               <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus>
 
               @if ($errors->has('email'))
@@ -44,9 +44,9 @@
             </div>
             <div class="mb-3 form-password-toggle">
               <div class="d-flex justify-content-between">
-                <label class="form-label" for="password">Password</label>
+                <label class="form-label" for="password">Contraseña</label>
                 <a href="{{url('auth/forgot-password-basic')}}">
-                  <small>Forgot Password?</small>
+                  <small>¿Has olvidado tu contraseña?</small>
                 </a>
               </div>
               <div class="input-group input-group-merge">
@@ -64,12 +64,12 @@
               <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="remember-me">
                 <label class="form-check-label" for="remember-me">
-                  Remember Me
+                  Acuérdate de mí
                 </label>
               </div>
             </div>
             <div class="mb-3">
-              <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
+              <button class="btn btn-primary d-grid w-100" type="submit">Iniciar sesión</button>
             </div>
           </form>
 

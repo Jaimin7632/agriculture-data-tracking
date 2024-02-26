@@ -79,7 +79,7 @@ $navbarDetached = ($navbarDetached ?? '');
               <li>
                 <a class="dropdown-item" href="{{route('pages-account-settings-account')}}">
                   <i class="bx bx-user me-2"></i>
-                  <span class="align-middle">My Profile</span>
+                  <span class="align-middle">Mi perfil</span>
                 </a>
               </li>
               <!-- <li>
@@ -103,7 +103,7 @@ $navbarDetached = ($navbarDetached ?? '');
               <li>
                 <a class="dropdown-item" href="{{ route('logout') }}">
                   <i class='bx bx-power-off me-2'></i>
-                  <span class="align-middle">Log Out</span>
+                  <span class="align-middle">Cerrar sesión</span>
                 </a>
               </li>
             </ul>

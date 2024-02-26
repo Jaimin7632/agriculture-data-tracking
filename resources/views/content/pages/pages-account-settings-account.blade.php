@@ -6,18 +6,18 @@
 
 @section('content')
 <h4 class="fw-bold py-3 mb-4">
-  <span class="text-muted fw-light">Account Settings /</span> Account
+  <span class="text-muted fw-light">Configuraciones de la cuenta /</span> Cuenta
 </h4>
 
 <div class="row">
   <div class="col-md-12">
     <ul class="nav nav-pills flex-column flex-md-row mb-3">
-      <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class="bx bx-user me-1"></i> Account</a></li>
+      <li class="nav-item"><a class="nav-link active" href="javascript:void(0);"><i class="bx bx-user me-1"></i> Cuenta</a></li>
       <!-- <li class="nav-item"><a class="nav-link" href="{{url('pages/account-settings-notifications')}}"><i class="bx bx-bell me-1"></i> Notifications</a></li>
       <li class="nav-item"><a class="nav-link" href="{{url('pages/account-settings-connections')}}"><i class="bx bx-link-alt me-1"></i> Connections</a></li> -->
     </ul>
     <div class="card mb-4">
-      <h5 class="card-header">Profile Details</h5>
+      <h5 class="card-header">detalles del perfil</h5>
       <!-- Account -->
       <!-- <div class="card-body">
         <div class="d-flex align-items-start align-items-sm-center gap-4">
@@ -44,7 +44,7 @@
           <input type="hidden" name="user_id" id="user_id" value="{{$user->id}}">
           <div class="row">
             <div class="mb-3 col-md-6">
-              <label for="firstName" class="form-label">Full Name</label>
+              <label for="firstName" class="form-label">Nombre completo</label>
               <input class="form-control" type="text" id="fullname" name="name" value="{{$user->name}}" autofocus />
             </div>
             <!-- <div class="mb-3 col-md-6">
@@ -52,12 +52,12 @@
               <input class="form-control" type="text" name="lastName" id="lastName" value="Doe" />
             </div> -->
             <div class="mb-3 col-md-6">
-              <label for="email" class="form-label">E-mail</label>
+              <label for="email" class="form-label">Correo electrónico</label>
               <input class="form-control" type="text" id="email" name="email" value="{{$user->email}}" placeholder="john.doe@example.com" />
             </div>
 
             <div class="mb-3 col-md-12">
-              <label class="form-label" for="timezone">TimeZone</label>
+              <label class="form-label" for="timezone">Zona horaria</label>
               <?php $selectedTimezones = ""; if (isset($user) && isset($user->timezone)) {
                 $selectedTimezones = $user->timezone;
               } ?>
@@ -170,9 +170,9 @@
             </div> -->
           </div>
           <div class="mt-2">
-            <input type="button" id="update_profile" class="btn btn-primary me-2" value="Save changes">
+            <input type="button" id="update_profile" class="btn btn-primary me-2" value="Guardar cambios">
             <!-- <button type="submit" class="btn btn-primary me-2">Save changes</button> -->
-            <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+            <button type="reset" class="btn btn-outline-secondary">Cancelar</button>
           </div>
         <!-- </form> -->
       </div>
@@ -198,7 +198,7 @@
     </div> -->
 
     <div class="card mb-4">
-      <h5 class="card-header">Change Password</h5>
+      <h5 class="card-header">Cambiar la contraseña</h5>
       <!-- Account -->
       <!-- <div class="card-body">
         <div class="d-flex align-items-start align-items-sm-center gap-4">
@@ -225,7 +225,7 @@
           <div class="row">
             <div class="mb-3 col-md-6 form-password-toggle">
               <div class="d-flex justify-content-between">
-                <label class="form-label" for="password">Old Password</label>
+                <label class="form-label" for="password">Contraseña anterior</label>
               </div>
               <div class="input-group input-group-merge">
                 <input class="form-control" type="password" id="old_password" name="password" value="" placeholder="" />
@@ -235,7 +235,7 @@
 
             <div class="mb-3 col-md-6 form-password-toggle">
               <div class="d-flex justify-content-between">
-                <label class="form-label" for="password">New Passsword</label>
+                <label class="form-label" for="password">Nueva contraseña</label>
               </div>
               <div class="input-group input-group-merge">
                 <input class="form-control" type="password" id="password" name="password" value="" placeholder="" />
@@ -245,7 +245,7 @@
 
             <div class="mb-3 col-md-6 form-password-toggle">
               <div class="d-flex justify-content-between">
-                <label class="form-label" for="password">Confirm Passsword</label>
+                <label class="form-label" for="password">Confirmar contraseña</label>
               </div>
               <div class="input-group input-group-merge">
                 <input class="form-control" type="password" id="password_confirmation" name="password_confirmation" value="" placeholder="" />
@@ -254,7 +254,7 @@
             </div>
           </div>
           <div class="mt-2">
-            <input type="button" id="update_password" class="btn btn-primary me-2" value="Save changes">
+            <input type="button" id="update_password" class="btn btn-primary me-2" value="Guardar cambios">
             <!-- <button type="submit" class="btn btn-primary me-2">Save changes</button> -->
             <!-- <button type="reset" class="btn btn-outline-secondary">Cancel</button> -->
           </div>

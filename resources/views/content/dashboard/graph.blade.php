@@ -6,33 +6,33 @@
     $targetdevice_id = explode(',', $user->device_id); ?>
     <?php if ($authuser->role == 'admin') { ?>
     <div class="mb-4">
-  <div class="row">
-    <div class="col-md-4 mb-3">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Name:</h5>
-          <p class="card-text">{{$user->name}}</p>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Nombre:</h5>
+              <p class="card-text">{{$user->name}}</p>
+            </div>
+          </div>
         </div>
+        <div class="col-md-6 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Correo electrónico:</h5>
+              <p class="card-text">{{$user->email}}</p>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Country:</h5>
+              <p class="card-text">{{$user->country}}</p>
+            </div>
+          </div>
+        </div> -->
       </div>
     </div>
-    <div class="col-md-4 mb-3">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Email:</h5>
-          <p class="card-text">{{$user->email}}</p>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4 mb-3">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Country:</h5>
-          <p class="card-text">{{$user->country}}</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 
     <?php } ?>
@@ -60,7 +60,7 @@
                   $device_name = $change_text_data->change_name;
                 }
               ?>
-              <span class="device_name_text">Device - <?php echo $device_name; ?></span>
+              <span class="device_name_text">Dispositivo - <?php echo $device_name; ?></span>
               <span class="no_data_found">
                   <h6 class="card-header m-0 me-2 pb-3 no_data_found<?php echo $value; ?>" style="display: none;"></h6>
               </span>
@@ -73,21 +73,21 @@
 
               <div class="btn-group col-md-6 col-sm-6 ">
                 <button type="button" class="btn btn-primary dropdown-toggle overflow-hidden d-sm-inline-flex d-block text-truncate justify-content-center hide-arrow" data-bs-toggle="dropdown"  aria-haspopup="true" aria-expanded="false">
-                  Action
+                  Acción
                 </button>
 
                 <ul class="dropdown-menu dropdown-menu-start dropdown-menu-lg-end">
-                  <li><button class="dropdown-item btn btn-outline-secondary show_summary" data-bs-toggle="modal" type="button" onclick="show_summary('<?php echo $value; ?>')" data-bs-target="#summury<?php echo $value; ?>">Summary</button></li>
+                  <li><button class="dropdown-item btn btn-outline-secondary show_summary" data-bs-toggle="modal" type="button" onclick="show_summary('<?php echo $value; ?>')" data-bs-target="#summury<?php echo $value; ?>">Resumen</button></li>
 
-                  <li><button class="dropdown-item btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#datefilter<?php echo $value; ?>">Filter</button></li>
+                  <li><button class="dropdown-item btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#datefilter<?php echo $value; ?>">Filtrar</button></li>
 
-                  <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#exportdata<?php echo $value; ?>">Export</button></li>
+                  <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#exportdata<?php echo $value; ?>">Exportar</button></li>
 
                   <?php if ($authuser->role == 'user') { ?>
-                  <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-toggle="modal" data-bs-target="#changeNameModal<?php echo $value; ?>">Customize</button></li>
+                  <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-toggle="modal" data-bs-target="#changeNameModal<?php echo $value; ?>">Personalizar</button></li>
                   <?php } ?>
 
-                  <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#setalarm<?php echo $value; ?>">Set Alarm</button></li>
+                  <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#setalarm<?php echo $value; ?>">Ajustar alarma</button></li>
 
                 </ul>
               </div>
@@ -108,16 +108,16 @@
           <div class="modal-dialog" role="document" style="max-width: 57rem">
               <div class="modal-content">
                   <div class="modal-header">
-                      <h5 class="modal-title" id="changeNameModalLabel"><?php echo $value; ?> Set Alarm</h5>
+                      <h5 class="modal-title" id="changeNameModalLabel"><?php echo $value; ?> Ajustar alarma</h5>
                   </div>
                   <div class="modal-body">
                       <div class="table-responsive text-nowrap">
                         <table class="table table-bordered" id="sensorTable<?php echo $value; ?>">
                            <thead>
                               <tr style="text-align:center; font-family:math">
-                                 <th>Sensor Name</th>
-                                 <th>Min Value</th>
-                                 <th>Max Value</th>
+                                 <th>Nombre del sensor</th>
+                                 <th>Valor mínimo</th>
+                                 <th>Valor máximo</th>
                               </tr>
                            </thead>
                            <tbody>
@@ -167,8 +167,8 @@
                       </div>
                   </div>
                   <div class="modal-footer">
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                      <button class="btn btn-primary" data-bs-dismiss="modal" id="saveSettings" onclick="saveSettings('<?php echo $value; ?>')">Save Settings</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
+                      <button class="btn btn-primary" data-bs-dismiss="modal" id="saveSettings" onclick="saveSettings('<?php echo $value; ?>')">Guardar ajustes</button>
                   </div>
               </div>
           </div>
@@ -179,14 +179,14 @@
           <div class="modal-dialog" role="document" style="max-width: 57rem">
               <div class="modal-content">
                   <div class="modal-header">
-                      <h5 class="modal-title" id="changeNameModalLabel"><?php echo $value; ?> Summary</h5>
+                      <h5 class="modal-title" id="changeNameModalLabel"><?php echo $value; ?> Resumen</h5>
                   </div>
                   <div class="modal-body">
                       <div class="table-responsive text-nowrap show_summary<?php echo $value; ?>">
                       </div>
                   </div>
                   <div class="modal-footer">
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
                   </div>
               </div>
           </div>
@@ -202,22 +202,22 @@
                     <div class="row">
                       <div class="col-md-6 col-12 mb-4">
                         <div class="modal-header" style="padding: 0rem 0rem 0rem;">
-                            <span for="flatpickr-date" class="form-label">From Date</span>
+                            <span for="flatpickr-date" class="form-label">Partir de la fecha</span>
                         </div>
                         
                         <input class="form-control from_date" type="date" value="2021-06-18T12:30:00" id="html5-datetime-local-input" />
                       </div>
                       <div class="col-md-6 col-12 mb-4">
                         <div class="modal-header" style="padding: 0rem 0rem 0rem;">
-                            <span for="flatpickr-date" class="form-label">To Date</span>
+                            <span for="flatpickr-date" class="form-label">Hasta la fecha</span>
                         </div>
                         <input class="form-control to_date" type="date" value="2021-06-18T12:30:00" id="html5-datetime-local-input" />
                       </div>
                     </div>
                   </div>
                   <div class="modal-footer">
-                      <button type="button" device-id="<?php echo $value; ?>" class="btn btn-primary datefilter">Submit</button>
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                      <button type="button" device-id="<?php echo $value; ?>" class="btn btn-primary datefilter">Entregar</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
                   </div>
               </div>
           </div>
@@ -233,22 +233,22 @@
                     <div class="row">
                       <div class="col-md-6 col-12 mb-4">
                         <div class="modal-header" style="padding: 0rem 0rem 0rem;">
-                            <span for="flatpickr-date" class="form-label">From Date</span>
+                            <span for="flatpickr-date" class="form-label">Partir de la fecha</span>
                         </div>
                         
                         <input class="form-control from_date_export<?php echo $value; ?>" type="date" value="2021-06-18T12:30:00" id="html5-datetime-local-input" />
                       </div>
                       <div class="col-md-6 col-12 mb-4">
                         <div class="modal-header" style="padding: 0rem 0rem 0rem;">
-                            <span for="flatpickr-date" class="form-label">To Date</span>
+                            <span for="flatpickr-date" class="form-label">Hasta la fecha</span>
                         </div>
                         <input class="form-control to_date_export<?php echo $value; ?>" type="date" value="2021-06-18T12:30:00" id="html5-datetime-local-input" />
                       </div>
                     </div>
                   </div>
                   <div class="modal-footer">
-                      <button type="button" class="btn btn-primary" onclick="datefilterexport('<?php echo $value; ?>')">Export</button>
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary" onclick="datefilterexport('<?php echo $value; ?>')">Exportar</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
                   </div>
               </div>
           </div>
@@ -262,7 +262,7 @@
               <div class="modal-dialog" role="document">
                   <div class="modal-content">
                       <div class="modal-header">
-                          <h5 class="modal-title" id="changeNameModalLabel">Customize Name</h5>
+                          <h5 class="modal-title" id="changeNameModalLabel">Personalizar nombre</h5>
                           <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                               <span aria-hidden="true">&times;</span>
                           </button> -->
@@ -271,8 +271,8 @@
                           <input type="text" name="change_name" id="name_textbox<?php echo $value; ?>" class="form-control" placeholder="Enter new name">
                       </div>
                       <div class="modal-footer">
-                          <button type="button" class="btn btn-primary" onclick="changedevicename('<?php echo $value; ?>')">Change</button>
-                          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-primary" onclick="changedevicename('<?php echo $value; ?>')">Cambiar</button>
+                          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
                       </div>
                   </div>
               </div>

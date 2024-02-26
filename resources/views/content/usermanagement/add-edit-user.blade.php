@@ -18,14 +18,14 @@
   <div class="col-xl">
     <div class="card mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">{{ isset($userdata) ? 'Edit User' : 'Add User' }}</h5> 
+        <h5 class="mb-0">{{ isset($userdata) ? 'editar usuario' : 'Agregar usuario' }}</h5> 
       </div>
       <div class="card-body">
         <form method="POST" action="{{ isset($userdata) ? route('update-user', $userdata->id) : route('insert-update-user') }}" id="change_lang">
           @csrf
           <input type="hidden" name="user_id" value="{{ isset($userdata) ? $userdata->id : '' }}">
           <div class="mb-3">
-            <label class="form-label" for="basic-default-fullname">Full Name</label>
+            <label class="form-label" for="basic-default-fullname">Nombre completo</label>
             <input type="text" name="name" value="{{ isset($userdata) ? $userdata->name : old('name') }}" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" id="basic-default-fullname" placeholder="John Doe" required/>
 
             @if ($errors->has('name'))
@@ -37,7 +37,7 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label" for="basic-default-fullname">Device Id</label>
+            <label class="form-label" for="basic-default-fullname">ID del dispositivo</label>
             <input type="button" onclick="generateUUID()" style="margin-bottom: 10px;margin-left: 10px;" class="btn rounded-pill me-2 btn-success" value="Generate Device Id">
             <input type="hidden" name="device_id" value="{{ isset($userdata) ? $userdata->device_id : old('device_id') }}" class="form-control{{ $errors->has('device_id') ? ' is-invalid' : '' }}" id="hiddenUUIDs" placeholder=""/>
 
@@ -62,7 +62,7 @@
           </div>
 
           <div class="mb-3 col-md-12">
-            <label class="form-label" style="margin-top: 10px" for="timezone">TimeZone</label>
+            <label class="form-label" style="margin-top: 10px" for="timezone">Zona horaria</label>
             <?php $selectedTimezones = ""; if (isset($userdata) && isset($userdata->timezone)) {
               $selectedTimezones = $userdata->timezone;
             } ?>
@@ -87,19 +87,19 @@
             <div class="form-check">
               <input name="role" class="form-check-input" type="radio" value="admin" {{ isset($userdata) && $userdata->role === 'admin' ? 'checked' : '' }} id="defaultRadio1" />
               <label class="form-check-label" for="defaultRadio1">
-                Admin
+                Administrador
               </label>
             </div>
             <div class="form-check">
               <input name="role" class="form-check-input" type="radio" value="user" id="defaultRadio2" {{ isset($userdata) && $userdata->role === 'user' ? 'checked' : '' }} />
               <label class="form-check-label" for="defaultRadio2">
-                User
+                Usuario
               </label>
             </div>
           </div>
 
           <div class="mb-3">
-            <label class="form-label" for="basic-default-email">Email</label>
+            <label class="form-label" for="basic-default-email">Correo electrónico</label>
             <div class="input-group input-group-merge">
               <input type="text" name="email" value="{{ isset($userdata) ? $userdata->email : old('email') }}" id="basic-default-email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" placeholder="john.doe" aria-label="john.doe" aria-describedby="basic-default-email2" />
               <!-- <span class="input-group-text" id="basic-default-email2">@example.com</span> -->
@@ -111,28 +111,28 @@
               @endif
 
             </div>
-            <div class="form-text"> You can use letters, numbers & periods </div>
+            <div class="form-text"> Puedes usar letras, números y puntos. </div>
           </div>
 
           <div class="row">
             <div class="mb-3 col-md-6">
-              <label class="form-label" for="basic-default-fullname">Status</label>
+              <label class="form-label" for="basic-default-fullname">Estado</label>
               <div class="form-check">
                 <input name="status" class="form-check-input" type="radio" value="active" {{ isset($userdata) && $userdata->status === 'active' ? 'checked' : '' }} id="defaultRadio3" />
                 <label class="form-check-label" for="defaultRadio3">
-                  Active
+                  Activo
                 </label>
               </div>
               <div class="form-check">
                 <input name="status" class="form-check-input" type="radio" value="inactive" id="defaultRadio4" {{ isset($userdata) && $userdata->status === 'inactive' ? 'checked' : '' }} />
                 <label class="form-check-label" for="defaultRadio4">
-                  Inactive
+                  Inactivo
                 </label>
               </div>
             </div>
 
             <div class="mb-3 col-md-6">
-              <label for="flatpickr-date" class="form-label">Expiry Date</label>
+              <label for="flatpickr-date" class="form-label">Fecha de caducidad</label>
               <input class="form-control" name="expiry_date" value="{{ isset($userdata) ? $userdata->expiry_date : old('expiry_date') }}" type="date" value="" id="html5-date-input" />
             </div>
           </div>
@@ -141,7 +141,7 @@
           if (isset($userdata)) { ?>
           <?php }else{ ?>
             <div class="mb-3">
-              <label class="form-label" for="basic-default-phone">Passsword</label>
+              <label class="form-label" for="basic-default-phone">Contraseña</label>
               <input type="password" name="password" value="" id="basic-default-phone" class="form-control" placeholder="" />
 
               @if ($errors->has('password'))
@@ -152,13 +152,13 @@
 
             </div>
             <div class="mb-3">
-              <label class="form-label" for="basic-default-phone">Confirm Passsword</label>
+              <label class="form-label" for="basic-default-phone">Confirmar contraseña</label>
               <input type="password" name="password_confirmation" id="basic-default-phone" class="form-control" placeholder="" required/>
             </div>
           <?php } ?>
           
 
-          <button type="submit" class="btn btn-primary">Submit</button>
+          <button type="submit" class="btn btn-primary">Entregar</button>
         </form>
       </div>
     </div>

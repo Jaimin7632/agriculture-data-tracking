@@ -2,38 +2,38 @@
   "menu": [
     {
       "url": "/",
-      "name": "Dashboard",
+      "name": "Panel",
       "icon": "menu-icon tf-icons bx bx-home-circle",
       "adminaccess" : "false",
       "slug": "dashboard-analytics"
     },
     {
-      "name": "Account Settings",
+      "name": "Configuraciones de la cuenta",
       "icon": "menu-icon tf-icons bx bx bx-dock-top",
       "slug": "pages-account-settings",
       "adminaccess" : "false",
       "submenu": [
         {
           "url": "/pages/account-settings-account",
-          "name": "Account",
+          "name": "Cuenta",
           "slug": "pages-account-settings-account"
         }
       ]
     },
     {
-      "name": "User Management",
+      "name": "Gestión de usuarios",
       "icon": "menu-icon tf-icons bx bx-detail",
       "slug": "user",
       "adminaccess" : "true",
       "submenu": [
         {
           "url": "usermanagement/user-list",
-          "name": "Users List",
+          "name": "Lista de usuarios",
           "slug": "user-list"
         },
         {
           "url": "usermanagement/add-edit-user",
-          "name": "Add Users",
+          "name": "Agregar usuarias",
           "slug": "add-edit-user"
         }
       ]

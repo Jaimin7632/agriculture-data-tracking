@@ -28,7 +28,7 @@
       $('#users_list').DataTable();
   });
 
-  function googleTranslateElementInit() {
+  /*function googleTranslateElementInit() {
         setCookie('googtrans', '/en/es/', 1);
         new google.translate.TranslateElement({
             pageLanguage: 'en',
@@ -40,16 +40,16 @@
         var expires = new Date();
         expires.setTime(expires.getTime() + (expiry * 24 * 60 * 60 * 1000));
         document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
-    }
+    }*/
 
-  	// function googleTranslateElementInit() {
-   //      new google.translate.TranslateElement({
-   //          pageLanguage: 'en',
-   //          includedLanguages: 'en,es',  // Specify included languages (English and Spanish)
-   //          layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-   //          autoDisplay: false
-   //      }, 'google_translate_element');
-   //  }
+  	function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,es',  // Specify included languages (English and Spanish)
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
+        }, 'google_translate_element');
+    }
 
     document.getElementById('languageSelector').addEventListener('change', function () {
         var selectedLanguage = this.value;
