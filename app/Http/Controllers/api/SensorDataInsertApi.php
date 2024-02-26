@@ -98,7 +98,7 @@ class SensorDataInsertApi extends Controller
             if(isset($data['device_id'])) { 
                 // Bulk insert data into MongoDB
                 $insertData = DB::collection('sensor_data')->insert([$data]);
-
+                
                 $device_id = $data['device_id'];
                 $data['device_id'] = (string) $device_id;
                 $userdata = User::where('device_id', 'like', "%$device_id%")->get();
@@ -117,13 +117,13 @@ class SensorDataInsertApi extends Controller
                                 if ($sensorData->min_value != '' && $sensorvalue < $sensorData->min_value) {
                                     // echo "Send Mail To User: " .$user['name']. ", " .$sensorData->sensor_name. " Min Value Set is ".$sensorData->min_value.'<br>';
                                     //SendEmailJob::dispatch($user['email'], "Min Value Alert - {$sensorData->sensor_name}", "Min value set is {$sensorData->min_value}");
-                                    //SendEmailJob::dispatch($user, $sensorData->sensor_name, $sensorData->min_value, $sensorData->max_value);
+                                    SendEmailJob::dispatch($user, $sensorData->sensor_name, $sensorData->min_value, $sensorData->max_value);
                                 }
 
                                 if ($sensorData->max_value != '' && $sensorvalue > $sensorData->max_value) {
                                     // echo "Send Mail To User: " .$user['name']. ", " .$sensorData->sensor_name. " Max Value Set is ".$sensorData->max_value.'<br>';
                                     //SendEmailJob::dispatch($user['email'], "Max Value Alert - {$sensorData->sensor_name}", "Max value set is {$sensorData->max_value}");
-                                    //SendEmailJob::dispatch($user, $sensorData->sensor_name, $sensorData->min_value, $sensorData->max_value);
+                                    SendEmailJob::dispatch($user, $sensorData->sensor_name, $sensorData->min_value, $sensorData->max_value);
 
                                 }
                             }
