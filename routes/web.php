@@ -64,6 +64,7 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::post('/get-show-summary', [Analytics::class, 'get_show_summary'])->name("get-show-summary");
 	Route::post('/file-export', [Analytics::class, 'fileExport'])->name('file-export');
 	Route::post('/update-alarm', [Analytics::class, 'updateAlarm'])->name('update-alarm');
+	Route::post('/get-alarm-history', [Analytics::class, 'get_alarm_history'])->name("get-alarm-history");
 	// Graph Data End
 
 	// layout

@@ -79,19 +79,20 @@ $('.datefilter').on('click', function() {
                     if (sensorconfig[sensorName]['type'] != 'multi'){
                       return true;
                     }
-                    // console.log("Sensor Name: " + sensorName);
+                     // console.log("Sensor Name: " + sensorValues.spname);
                     // console.log("Sensor Value: " + sensorValues.color);
                     // console.log("Sensor Value: " + sensorValues.icon);
-                    var readableSensorName = convertSensorName(sensorName);
+                    var readableSensorName = convertSensorName(sensorValues.spname);
                     if (readableSensorName == 'HUMIDITY SENSOR') {
                       readableSensorName = 'AIR '+readableSensorName;
                     }else if(readableSensorName == 'TEMPERATURE SENSOR'){
                       readableSensorName = 'AIR '+readableSensorName;
                     }
+
                     var sensorxvalue = [];
                     var sensoryvalue = [];
                     // Iterate over each sensor value
-
+                    console.log("Sensor Name: " + readableSensorName);
                     let cardColor, headingColor, axisColor, shadeColor, borderColor, legendColor, chartColors, labelColor ;
 
                     cardColor = config.colors.white;

@@ -89,6 +89,8 @@
 
                   <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#setalarm<?php echo $value; ?>">Ajustar alarma</button></li>
 
+                  <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" onclick="show_alarmhistory('<?php echo $value; ?>')" data-bs-target="#alarmhistry<?php echo $value; ?>">Historial de alarmas</button></li>
+
                 </ul>
               </div>
             </div>
@@ -101,6 +103,24 @@
 
           <!-- </div> -->
         <!-- </div> -->
+      </div>
+
+      <!-- Modal Summary-->
+      <div class="modal fade" id="alarmhistry<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document" style="max-width: 57rem">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="changeNameModalLabel"><?php echo $value; ?> Historial de alarmas</h5>
+                  </div>
+                  <div class="modal-body">
+                      <div class="table-responsive text-nowrap show_alarmhistory<?php echo $value; ?>">
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
+                  </div>
+              </div>
+          </div>
       </div>
 
       <!-- Modal Set Alarm-->
@@ -393,6 +413,48 @@
                 //       location.reload(true);
                 //   }
                 // });
+            }
+            // $('.loader').fadeOut();
+        }
+    });
+
+  }
+
+  function show_alarmhistory(device_id) {
+    //$("#changeNameModal"+device_id).modal('hide');
+    var device_id = device_id;
+    var user_id = $("#User_Id").val();
+    // console.log(user_id);
+    $.ajax({
+        type: 'POST',
+        url: '{{ route("get-alarm-history") }}',
+        data: {device_id:device_id,user_id:user_id,_token:"{{ csrf_token() }}"},
+        success: function (response) {
+            console.log(response);
+            //return false;
+            if (response.success == 'success') {
+                // location.reload(true);
+                $('.show_alarmhistory'+device_id).html(response.html);
+
+            }else{
+                $("#alarmhistry"+device_id).modal('hide');
+                Swal.fire({
+                    // title: 'You Dial Number!',
+                    title: 'Alarm History Not Found!',
+                    icon: 'failure',
+                    allowOutsideClick: false,
+                    confirmButtonText: 'Ok',
+                    customClass: {
+                        confirmButton: 'btn btn-danger ml-1'
+                    },
+                    buttonsStyling: true
+                }).then(function(result) {
+                  if (result.isConfirmed) {
+                      location.reload(true);
+                  } else {
+                      location.reload(true);
+                  }
+                });
             }
             // $('.loader').fadeOut();
         }

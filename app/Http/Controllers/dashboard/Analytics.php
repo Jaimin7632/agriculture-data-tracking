@@ -10,6 +10,7 @@ use App\Models\ChangeDeviceName;
 use App\Models\User;
 use App\Models\SensorData;
 use App\Models\Setalarm;
+use App\Models\AlarmHistory;
 use App\Models\Country;
 use Carbon\Carbon;
 use DB;
@@ -100,10 +101,12 @@ class Analytics extends Controller
           // Initialize an array to store sensor values dynamically
 
           foreach ($sensorConfig as $sensorName => $sensorDetails) {
+             // echo "<pre>"; print_r($sensorDetails['spname']); die();
               $sensorValueKey = $sensorDetails['key'];
               $sensorValueType = $sensorDetails['type'];
               $sensorValueColor = $sensorDetails['color'];
               $sensorValueIcon = $sensorDetails['icon'];
+              // $SPName = $sensorDetails['spname'];
 
               if (array_key_exists($sensorValueKey, $item)) {
                 if ($sensorValueType == 'single') {
@@ -112,6 +115,7 @@ class Analytics extends Controller
                   $sensorValues[$sensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $item[$sensorValueKey]];
                 }
                 // Add sensor values to the dynamically generated array
+                $sensorValues[$sensorName]['spname'] = $sensorDetails['spname'];
                 $sensorValues[$sensorName]['color'] = $sensorValueColor;
                 $sensorValues[$sensorName]['icon'] = $sensorValueIcon;
               }
@@ -472,7 +476,7 @@ class Analytics extends Controller
   public function updateAlarm(Request $request){
 
     $settings = $request->input('settings');
-    
+
     $user_id = $request->input('user_id');
     $device_id = $request->input('device_id');
     $allSensorData = [];
@@ -503,6 +507,58 @@ class Analytics extends Controller
       $responseData = ['success' => 'success', 'error' => ''];
       return response()->json($responseData);
 
+  }
+
+  public function get_alarm_history(Request $request){
+
+    $message = "Failure";
+    $post_data = $request->all();
+    $device_id = $post_data['device_id'];
+    $user_id = $post_data['user_id'];
+    if (!empty($device_id)) {
+      // $sensor_data = SensorData::where('device_id', $device_id)->get()->toArray();
+      $alarm_history = AlarmHistory::where('device_id', $device_id)->where('user_id', $user_id)->limit(15)->get()->toArray();
+      
+    } else {
+
+      $responseData = ['success' => 'failure', 'error' => '', 'html' => ''];
+      return response()->json($responseData);
+
+    }
+
+    $html = '<table class="table table-bordered">';
+    $html .= '<thead>';
+    $html .= '<tr style="text-align:center; font-family:math">';
+    $html .= '<th>Sensor Name</th>';
+    $html .= '<th>Alarm Value</th>';
+    $html .= '<th>Actual Value</th>';
+    $html .= '<th>Alarm Date</th>';
+    $html .= '</tr>';
+    $html .= '</thead>';
+    $html .= '<tbody>';
+
+    if (!empty($alarm_history)) {
+      foreach ($alarm_history as $key => $history) {
+        $dateTime = new \DateTime($history['created_at']);
+        $createdAt = $dateTime->format('Y-m-d H:i:s');
+
+          $html .= '<tr style="text-align:center;">';
+          $html .= '<td>' . $history['sensorname'] . '</td>';
+          $html .= '<td>' . $history['alarmvalue'] . '</td>';
+          $html .= '<td>' . $history['actualvalue'] . '</td>';
+          $html .= '<td>' . $createdAt . '</td>';
+          $html .= '</tr>';
+      }
+
+      $html .= '</tbody>';
+      $html .= '</table>';
+      $responseData = ['success' => 'success', 'error' => '', 'html' => $html];
+      return response()->json($responseData);
+    }else{
+      $responseData = ['success' => 'failure', 'error' => '', 'html' => $html];
+      return response()->json($responseData);
+    }
+    
   }
 
 }
