@@ -526,13 +526,17 @@ class Analytics extends Controller
 
     }
 
-    $html = '<table class="table table-bordered">';
+    $html = '<div class="table-responsive" style="margin-top: 10px;">';
+    $html .= '<table class="table table-bordered">';
     $html .= '<thead>';
     $html .= '<tr style="text-align:center; font-family:math">';
+    $html .= '<th colspan="4">Alarm History</th>'; // Spanning all columns for the title
+    $html .= '</tr>';
+    $html .= '<tr style="text-align:center; font-family:math">';
+    $html .= '<th>Alarm Date</th>';
     $html .= '<th>Sensor Name</th>';
     $html .= '<th>Alarm Value</th>';
     $html .= '<th>Actual Value</th>';
-    $html .= '<th>Alarm Date</th>';
     $html .= '</tr>';
     $html .= '</thead>';
     $html .= '<tbody>';
@@ -543,15 +547,16 @@ class Analytics extends Controller
         $createdAt = $dateTime->format('Y-m-d H:i:s');
 
           $html .= '<tr style="text-align:center;">';
+          $html .= '<td>' . $createdAt . '</td>';
           $html .= '<td>' . $history['sensorname'] . '</td>';
           $html .= '<td>' . $history['alarmvalue'] . '</td>';
           $html .= '<td>' . $history['actualvalue'] . '</td>';
-          $html .= '<td>' . $createdAt . '</td>';
           $html .= '</tr>';
       }
 
       $html .= '</tbody>';
       $html .= '</table>';
+      $html .= '</div>';
       $responseData = ['success' => 'success', 'error' => '', 'html' => $html];
       return response()->json($responseData);
     }else{

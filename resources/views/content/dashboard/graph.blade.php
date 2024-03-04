@@ -50,31 +50,32 @@
         <!-- <div class="card-body"> -->
           <!-- <div class="demo-inline-spacing"> -->
             <div class="row" style="padding: 15px 10px 15px 10px;">
-              <div class="btn-group col-md-5 col-sm-6  graphDiv align-items-center" device-id="<?php echo $value; ?>" style="cursor: pointer; color: blue;">
-                <?php
-                $device_name = $value;
+              <div class="col-md-5 col-sm-6">
+                  <div class="btn-group graphDiv align-items-center" device-id="<?php echo $value; ?>" onclick="show_alarmhistory('<?php echo $value; ?>')" style="cursor: pointer; color: blue;">
+                      <?php
+                      $device_name = $value;
 
-                $change_text_data = \App\Models\ChangeDeviceName::where('user_id', $user->id)->where('device_id', $value)->first();
+                      $change_text_data = \App\Models\ChangeDeviceName::where('user_id', $user->id)->where('device_id', $value)->first();
 
-                if (!empty($change_text_data)) {
-                  $device_name = $change_text_data->change_name;
-                }
-              ?>
-              <span class="device_name_text">Dispositivo - <?php echo $device_name; ?></span>
-              <span class="no_data_found">
-                  <h6 class="card-header m-0 me-2 pb-3 no_data_found<?php echo $value; ?>" style="display: none;"></h6>
-              </span>
+                      if (!empty($change_text_data)) {
+                          $device_name = $change_text_data->change_name;
+                      }
+                      ?>
+                      <span class="device_name_text">Dispositivo - <?php echo $device_name; ?></span>
+                      <span class="no_data_found">
+                          <h6 class="card-header m-0 me-2 pb-3 no_data_found<?php echo $value; ?>" style="display: none;"></h6>
+                      </span>
+                  </div>
               </div>
-              <div class="col-md-1 col-sm-6 align-items-center justify-content-left">
-                <div class="spinner-border m-3" id="spinner<?php echo $value; ?>" role="status" style="color: blue; display: none;">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
+              <div class="col-md-1 col-sm-6">
+                  <div class="spinner-border " id="spinner<?php echo $value; ?>" role="status" style="color: blue; display: none;">
+                      <span class="visually-hidden">Loading...</span>
+                  </div>
               </div>
 
-              <div class="btn-group col-md-6 col-sm-6 ">
-                <button type="button" class="btn btn-primary dropdown-toggle overflow-hidden d-sm-inline-flex d-block text-truncate justify-content-center hide-arrow" data-bs-toggle="dropdown"  aria-haspopup="true" aria-expanded="false">
-                  Acción
-                </button>
+              <div class="btn-group col-md-6 col-sm-6 " style="justify-content: end;">
+                
+                <i class="fas fa-cog" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="justify-content: end;"></i>
 
                 <ul class="dropdown-menu dropdown-menu-start dropdown-menu-lg-end">
                   <li><button class="dropdown-item btn btn-outline-secondary show_summary" data-bs-toggle="modal" type="button" onclick="show_summary('<?php echo $value; ?>')" data-bs-target="#summury<?php echo $value; ?>">Resumen</button></li>
@@ -89,38 +90,27 @@
 
                   <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#setalarm<?php echo $value; ?>">Ajustar alarma</button></li>
 
-                  <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" onclick="show_alarmhistory('<?php echo $value; ?>')" data-bs-target="#alarmhistry<?php echo $value; ?>">Historial de alarmas</button></li>
-
                 </ul>
               </div>
+
+              </br>
+              <span class="show_alarm_history<?php echo $value; ?>" id="show_alarm_history"></span>
+              <span class="append_graph_blank" id="append_graph<?php echo $value; ?>"></span>
+              <span class="append_graph_single" id="append_graph_single<?php echo $value; ?>"></span>
+
             </div>
 
+            <!-- <div class="row row-bordered g-0 show_alarm_history<?php echo $value; ?>" >
+            </div>
+            <br>
             <div class="row row-bordered g-0 append_graph_blank" id="append_graph<?php echo $value; ?>">
             </div>
 
             <div class="row row-bordered g-0 append_graph_single" id="append_graph_single<?php echo $value; ?>">
-            </div>
+            </div> -->
 
           <!-- </div> -->
         <!-- </div> -->
-      </div>
-
-      <!-- Modal Summary-->
-      <div class="modal fade" id="alarmhistry<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
-          <div class="modal-dialog" role="document" style="max-width: 57rem">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h5 class="modal-title" id="changeNameModalLabel"><?php echo $value; ?> Historial de alarmas</h5>
-                  </div>
-                  <div class="modal-body">
-                      <div class="table-responsive text-nowrap show_alarmhistory<?php echo $value; ?>">
-                      </div>
-                  </div>
-                  <div class="modal-footer">
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
-                  </div>
-              </div>
-          </div>
       </div>
 
       <!-- Modal Set Alarm-->
@@ -211,7 +201,6 @@
               </div>
           </div>
       </div>
-
   
 
       <!-- Modal Data Filter-->
@@ -244,7 +233,6 @@
       </div>
 
 
- 
       <!-- Modal Export Data-->
       <div class="modal fade" id="exportdata<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document" style="max-width: 57rem">
@@ -421,7 +409,7 @@
   }
 
   function show_alarmhistory(device_id) {
-    //$("#changeNameModal"+device_id).modal('hide');
+    $("#show_alarm_history").html('');
     var device_id = device_id;
     var user_id = $("#User_Id").val();
     // console.log(user_id);
@@ -434,27 +422,12 @@
             //return false;
             if (response.success == 'success') {
                 // location.reload(true);
-                $('.show_alarmhistory'+device_id).html(response.html);
+                $('.show_alarm_history'+device_id).html(response.html);
 
             }else{
                 $("#alarmhistry"+device_id).modal('hide');
-                Swal.fire({
-                    // title: 'You Dial Number!',
-                    title: 'Alarm History Not Found!',
-                    icon: 'failure',
-                    allowOutsideClick: false,
-                    confirmButtonText: 'Ok',
-                    customClass: {
-                        confirmButton: 'btn btn-danger ml-1'
-                    },
-                    buttonsStyling: true
-                }).then(function(result) {
-                  if (result.isConfirmed) {
-                      location.reload(true);
-                  } else {
-                      location.reload(true);
-                  }
-                });
+                $('.show_alarm_history'+device_id).html("");
+                
             }
             // $('.loader').fadeOut();
         }
