@@ -126,13 +126,13 @@ $('.datefilter').on('click', function() {
                     // });
                     var chartTitle = $('<h3>', {
                       html: sensorValues.icon  + readableSensorName, // Icon HTML added before the text
-                      style: 'color: ' + sensorValues.color + '; font-size: 24px; margin-bottom: 10px;' // Adjust font-size and margin as needed
+                      style: 'color: ' + sensorValues.color + '; font-size: 20px; margin-bottom: 10px;' // Adjust font-size and margin as needed
                     });
 
                     // Last Y Value
                     var lastYValue = $('<h3>', {
                       text: Math.round(sensorValues.data[sensorValues.data.length - 1].y * 100)/100 + ' ' + sensorconfig[sensorName]['unit'],
-                      style: 'color: #4c4e4f; font-size: 34px;'  // Adjust font-size as needed
+                      style: 'color: #4c4e4f; font-size: 28px;'  // Adjust font-size as needed
                     });
 
                     // Append elements to the container
