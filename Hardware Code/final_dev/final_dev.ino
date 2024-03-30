@@ -6,7 +6,8 @@ const char wifiPass[] = "blackqr_7632";
 // set sensors details
 const int numSensors = 4;
 const int sensorPins[numSensors] = {32, 36, -1, -1}; // Example sensor pins
-const char* sensorNames[numSensors] = {"Soil", "Pressure", "Humidity", "Temperature"};
+const char* sensorNames[numSensors] = {"SoilWetness", "AirPressure", "Humidity", "AirTemperature"};
+const char* sensorUnits[numSensors] = {"%", "kPa", "%", "°C"};
 const float pressureMaxRange = 0.2; // set pressure sensor range in MPa
 
 
@@ -33,6 +34,7 @@ String locationString;
 
 Adafruit_AHTX0 aht;
 
+// Function to read sensor values
 void readSensors() {
     for (int i = 0; i < numSensors; ++i) {
         if (strcmp(sensorNames[i], "Humidity") == 0) {
@@ -40,7 +42,7 @@ void readSensors() {
             sensors_event_t humidity, temp;
             aht.getEvent(&humidity, &temp);
             sensorValues[i] = humidity.relative_humidity;
-        } else if (strcmp(sensorNames[i], "Temperature") == 0) {
+        } else if (strcmp(sensorNames[i], "AirTemperature") == 0) {
             // Code to read temperature sensor differently
             sensors_event_t humidity, temp;
             aht.getEvent(&humidity, &temp);
@@ -48,6 +50,13 @@ void readSensors() {
         } else {
             // Code to read other sensors (like soil, pressure) using analogRead
             sensorValues[i] = analogRead(sensorPins[i]);
+            if (strcmp(sensorNames[i], "SoilWetness") == 0) {
+                // Transformation for soil sensor value
+                sensorValues[i] = (1 - (sensorValues[i] / 4095.0)) * 100;
+            } else if (strcmp(sensorNames[i], "AirPressure") == 0) {
+                // Transformation for pressure sensor value
+                sensorValues[i] = (pressureMaxRange / 1023.0) * sensorValues[i];
+            }
         }
     }
 }
@@ -55,8 +64,11 @@ void readSensors() {
 // Function to add sensor data to JSON document
 void addSensorDataToJson(DynamicJsonDocument& jsonDocument) {
     jsonDocument["device_id"] = device_id;
+    JsonObject sensorData = jsonDocument.createNestedObject("sensor_data");
     for (int i = 0; i < numSensors; ++i) {
-        jsonDocument[sensorNames[i]] = sensorValues[i];
+        JsonObject sensor = sensorData.createNestedObject(sensorNames[i]);
+        sensor["value"] = sensorValues[i];
+        sensor["unit"] = sensorUnits[i];
     }
 }
 
