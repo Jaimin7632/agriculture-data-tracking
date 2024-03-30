@@ -1,7 +1,7 @@
 const char device_id[] = "57515554";
 // Your WiFi connection credentials
-const char wifiSSID[] = "BlackQR";
-const char wifiPass[] = "blackqr_7632";
+char wifiSSID[] = "OnePlus 8";
+char wifiPass[] = "jaimin@7632";
 
 // set sensors details
 const int numSensors = 4;
@@ -110,25 +110,33 @@ void loop() {
     // Perform HTTP POST request
     int httpResponseCode = http.post(endpoint, "application/json", jsonString);
 
-    if (httpResponseCode > 0) {
+    if (httpResponseCode == 0) {
         Serial.print("HTTP Response code: ");
         Serial.println(httpResponseCode);
-        String payload = http.getString();
-        Serial.println("Response:");
-        Serial.println(payload);
-        DynamicJsonDocument responseData(512); // Adjust buffer size according to your JSON payload size
-        DeserializationError error = deserializeJson(responseData, payload);
-        Serial.print(responseData);
-        const char* wifi_id = responseData["data"]["wifi_id"];
-        const char* wifi_password = responseData["data"]["wifi_password"];
-        Serial.print(wifi_id);
-        // Extract data from the response if needed
+        String payload = http.readString();
+        int bodyIndex = payload.indexOf("\r\n\r\n");
+
+        // Extract the body part if the blank line was found
+        if (bodyIndex != -1) {
+            String body = payload.substring(bodyIndex + 4); // Add 4 to skip "\r\n\r\n"
+            Serial.println("Body:");
+            Serial.println(body);
+            DynamicJsonDocument responseData(512); // Adjust buffer size according to your JSON payload size
+            DeserializationError error = deserializeJson(responseData, body);
+            const char* wifi_id = responseData["data"]["wifi_id"];
+            const char* wifi_password = responseData["data"]["wifi_password"];
+            
+            
+        } else {
+            Serial.println("Error: Blank line indicating end of headers not found.");
+        }
+
     } else {
         Serial.print("Error code: ");
         Serial.println(httpResponseCode);
     }
 
-    http.end();
+    http.stop();
     // Delay or other code here
 
     // Delay before sending next data
