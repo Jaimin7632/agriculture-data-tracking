@@ -1,7 +1,7 @@
 const char device_id[] = "57515554";
 // Your WiFi connection credentials
-char wifiSSID[] = "OnePlus 8";
-char wifiPass[] = "jaimin@7632";
+char wifiSSID[] = "BlackQR";
+char wifiPass[] = "blackqr_7632";
 
 // set sensors details
 const int numSensors = 4;
