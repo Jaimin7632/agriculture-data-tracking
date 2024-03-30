@@ -108,25 +108,28 @@ void loop() {
     Serial.println(jsonString);
 
     // Perform HTTP POST request
-    int err = http.post(endpoint, "application/json", jsonString);
-    if (err != 0) {
-        Serial.println("Failed to connect");
-        delay(10000);
-        return;
-    }
+    int httpResponseCode = http.post(endpoint, "application/json", jsonString);
 
-    int status = http.responseStatusCode();
-    Serial.print("Response status code: ");
-    Serial.println(status);
-
-    if (status == 200) {
-        Serial.println("Data sent successfully");
+    if (httpResponseCode > 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+        String payload = http.getString();
+        Serial.println("Response:");
+        Serial.println(payload);
+        DynamicJsonDocument responseData(512); // Adjust buffer size according to your JSON payload size
+        DeserializationError error = deserializeJson(responseData, payload);
+        Serial.print(responseData);
+        const char* wifi_id = responseData["data"]["wifi_id"];
+        const char* wifi_password = responseData["data"]["wifi_password"];
+        Serial.print(wifi_id);
+        // Extract data from the response if needed
     } else {
-        Serial.println("Failed to send data");
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
     }
 
-    http.stop();
-    Serial.println("Server disconnected");
+    http.end();
+    // Delay or other code here
 
     // Delay before sending next data
     delay(60 * 5000);
