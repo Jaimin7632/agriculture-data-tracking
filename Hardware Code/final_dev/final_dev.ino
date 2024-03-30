@@ -3,11 +3,14 @@ const char device_id[] = "57515554";
 const char wifiSSID[] = "BlackQR";
 const char wifiPass[] = "blackqr_7632";
 
-// Sensor pins
-const int soilSensorPin = 32;  // A0 is equivalent to 0
-const int pressureSensorPin = 36;  // A1 is equivalent to 1
+// set sensors details
+const int numSensors = 4;
+const int sensorPins[numSensors] = {32, 36, -1, -1}; // Example sensor pins
+const char* sensorNames[numSensors] = {"Soil", "Pressure", "Humidity", "Temperature"};
 const float pressureMaxRange = 0.2; // set pressure sensor range in MPa
 
+
+float sensorValues[numSensors] = {0};
 // Server details
 const char server[] = "16.171.60.141";
 const int port = 8000;
@@ -30,6 +33,32 @@ String locationString;
 
 Adafruit_AHTX0 aht;
 
+void readSensors() {
+    for (int i = 0; i < numSensors; ++i) {
+        if (strcmp(sensorNames[i], "Humidity") == 0) {
+            // Code to read humidity sensor differently
+            sensors_event_t humidity, temp;
+            aht.getEvent(&humidity, &temp);
+            sensorValues[i] = humidity.relative_humidity;
+        } else if (strcmp(sensorNames[i], "Temperature") == 0) {
+            // Code to read temperature sensor differently
+            sensors_event_t humidity, temp;
+            aht.getEvent(&humidity, &temp);
+            sensorValues[i] = temp.temperature;
+        } else {
+            // Code to read other sensors (like soil, pressure) using analogRead
+            sensorValues[i] = analogRead(sensorPins[i]);
+        }
+    }
+}
+
+// Function to add sensor data to JSON document
+void addSensorDataToJson(DynamicJsonDocument& jsonDocument) {
+    jsonDocument["device_id"] = device_id;
+    for (int i = 0; i < numSensors; ++i) {
+        jsonDocument[sensorNames[i]] = sensorValues[i];
+    }
+}
 
 void setup() {
     Serial.begin(115200);
@@ -53,27 +82,13 @@ void setup() {
 
 void loop() {
     // Read sensor values
-    soilSensorValue = analogRead(soilSensorPin);
-    pressureSensorValue = analogRead(pressureSensorPin);
+    readSensors();
 
-    // Read AHTX0 sensor values
-    sensors_event_t humidity, temp;
-    aht.getEvent(&humidity, &temp);
-    humiditySensorValue = humidity.relative_humidity;
-    temperatureSensorValue = temp.temperature;
+    // Create JSON object
+    DynamicJsonDocument jsonDocument(256);
+    addSensorDataToJson(jsonDocument);
 
-  
-
-  // Create JSON object
-  DynamicJsonDocument jsonDocument(256);
-  jsonDocument["device_id"] = device_id;
-  jsonDocument["soilSensorValue"] = ((1 - (soilSensorValue/4095)) * 100);
-  jsonDocument["pressureSensorValue"] = (pressureMaxRange/1023) * pressureSensorValue;
-  jsonDocument["humiditySensorValue"] = humiditySensorValue;
-  jsonDocument["temperatureSensorValue"] = temperatureSensorValue;
-  // jsonDocument["location"] = locationString;
-
-    // Serialize JSON to string
+    // Serialize JSON document
     String jsonString;
     serializeJson(jsonDocument, jsonString);
 
