@@ -143,9 +143,9 @@ class SensorDataInsertApi extends Controller
                     }
                 }
             }
-            
+            $extraparam = array('wifi_id' => 'BlackQR', 'wifi_password' => 'blackqr_7632');
             if($insertData){
-                return response()->json(['status'=>'success','data'=>$data,'message' => 'Request was successful'], 200);
+                return response()->json(['status'=>'success','data'=>$extraparam,'message' => 'Request was successful'], 200);
             } else {
                 return response()->json(['status'=>'failed','data'=>'','message' => 'Request failed'], 201);
             }
