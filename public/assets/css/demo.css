@@ -107,7 +107,7 @@
 }
 .device_name_text:hover {
     font-weight: bold; /* Change to bold on hover */
-    color: #696cff; /* Change the color on hover */
+    color: #195905; /* Change the color on hover */
 }
 .logo-center{
   height: 110px; 
@@ -115,4 +115,8 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+.fa-cog{
+  color: #215732;
 }
