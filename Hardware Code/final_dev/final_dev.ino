@@ -1,7 +1,7 @@
 const char device_id[] = "57515554";
 // Your WiFi connection credentials
-const char wifiSSID[] = "BlackQR";
-const char wifiPass[] = "blackqr_7632";
+char wifiSSID[] = "BlackQR";
+char wifiPass[] = "blackqr_7632";
 
 // set sensors details
 const int numSensors = 4;
@@ -108,25 +108,36 @@ void loop() {
     Serial.println(jsonString);
 
     // Perform HTTP POST request
-    int err = http.post(endpoint, "application/json", jsonString);
-    if (err != 0) {
-        Serial.println("Failed to connect");
-        delay(10000);
-        return;
-    }
+    int httpResponseCode = http.post(endpoint, "application/json", jsonString);
 
-    int status = http.responseStatusCode();
-    Serial.print("Response status code: ");
-    Serial.println(status);
+    if (httpResponseCode == 0) {
+        Serial.print("HTTP Response code: ");
+        Serial.println(httpResponseCode);
+        String payload = http.readString();
+        int bodyIndex = payload.indexOf("\r\n\r\n");
 
-    if (status == 200) {
-        Serial.println("Data sent successfully");
+        // Extract the body part if the blank line was found
+        if (bodyIndex != -1) {
+            String body = payload.substring(bodyIndex + 4); // Add 4 to skip "\r\n\r\n"
+            Serial.println("Body:");
+            Serial.println(body);
+            DynamicJsonDocument responseData(512); // Adjust buffer size according to your JSON payload size
+            DeserializationError error = deserializeJson(responseData, body);
+            const char* wifi_id = responseData["data"]["wifi_id"];
+            const char* wifi_password = responseData["data"]["wifi_password"];
+            
+            
+        } else {
+            Serial.println("Error: Blank line indicating end of headers not found.");
+        }
+
     } else {
-        Serial.println("Failed to send data");
+        Serial.print("Error code: ");
+        Serial.println(httpResponseCode);
     }
 
     http.stop();
-    Serial.println("Server disconnected");
+    // Delay or other code here
 
     // Delay before sending next data
     delay(60 * 5000);

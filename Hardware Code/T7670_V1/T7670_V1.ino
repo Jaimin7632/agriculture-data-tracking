@@ -1,19 +1,26 @@
 #include <ArduinoJson.h>
 #include <Adafruit_AHTX0.h>
 
+
 #define TINY_GSM_USE_GPRS true
 
 
 const char device_id[] = "41241112";
-// Sensor pins
-const int soilSensorPin = 32;  // A0 is equivalent to 0
-const int pressureSensorPin = 36;  // A1 is equivalent to 1
+// set sensors details
+const int numSensors = 4;
+const int sensorPins[numSensors] = {32, 36, -1, -1}; // Example sensor pins
+const char* sensorNames[numSensors] = {"SoilWetness", "AirPressure", "Humidity", "AirTemperature"};
+const char* sensorUnits[numSensors] = {"%", "kPa", "%", "°C"};
 const float pressureMaxRange = 0.2; // set pressure sensor range in MPa
 
+float sensorValues[numSensors] = {0};
+
 // Server details
-const char endpoint[] = "http://16.171.60.141:8000/api/sensordatastore";
+const char server[] = "16.171.60.141";
+const int port = 8000;
+const char endpoint[] = "/api/sensordatastore";
 
-
+#include <ArduinoHttpClient.h>
 #if TINY_GSM_USE_GPRS
   #define LILYGO_T_A7670
   #define TINY_GSM_RX_BUFFER          1024
@@ -26,7 +33,10 @@ const char endpoint[] = "http://16.171.60.141:8000/api/sensordatastore";
   TinyGsm modem(debugger);
   #else
   TinyGsm modem(SerialAT);
+  
   #endif
+  TinyGsmClient client(modem);
+  HttpClient    http(client, server, port);
 
 #endif
 
@@ -38,53 +48,43 @@ float temperatureSensorValue;
 
 Adafruit_AHTX0 aht;
 
-void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
-    String jsonString;
-    serializeJson(jsonDocument, jsonString);
-
-    Serial.print("Sending JSON data: ");
-    Serial.print(server_url);
-    Serial.println(jsonString);
-
-    // Initialize HTTPS
-    modem.https_begin();
-
-    // Set GET URT
-    if (!modem.https_set_url(server_url)) {
-        Serial.println("Failed to set the URL. Please check the validity of the URL!");
-        return;
+// Function to read sensor values
+void readSensors() {
+    for (int i = 0; i < numSensors; ++i) {
+        if (strcmp(sensorNames[i], "Humidity") == 0) {
+            // Code to read humidity sensor differently
+            sensors_event_t humidity, temp;
+            aht.getEvent(&humidity, &temp);
+            sensorValues[i] = humidity.relative_humidity;
+        } else if (strcmp(sensorNames[i], "AirTemperature") == 0) {
+            // Code to read temperature sensor differently
+            sensors_event_t humidity, temp;
+            aht.getEvent(&humidity, &temp);
+            sensorValues[i] = temp.temperature;
+        } else {
+            // Code to read other sensors (like soil, pressure) using analogRead
+            sensorValues[i] = analogRead(sensorPins[i]);
+            if (strcmp(sensorNames[i], "SoilWetness") == 0) {
+                // Transformation for soil sensor value
+                sensorValues[i] = (1 - (sensorValues[i] / 4095.0)) * 100;
+            } else if (strcmp(sensorNames[i], "AirPressure") == 0) {
+                // Transformation for pressure sensor value
+                sensorValues[i] = (pressureMaxRange / 1023.0) * sensorValues[i];
+            }
+        }
     }
-
-    //
-    modem.https_add_header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
-    modem.https_add_header("Accept-Encoding", "gzip, deflate, br");
-    modem.https_set_accept_type("application/json");
-    modem.https_set_user_agent("TinyGSM/LilyGo-A76XX");
-    modem.https_add_header("Content-Type", "application/json");
-
-    String post_body = jsonString;
-
-    int httpCode = modem.https_post(post_body);
-    if (httpCode != 200) {
-        Serial.print("HTTP post failed ! error code = ");
-        Serial.println(httpCode);
-        return;
-    }
-
-    // Get HTTPS header information
-    String header = modem.https_header();
-    Serial.print("HTTP Header : ");
-    Serial.println(header);
-
-    // Get HTTPS response
-    String body = modem.https_body();
-    Serial.print("HTTP body : ");
-    Serial.println(body);
-    Serial.println("Server disconnected");
-
 }
 
-
+// Function to add sensor data to JSON document
+void addSensorDataToJson(DynamicJsonDocument& jsonDocument) {
+    jsonDocument["device_id"] = device_id;
+    JsonObject sensorData = jsonDocument.createNestedObject("sensor_data");
+    for (int i = 0; i < numSensors; ++i) {
+        JsonObject sensor = sensorData.createNestedObject(sensorNames[i]);
+        sensor["value"] = sensorValues[i];
+        sensor["unit"] = sensorUnits[i];
+    }
+}
 
 void setup() {
     Serial.begin(115200);
@@ -217,28 +217,62 @@ void setup() {
 }
 
 void loop() {
+    
     // Read sensor values
-    soilSensorValue = analogRead(soilSensorPin);
-    pressureSensorValue = analogRead(pressureSensorPin);
-
-    // Read AHTX0 sensor values
-    sensors_event_t humidity, temp;
-    aht.getEvent(&humidity, &temp);
-    humiditySensorValue = humidity.relative_humidity;
-    temperatureSensorValue = temp.temperature;
+    readSensors();
 
     // Create JSON object
     DynamicJsonDocument jsonDocument(256);
-    jsonDocument["device_id"] = device_id;
-    jsonDocument["soilSensorValue"] = ((1 - (soilSensorValue/4095)) * 100);
-    jsonDocument["pressureSensorValue"] = (pressureMaxRange/1023) * pressureSensorValue;
-    jsonDocument["humiditySensorValue"] = humiditySensorValue;
-    jsonDocument["temperatureSensorValue"] = temperatureSensorValue;
-    jsonDocument["location"] = "0,0";
+    addSensorDataToJson(jsonDocument);
 
-    #if TINY_GSM_USE_GPRS
-      sendJsonModem(endpoint, jsonDocument);
-    #endif
+    // Serialize JSON document
+    String jsonString;
+    serializeJson(jsonDocument, jsonString);
+
+    Serial.print("Sending JSON data: ");
+    Serial.println(jsonString);
+
+    int err = http.post(endpoint, "application/json", jsonString);
+    if (err != 0) {
+        Serial.println(F("failed to connect"));
+        delay(10000);
+        return;
+    }
+
+    int status = http.responseStatusCode();
+    Serial.print(F("Response status code: "));
+    Serial.println(status);
+    if (!status) {
+        delay(10000);
+        return;
+    }
+
+    Serial.println(F("Response Headers:"));
+    while (http.headerAvailable()) {
+        String headerName  = http.readHeaderName();
+        String headerValue = http.readHeaderValue();
+        Serial.println("    " + headerName + " : " + headerValue);
+    }
+
+    int length = http.contentLength();
+    if (length >= 0) {
+        Serial.print(F("Content length is: "));
+        Serial.println(length);
+    }
+    if (http.isResponseChunked()) {
+        Serial.println(F("The response is chunked"));
+    }
+
+    String body = http.responseBody();
+    Serial.println(F("Response:"));
+    Serial.println(body);
+
+    Serial.print(F("Body length is: "));
+    Serial.println(body.length());
+
+    // Shutdown
+
+    http.stop();
     // 15 min Delay before sending next data
     delay(60 * 1000 * 15);
 }
