@@ -107,7 +107,63 @@ class SensorDataInsertApi extends Controller
                 foreach ($userdata as $user) {
                     $uid = $user['_id'];
                     $did = $user['device_id'];
-                    $alarmdata = Setalarm::where('user_id', $uid)->where('device_id', $device_id)->first();
+                    
+                    foreach ($data['sensor_data'] as $sensor_name => $sensor_value) {
+                        $alarmdata = Setalarm::where('user_id', $uid)
+                                            ->where('sensor_name', $sensor_name)
+                                            ->where('device_id', $device_id)
+                                            ->first();
+
+                        if (!empty($alarmdata)) {
+                            $alarm_data = json_decode($alarmdata->alarmdata);
+                            
+                            foreach ($alarm_data as $sensorData) {
+                                if (isset($sensor_value['value'])) {
+                                    $sensorvalue = $sensor_value['value'];
+                                    
+                                    if ($sensorData->min_value != '' && $sensorvalue < $sensorData->min_value) {
+                                        $this->savealarmhistory($device_id, $uid, $sensorData->min_value, $sensorvalue, $data['created_at'], $sensor_name);
+                                    }
+
+                                    if ($sensorData->max_value != '' && $sensorvalue > $sensorData->max_value) {
+                                        $this->savealarmhistory($device_id, $uid, $sensorData->max_value, $sensorvalue, $data['created_at'], $sensor_name);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            $extraparam = array('wifi_id' => 'BlackQR', 'wifi_password' => 'blackqr_7632');
+            if($insertData){
+                return response()->json(['status'=>'success','data'=>$extraparam,'message' => 'Request was successful'], 200);
+            } else {
+                return response()->json(['status'=>'failed','data'=>'','message' => 'Request failed'], 201);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status'=>'failed','data'=>'','error' => 'Request failed', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function sensordatastore_04_04_2024(Request $request){
+        try {
+            $data = $request->all();
+            echo "<pre>"; print_r($data); die();
+            $data['created_at'] = $data['updated_at'] = date('Y-m-d H:i:s');
+            
+            if(isset($data['device_id'])) { 
+                // Bulk insert data into MongoDB
+                $insertData = DB::collection('sensor_data')->insert([$data]);
+
+                $device_id = $data['device_id'];
+                $data['device_id'] = (string) $device_id;
+                $userdata = User::where('device_id', 'like', "%$device_id%")->get();
+                
+                foreach ($userdata as $user) {
+                    $uid = $user['_id'];
+                    $did = $user['device_id'];
+                    $alarmdata = Setalarm::where('user_id', $uid)->where('sensor_name', $sensor_name)->where('device_id', $device_id)->first();
 
                     if (!empty($alarmdata)) {
                         $alarm_data = json_decode($alarmdata->alarmdata);

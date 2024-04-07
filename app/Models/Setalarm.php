@@ -21,6 +21,7 @@ class Setalarm extends Authenticatable
      */
     protected $fillable = [
         'id',
+        'sensor_name',
         'user_id',
         'device_id',
         'alarmdata',

@@ -57,7 +57,8 @@ $('.datefilter').on('click', function() {
         data: {device_id:device_id,from_date:from_date,to_date:to_date,_token:csrfToken},
         dataType: 'json',
         success: function (response) {
-            // console.log(response);
+          //console.log('resp');
+            console.log(response);
               $('#spinner'+device_id).hide();
               // localStorage.screenname = "callcenter";
               // setCurrentScreen(localStorage.screenname);
@@ -66,7 +67,7 @@ $('.datefilter').on('click', function() {
                 $('.no_data_found'+response.devide_id).hide();
                 var sensorData = response.data.sensordata;
                 var sensorconfig = response.sensorconfig;
-                console.log(sensorData);
+                //console.log(sensorData);
                 if ($.isEmptyObject(sensorData)) {
                     $('.no_data_found').show();
                     $('.no_data_found'+response.devide_id).show();
@@ -76,12 +77,12 @@ $('.datefilter').on('click', function() {
                 var devide_id = response.devide_id;
                 // Iterate over each sensor
                 $.each(sensorData, function(sensorName, sensorValues) {
-                    if (sensorconfig[sensorName]['type'] != 'multi'){
+                  console.log(sensorValues.type);
+                    if (sensorValues.type != 'multi'){
                       return true;
                     }
-                     // console.log("Sensor Name: " + sensorValues.spname);
-                    // console.log("Sensor Value: " + sensorValues.color);
-                    // console.log("Sensor Value: " + sensorValues.icon);
+                    //console.log(sensorValues);
+                    
                     var readableSensorName = convertSensorName(sensorValues.spname);
                     if (readableSensorName == 'HUMIDITY SENSOR') {
                       readableSensorName = 'AIR '+readableSensorName;
@@ -119,19 +120,20 @@ $('.datefilter').on('click', function() {
                     });
 
                     var imageUrl = baseUrl +'/'+ sensorValues.icon;
-                    // Chart Title
-                    // var chartTitle = $('<h3>', {
-                    //   text: readableSensorName,
-                    //   style: 'color: '+sensorValues.color+'; font-size: 24px; margin-bottom: 10px;'  // Adjust font-size and margin as needed
-                    // });
+                    
                     var chartTitle = $('<h3>', {
-                      html: sensorValues.icon  + readableSensorName, // Icon HTML added before the text
-                      style: 'color: ' + sensorValues.color + '; font-size: 20px; margin-bottom: 10px;' // Adjust font-size and margin as needed
+                        html: '<button class="btn" data-bs-toggle="modal" type="button" onclick="get_sensor_alarm(\'' + sensorName + '\', \'' + devide_id + '\')" data-bs-target="#setalarm' + devide_id + '"><i class="fa fa-cog"></i></button> ' + sensorValues.icon + readableSensorName,
+                        style: 'color: ' + sensorValues.color + '; font-size: 20px; margin-bottom: 10px;'
                     });
 
+
+                    console.log(sensorValues.data);
+                    console.log(sensorValues.data[-1]);
+                    console.log(sensorValues.data.length);
+                    console.log(sensorValues.data[0]);
                     // Last Y Value
                     var lastYValue = $('<h3>', {
-                      text: Math.round(sensorValues.data[sensorValues.data.length - 1].y * 100)/100 + ' ' + sensorconfig[sensorName]['unit'],
+                      text: Math.round(sensorValues.data[sensorValues.data.length - 1].y * 100)/100 + ' ' + sensorValues.unit,
                       style: 'color: #4c4e4f; font-size: 28px;'  // Adjust font-size as needed
                     });
 
@@ -149,10 +151,6 @@ $('.datefilter').on('click', function() {
                         sensorxvalue.push(value.x);
                         sensoryvalue.push(value.y);
                     });
-
-                    /*$.each(sensorValues.data, function(index, value) {*/
-                        // console.log("X: " + value.x + ", Y: " + value.y);
-                        // Do something with the value
 
                         if (response.data != "") {
 
@@ -211,13 +209,6 @@ $('.datefilter').on('click', function() {
                             xaxis: {
                               //type: 'datetime',
                               categories: sensorxvalue,
-                              //tickAmount: 5,
-                              // axisBorder: {
-                              //   show: false
-                              // },
-                              // axisTicks: {
-                              //   show: false
-                              // },
                               labels: {
                                 style: {
                                   colors: labelColor,
@@ -241,48 +232,54 @@ $('.datefilter').on('click', function() {
                           }
 
                         }
-
-                    /*});*/
+                  
                 });
 
 
                 $('#append_graph_single'+response.devide_id).html("");
                 $.each(sensorData, function(sensorName, sensorValue) {
-                if (sensorconfig[sensorName]['type'] != 'single') {
-                    return true; // Skip to the next iteration if the sensor type is not 'single'
-                }
+                    if (sensorValue.type != 'single') {
+                        return true; // Skip to the next iteration if the sensor type is not 'single'
+                    }
 
-                var sensor_name = convertSensorName(sensorName);
-                var mapContainerId = 'map_' + sensorName; // Unique identifier for each map container
-                var cardHtml = `<hr>
-                    <div class="card">
-                        <div class="card-body" style="text-align: center">
-                            <div class="card-title d-flex align-items-start justify-content-between">
-                            </div>
-                            <h3 class="mb-1" style="font-size: 24px; color:black">${sensor_name}</h3>
-                            <h3 class="mb-2" style="font-size: 34px; color: #4c4e4f">${sensorValue.data.y}</h3>
-                            <h3 class="mb-2" style="font-size: 12px; color:black">${sensorValue.data.x}</h3>
-                            <h3 class="mb-2" style="font-size: 24px; color: #4c4e4f">${sensorValue.data.address}</h3>
-                            <div id="${mapContainerId}" style="height: 400px;"></div> <!-- Use the unique map container id -->
-                        </div>
-                    </div>`;
+                    var sensor_name = convertSensorName(sensorName);
+                    var mapContainerId = 'map_' + sensorName; // Unique identifier for each map container
+                    var cardHtml = `<hr>
+                        <div class="card">
+                            <div class="card-body" style="text-align: center">
+                                <div class="card-title d-flex align-items-start justify-content-between">
+                                </div>
+                                <h3 class="mb-1" style="font-size: 24px; color:black">${sensor_name}</h3>
+                                <h3 class="mb-2" style="font-size: 34px; color: #4c4e4f">${sensorValue.data.y}</h3>
+                                <h3 class="mb-2" style="font-size: 12px; color:black">${sensorValue.data.x}</h3>`;
 
-                // Append the HTML content to the container
-                $('#append_graph_single' + response.devide_id).append(cardHtml);
+                        if (sensorValue.type === 'location') {
+                            // Include location-related HTML elements
+                            cardHtml += `<h3 class="mb-2" style="font-size: 24px; color: #4c4e4f">${sensorValue.data.address}</h3>
+                            <div id="${mapContainerId}" style="height: 400px;"></div>`;
+                        }
 
-                // Initialize the map for this sensor
-                var map = L.map(mapContainerId).setView([sensorValue.data.Latitude, sensorValue.data.Longitude], 13);
+                        cardHtml += `</div></div>`;
 
-                // Add a tile layer (OSM) to the map
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                }).addTo(map);
+                    // Append the HTML content to the container
+                    $('#append_graph_single' + response.devide_id).append(cardHtml);
 
-                // Add a marker to the map
-                var marker = L.marker([sensorValue.data.Latitude, sensorValue.data.Longitude]).addTo(map);
+                    if (sensorValue.type == 'location') {
+                      // Initialize the map for this sensor
+                      var map = L.map(mapContainerId).setView([sensorValue.data.Latitude, sensorValue.data.Longitude], 13);
 
-                console.log("X: " + sensorValue.data.x + ", Y: " + sensorValue.data.y);
-            });
+                      // Add a tile layer (OSM) to the map
+                      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      }).addTo(map);
+
+                      // Add a marker to the map
+                      var marker = L.marker([sensorValue.data.Latitude, sensorValue.data.Longitude]).addTo(map);
+
+                      console.log("X: " + sensorValue.data.x + ", Y: " + sensorValue.data.y);
+                    }
+                    
+                });
 
 
             }

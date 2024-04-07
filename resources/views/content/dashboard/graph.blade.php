@@ -33,7 +33,7 @@
         </div> -->
       </div>
     </div>
-
+    
 
     <?php } ?>
 
@@ -51,7 +51,7 @@
           <!-- <div class="demo-inline-spacing"> -->
             <div class="row" style="padding: 15px 10px 15px 10px;">
               <div class="col-md-5 col-sm-6">
-                  <div class="btn-group graphDiv align-items-center" device-id="<?php echo $value; ?>" onclick="show_alarmhistory('<?php echo $value; ?>')" style="cursor: pointer; color: blue;">
+                  <div class="btn-group graphDiv align-items-center" device-id="<?php echo $value; ?>" onclick="show_alarmhistory('<?php echo $value; ?>')" style="cursor: pointer; color: #215732;">
                       <?php
                       $device_name = $value;
 
@@ -68,7 +68,7 @@
                   </div>
               </div>
               <div class="col-md-1 col-sm-6">
-                  <div class="spinner-border " id="spinner<?php echo $value; ?>" role="status" style="color: blue; display: none;">
+                  <div class="spinner-border " id="spinner<?php echo $value; ?>" role="status" style="color: #215732; display: none;">
                       <span class="visually-hidden">Loading...</span>
                   </div>
               </div>
@@ -88,7 +88,7 @@
                   <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-toggle="modal" data-bs-target="#changeNameModal<?php echo $value; ?>">Personalizar</button></li>
                   <?php } ?>
 
-                  <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#setalarm<?php echo $value; ?>">Ajustar alarma</button></li>
+                  <!-- <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#setalarm<?php echo $value; ?>">Ajustar alarma</button></li> -->
 
                 </ul>
               </div>
@@ -131,47 +131,13 @@
                               </tr>
                            </thead>
                            <tbody>
-                            <?php
-                            $sensorConfig = config('global');
-                            foreach ($sensorConfig as $sensorName => $sensorDetails) {
-                                if ($sensorDetails['key'] != 'location') { 
-                                    // Flag to check if sensor data exists
-                                    $sensorDataExists = false;
-                                    if (!empty($alarmdata)) {
-                                      foreach ($alarmdata as $sensorData) {
-                                          if ($sensorData->sensor_name == $sensorDetails['key']) {
-                                              // Output input box with max and min values from sensor data
-                                              $sensorDataExists = true;
-                                              ?>
-                                              <tr style="text-align:center;">
-                                                  <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">{{$sensorDetails['key']}} </font></font>
-                                                    <input type="hidden" name="sname" value="{{$sensorDetails['key']}}" class="sname">
-                                                  </td>
-                                                  <td><input type="number" value="<?php echo $sensorData->min_value; ?>" class="form-control min-value" /></td>
-                                                  <td><input type="number" value="{{$sensorData->max_value}}" class="form-control max-value" /></td>
-                                              </tr>
-                                              <?php
-                                          }
-                                      }
-                                    }
-                                    
-                                    // If no sensor data found, output default input boxes
-                                    if (!$sensorDataExists) {
-                                        ?>
-                                        <tr style="text-align:center;">
-                                            <td><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">{{$sensorDetails['key']}} </font></font>
-                                              <input type="hidden" name="sname" value="{{$sensorDetails['key']}}" class="sname">
-                                            </td>
-                                            <td><input type="number" value="" class="form-control min-value" /></td>
-                                            <td><input type="number" value="" class="form-control max-value" /></td>
-                                            
-                                        </tr>
-                                        <?php
-                                    }
-                                }
-                            } 
-                            ?>
-                              
+                            <tr style="text-align:center;" class="minmaxadd">
+                                <td><font style="vertical-align: inherit;"><span class="Sensor_Name"></span> </font>
+                                  <input type="hidden" name="sname" value="" class="sname">
+                                </td>
+                                <td class="min-td"><input type="number" value="" class="form-control min-value" /></td>
+                                <td class="max-td"><input type="number" value="" class="form-control max-value" /></td>
+                            </tr>
                            </tbody>
                         </table>
                       </div>
@@ -294,7 +260,7 @@
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
-
+  
   var baseUrl = "{{ url('/') }}";
 
   function changedevicename(device_id) {
@@ -468,6 +434,53 @@
                 // Clean up
                 document.body.removeChild(link);
             }
+        }
+    });
+
+  }
+
+  function get_sensor_alarm(sensorName,device_id) {
+    //$('.minmaxadd').empty();
+    $(".sname").val(sensorName);
+    $(".Sensor_Name").text(sensorName);
+    console.log(sensorName);
+    console.log(device_id);
+    var user_id = $("#User_Id").val();
+    // return false;
+    $.ajax({
+        type: 'POST',
+        url: '{{ route("get-alarm-data-by-sensorname") }}',
+        data: {device_id:device_id,user_id:user_id,sensorName:sensorName,_token:"{{ csrf_token() }}"},
+        success: function (response) {
+            console.log(response);
+            //return false;
+            if (response.success == 'success') {
+
+                // location.reload(true);
+                $('.minmaxadd').html(response.html);
+
+            }else{
+              $('.min-td').html(response.mintd);
+              $('.max-td').html(response.maxtd);
+                // Swal.fire({
+                //     // title: 'You Dial Number!',
+                //     title: 'Device Name Does Not Update Successfully!',
+                //     icon: 'failure',
+                //     allowOutsideClick: false,
+                //     confirmButtonText: 'Ok',
+                //     customClass: {
+                //         confirmButton: 'btn btn-danger ml-1'
+                //     },
+                //     buttonsStyling: true
+                // }).then(function(result) {
+                //   if (result.isConfirmed) {
+                //       location.reload(true);
+                //   } else {
+                //       location.reload(true);
+                //   }
+                // });
+            }
+            // $('.loader').fadeOut();
         }
     });
 

@@ -77,18 +77,18 @@ class Analytics extends Controller
           $toDate .= ' 23:59:59'; // Concatenate time for end of the day
           $sensor_data = SensorData::where('device_id', $device_id)
               ->whereBetween('created_at', [$fromDate, $toDate])
+              ->orderByDesc('created_at')
               ->limit(15)
               ->get()
               ->toArray();
       } else {
-          $sensor_data = SensorData::where('device_id', $device_id)->limit(15)
+          $sensor_data = SensorData::where('device_id', $device_id)->orderByDesc('created_at')->limit(15)
               ->get()
               ->toArray();
       }
       // $sensor_data = SensorData::where('device_id', $device_id)->whereBetween('created_at', [$fromDate, $toDate])->get()->toArray();
-
+      // echo "<pre>"; print_r($sensor_data); die();
       $outputArray = [];
-
       $sensorConfig = config('global');
       $sensorValues = [];
       $sensorColors = [];
@@ -96,31 +96,68 @@ class Analytics extends Controller
           $formattedDateTime = $item['created_at'];
           $dateTime = new \DateTime($formattedDateTime);
           $createdAt = $dateTime->format('Y-m-d H:i:s');
-
+          // echo "<pre>"; print_r($item['sensor_data']); die;
           $changedateBycountry =  Country::changedateBytimezone($dateTime, $authuser->timezone)->format('Y-m-d H:i:s');
           // Initialize an array to store sensor values dynamically
-
-          foreach ($sensorConfig as $sensorName => $sensorDetails) {
-             // echo "<pre>"; print_r($sensorDetails['spname']); die();
-              $sensorValueKey = $sensorDetails['key'];
-              $sensorValueType = $sensorDetails['type'];
-              $sensorValueColor = $sensorDetails['color'];
-              $sensorValueIcon = $sensorDetails['icon'];
-              // $SPName = $sensorDetails['spname'];
-
-              if (array_key_exists($sensorValueKey, $item)) {
-                if ($sensorValueType == 'single') {
-                  $sensorValues[$sensorName]['data'] = ['x' => $changedateBycountry, 'y' => $item[$sensorValueKey]];
-                }else{
-                  $sensorValues[$sensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $item[$sensorValueKey]];
-                }
+          foreach ($item['sensor_data'] as $sensorName => $sensorDetails) {
+             
+              $sensorValueKey = $sensorName;
+              $sensorValueType = isset($sensorDetails['type']) ? $sensorDetails['type'] : "graph" ;
+              $sensorValueColor = $sensorDetails['unit'];
                 // Add sensor values to the dynamically generated array
-                $sensorValues[$sensorName]['spname'] = $sensorDetails['spname'];
-                $sensorValues[$sensorName]['color'] = $sensorValueColor;
-                $sensorValues[$sensorName]['icon'] = $sensorValueIcon;
-              }
+                $sensorValues[$sensorName]['type'] = $sensorValueType;
+                $sensorValues[$sensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $sensorDetails['value']];
+                $sensorValues[$sensorName]['spname'] = $sensorName;
+                $sensorValues[$sensorName]['unit'] = $sensorDetails['unit'];
+                $sensorValues[$sensorName]['color'] = '#E31A1A';
+                $sensorValues[$sensorName]['icon'] = '<svg viewBox="0 0 24 24" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 4H20M15 8H20M17 12H20M8 15.9998C7.44772 15.9998 7 16.4475 7 16.9998C7 17.5521 7.44772 17.9998 8 17.9998C8.55228 17.9998 9 17.5521 9 16.9998C9 16.4475 8.55228 15.9998 8 15.9998ZM8 15.9998V9M8 16.9998L8.00707 17.0069M12 16.9998C12 19.209 10.2091 20.9998 8 20.9998C5.79086 20.9998 4 19.209 4 16.9998C4 15.9854 4.37764 15.0591 5 14.354L5 6C5 4.34315 6.34315 3 8 3C9.65685 3 11 4.34315 11 6V14.354C11.6224 15.0591 12 15.9854 12 16.9998Z" stroke="#FF33C7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>';
+              
           }
       }
+
+      foreach ($sensorValues as $sensorName => $sensorData) {
+          $sensorValueType = $sensorData['type'];
+          
+          if ($sensorValueType == 'lastvalue' || $sensorValueType == 'location') {
+              $type = 'single';
+            if ($sensorValueType == 'location') {
+              $type = 'location';
+            }
+              // Check if the 'data' array is not empty
+              if (!empty($sensorValues[$sensorName]['data'])) {
+                  // Get the last element of the 'data' array
+                  $lastData = end($sensorValues[$sensorName]['data']);
+                  if ($lastData !== false) {
+                      $sensorValues[$sensorName]['data'] = $lastData;
+                      $sensorValues[$sensorName]['type'] = $type;
+                  } else {
+                      // Handle the case when 'data' array is empty or end() fails
+                      // For example, set a default value or do something else
+                      $sensorValues[$sensorName]['type'] = $type;
+                  }
+              } else {
+                  // Handle the case when 'data' array is empty
+                  // For example, set a default value or do something else
+                  $sensorValues[$sensorName]['type'] = $type;
+              }
+          } else {
+              $sensorValues[$sensorName]['type'] = 'multi';
+          }
+      } 
+      
+      // foreach ($sensorValues as $sensorName => $sensorData) {
+      //   $sensorValueType = $sensorData['type'];
+      //   //echo $sensorValueType;
+      //   if ($sensorValueType == 'lastvalue' || $sensorValueType == 'location') {
+      //     $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][-1];
+      //     $sensorValues[$sensorName]['type'] = 'single';
+      //   }
+      //   else{
+          
+      //      $sensorValues[$sensorName]['type'] = 'multi';
+      //   }
+      // } 
+      
 
       // Check if 'location' key exists
       if (isset($sensorValues['location'])) {
@@ -147,6 +184,7 @@ class Analytics extends Controller
     }
 
      $responseData = ['status' => $success, 'msg' => $message, 'data' => $data, 'devide_id' => $device_id, 'sensorconfig' => $sensorConfig];
+     
     //return view('content/dashboard/graph', compact('soialSensorValues'));
     return response()->json($responseData);
   }
@@ -499,7 +537,7 @@ class Analytics extends Controller
       $alarmData = json_encode($allSensorData);
 
       Setalarm::updateOrCreate(
-          ['user_id' => $user_id, 'device_id' => $device_id],
+          ['sensor_name' => $sensorName, 'user_id' => $user_id, 'device_id' => $device_id],
           ['alarmdata' => $alarmData]
       );
       // die();
@@ -564,6 +602,52 @@ class Analytics extends Controller
       return response()->json($responseData);
     }
     
+  }
+
+  public function get_alarm_data_by_sensorname(Request $request){
+
+      $message = "Failure";
+      $post_data = $request->all();
+      // echo "<pre>"; print_r($post_data); die();
+      $device_id = $post_data['device_id'];
+      $sensorName = $post_data['sensorName'];
+      $user_id = $post_data['user_id'];
+      $html = ''; // Initialize HTML variable
+      if (!empty($sensorName)) {
+          $alarms = Setalarm::where('device_id', $device_id)
+                                 ->where('user_id', $user_id)
+                                 ->where('sensor_name', $sensorName)
+                                 ->first(); // Use first() instead of get()->first()
+          
+          if (!empty($alarms)) {
+              $alarmdata = json_decode($alarms->alarmdata);
+              if (!empty($alarmdata)) {
+                  foreach ($alarmdata as $sensorData) {
+                      // $html .= '<tr>';
+                      $html .= '<td><font style="vertical-align: inherit;"><span class="Sensor_Name">' . $alarms->sensor_name . '</span></font>';
+                      $html .= '<input type="hidden" name="sname" value="' . $alarms->sensor_name . '" class="sname"></td>';
+                      $html .= '<td class="min-td"><input type="number" value="' . $sensorData->min_value . '" class="form-control min-value" /></td>';
+                      $html .= '<td class="max-td"><input type="number" value="' . $sensorData->max_value . '" class="form-control max-value" /></td>';
+                      // $html .= '</tr>';
+                  }
+                $responseData = ['success' => 'success', 'error' => '', 'html' => $html];
+              }else{
+                $mintd = '<input type="number" value="" class="form-control min-value" />';
+                $maxtd = '<input type="number" value="" class="form-control max-value" />';
+                $responseData = ['success' => 'failure', 'error' => '', 'mintd' => $mintd, 'maxtd' => $maxtd];
+              }
+          }else{
+            $mintd = '<input type="number" value="" class="form-control min-value" />';
+            $maxtd = '<input type="number" value="" class="form-control max-value" />';
+            $responseData = ['success' => 'failure', 'error' => '', 'mintd' => $mintd, 'maxtd' => $maxtd];
+          }
+      }else{
+        $mintd = '<input type="number" value="" class="form-control min-value" />';
+        $maxtd = '<input type="number" value="" class="form-control max-value" />';
+        $responseData = ['success' => 'failure', 'error' => '', 'mintd' => $mintd, 'maxtd' => $maxtd];
+       // Return HTML in JSON response
+      }
+      return response()->json($responseData);
   }
 
 }
