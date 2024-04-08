@@ -33,7 +33,7 @@ const char endpoint[] = "/api/sensordatastore";
   TinyGsm modem(debugger);
   #else
   TinyGsm modem(SerialAT);
-  
+
   #endif
   TinyGsmClient client(modem);
   HttpClient    http(client, server, port);
@@ -84,6 +84,52 @@ void addSensorDataToJson(DynamicJsonDocument& jsonDocument) {
         sensor["value"] = sensorValues[i];
         sensor["unit"] = sensorUnits[i];
     }
+}
+
+void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
+    String jsonString;
+    serializeJson(jsonDocument, jsonString);
+
+    Serial.print("Sending JSON data: ");
+    Serial.print(server_url);
+    Serial.println(jsonString);
+
+    // Initialize HTTPS
+    modem.https_begin();
+
+    // Set GET URT
+    if (!modem.https_set_url(server_url)) {
+        Serial.println("Failed to set the URL. Please check the validity of the URL!");
+        return;
+    }
+
+    //
+    modem.https_add_header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+    modem.https_add_header("Accept-Encoding", "gzip, deflate, br");
+    modem.https_set_accept_type("application/json");
+    modem.https_set_user_agent("TinyGSM/LilyGo-A76XX");
+    modem.https_add_header("Content-Type", "application/json");
+
+    String post_body = jsonString;
+
+    int httpCode = modem.https_post(post_body);
+    if (httpCode != 200) {
+        Serial.print("HTTP post failed ! error code = ");
+        Serial.println(httpCode);
+        return;
+    }
+
+    // Get HTTPS header information
+    String header = modem.https_header();
+    Serial.print("HTTP Header : ");
+    Serial.println(header);
+
+    // Get HTTPS response
+    String body = modem.https_body();
+    Serial.print("HTTP body : ");
+    Serial.println(body);
+    Serial.println("Server disconnected");
+
 }
 
 void setup() {
@@ -217,7 +263,7 @@ void setup() {
 }
 
 void loop() {
-    
+
     // Read sensor values
     readSensors();
 
@@ -232,47 +278,52 @@ void loop() {
     Serial.print("Sending JSON data: ");
     Serial.println(jsonString);
 
-    int err = http.post(endpoint, "application/json", jsonString);
-    if (err != 0) {
-        Serial.println(F("failed to connect"));
-        delay(10000);
-        return;
-    }
-
-    int status = http.responseStatusCode();
-    Serial.print(F("Response status code: "));
-    Serial.println(status);
-    if (!status) {
-        delay(10000);
-        return;
-    }
-
-    Serial.println(F("Response Headers:"));
-    while (http.headerAvailable()) {
-        String headerName  = http.readHeaderName();
-        String headerValue = http.readHeaderValue();
-        Serial.println("    " + headerName + " : " + headerValue);
-    }
-
-    int length = http.contentLength();
-    if (length >= 0) {
-        Serial.print(F("Content length is: "));
-        Serial.println(length);
-    }
-    if (http.isResponseChunked()) {
-        Serial.println(F("The response is chunked"));
-    }
-
-    String body = http.responseBody();
-    Serial.println(F("Response:"));
-    Serial.println(body);
-
-    Serial.print(F("Body length is: "));
-    Serial.println(body.length());
-
-    // Shutdown
-
-    http.stop();
+//     int err = http.post(endpoint, "application/json", jsonString);
+//     if (err != 0) {
+//         Serial.println(F("failed to connect"));
+//         delay(10000);
+//         return;
+//     }
+//
+//     int status = http.responseStatusCode();
+//     Serial.print(F("Response status code: "));
+//     Serial.println(status);
+//     if (!status) {
+//         delay(10000);
+//         return;
+//     }
+//
+//     Serial.println(F("Response Headers:"));
+//     while (http.headerAvailable()) {
+//         String headerName  = http.readHeaderName();
+//         String headerValue = http.readHeaderValue();
+//         Serial.println("    " + headerName + " : " + headerValue);
+//     }
+//
+//     int length = http.contentLength();
+//     if (length >= 0) {
+//         Serial.print(F("Content length is: "));
+//         Serial.println(length);
+//     }
+//     if (http.isResponseChunked()) {
+//         Serial.println(F("The response is chunked"));
+//     }
+//
+//     String body = http.responseBody();
+//     Serial.println(F("Response:"));
+//     Serial.println(body);
+//
+//     Serial.print(F("Body length is: "));
+//     Serial.println(body.length());
+//
+//     // Shutdown
+//
+//     http.stop();
+    #if TINY_GSM_USE_GPRS
+      sendJsonModem(endpoint, jsonDocument);
+    #else
+      sendJsonData(endpoint, jsonDocument);
+    #endif
     // 15 min Delay before sending next data
     delay(60 * 1000 * 15);
 }
