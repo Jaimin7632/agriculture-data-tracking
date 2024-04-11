@@ -86,8 +86,7 @@ class Analytics extends Controller
               ->get()
               ->toArray();
       }
-      // $sensor_data = SensorData::where('device_id', $device_id)->whereBetween('created_at', [$fromDate, $toDate])->get()->toArray();
-      // echo "<pre>"; print_r($sensor_data); die();
+      
       $outputArray = [];
       $sensorConfig = config('global');
       $sensorValues = [];
@@ -102,7 +101,7 @@ class Analytics extends Controller
           foreach ($item['sensor_data'] as $sensorName => $sensorDetails) {
              
               $sensorValueKey = $sensorName;
-              $sensorValueType = isset($sensorDetails['type']) ? $sensorDetails['type'] : "graph" ;
+                $sensorValueType = isset($sensor_data[0]['sensor_data'][$sensorValueKey]['type']) ? $sensor_data[0]['sensor_data'][$sensorValueKey]['type'] : "graph" ;
               $sensorValueColor = $sensorDetails['unit'];
                 // Add sensor values to the dynamically generated array
                 $sensorValues[$sensorName]['type'] = $sensorValueType;
@@ -114,53 +113,42 @@ class Analytics extends Controller
               
           }
       }
-
+      
       foreach ($sensorValues as $sensorName => $sensorData) {
-          $sensorValueType = $sensorData['type'];
+        $sensorValueType = $sensorData['type'];
+        //echo $sensorValueType;
+        if ($sensorValueType == 'lastvalue') {
+          $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][0];
+          $sensorValues[$sensorName]['type'] = 'single';
+        }else if($sensorValueType == 'location'){
+          $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][0];
+          $sensorValues[$sensorName]['type'] = 'location';
+          $locationData = $sensorData['data'][0];
+          $xValue = $locationData['x'];
+          $yValue = $locationData['y'];
+
+          $coordinates = explode(',', $yValue);
+          $latitude = $coordinates[0];
+          $longitude = $coordinates[1];
+          $latLongStr = 'Latitude: '.$latitude.'° N'.', Longitude: '.$longitude.'° W';
+
+          $address = $this->getAddressFromCoordinates($latitude,$longitude);
+
+          $LocationAddress = $address->original['address'];
+          $sensorValues[$sensorName]['data'] = ['x' => $xValue, 'y' => $latLongStr, 'address' => $LocationAddress,'Latitude' => $latitude, 'Longitude' => $longitude];
+
+          //print_r($sensorData['data']);
+        }
+        else{
           
-          if ($sensorValueType == 'lastvalue' || $sensorValueType == 'location') {
-              $type = 'single';
-            if ($sensorValueType == 'location') {
-              $type = 'location';
-            }
-              // Check if the 'data' array is not empty
-              if (!empty($sensorValues[$sensorName]['data'])) {
-                  // Get the last element of the 'data' array
-                  $lastData = end($sensorValues[$sensorName]['data']);
-                  if ($lastData !== false) {
-                      $sensorValues[$sensorName]['data'] = $lastData;
-                      $sensorValues[$sensorName]['type'] = $type;
-                  } else {
-                      // Handle the case when 'data' array is empty or end() fails
-                      // For example, set a default value or do something else
-                      $sensorValues[$sensorName]['type'] = $type;
-                  }
-              } else {
-                  // Handle the case when 'data' array is empty
-                  // For example, set a default value or do something else
-                  $sensorValues[$sensorName]['type'] = $type;
-              }
-          } else {
-              $sensorValues[$sensorName]['type'] = 'multi';
-          }
+           $sensorValues[$sensorName]['type'] = 'multi';
+
+        }
       } 
-      
-      // foreach ($sensorValues as $sensorName => $sensorData) {
-      //   $sensorValueType = $sensorData['type'];
-      //   //echo $sensorValueType;
-      //   if ($sensorValueType == 'lastvalue' || $sensorValueType == 'location') {
-      //     $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][-1];
-      //     $sensorValues[$sensorName]['type'] = 'single';
-      //   }
-      //   else{
-          
-      //      $sensorValues[$sensorName]['type'] = 'multi';
-      //   }
-      // } 
-      
+      //echo "<pre>";print_r($sensorValues);exit;
 
       // Check if 'location' key exists
-      if (isset($sensorValues['location'])) {
+      /*if (isset($sensorValues['location'])) {
           // Accessing 'location' data
           $locationData = $sensorValues['location']['data'];
           $xValue = $locationData['x'];
@@ -176,7 +164,7 @@ class Analytics extends Controller
           $sensorValues['location']['data'] = ['x' => $xValue, 'y' => $latLongStr, 'address' => $LocationAddress,'Latitude' => $latitude, 'Longitude' => $longitude];
       } else {
           //echo "Location does not exist.\n";
-      }
+      }*/
         $message = "success";
         $success = "success";
 

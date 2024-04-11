@@ -282,6 +282,50 @@ $('.datefilter').on('click', function() {
                 });
 
 
+                $.each(sensorData, function(sensorName, sensorValue) {
+                    if (sensorValue.type != 'location') {
+                        return true; // Skip to the next iteration if the sensor type is not 'single'
+                    }
+
+                    var sensor_name = convertSensorName(sensorName);
+                    var mapContainerId = 'map_' + sensorName; // Unique identifier for each map container
+                    var cardHtml = `<hr>
+                        <div class="card">
+                            <div class="card-body" style="text-align: center">
+                                <div class="card-title d-flex align-items-start justify-content-between">
+                                </div>
+                                <h3 class="mb-1" style="font-size: 24px; color:black">${sensor_name}</h3>
+                                <h3 class="mb-2" style="font-size: 34px; color: #4c4e4f">${sensorValue.data.y}</h3>
+                                <h3 class="mb-2" style="font-size: 12px; color:black">${sensorValue.data.x}</h3>`;
+
+                        if (sensorValue.type === 'location') {
+                            // Include location-related HTML elements
+                            cardHtml += `<h3 class="mb-2" style="font-size: 24px; color: #4c4e4f">${sensorValue.data.address}</h3>
+                            <div id="${mapContainerId}" style="height: 400px;"></div>`;
+                        }
+
+                        cardHtml += `</div></div>`;
+
+                    // Append the HTML content to the container
+                    $('#append_graph_single' + response.devide_id).append(cardHtml);
+
+                    
+                      // Initialize the map for this sensor
+                      var map = L.map(mapContainerId).setView([sensorValue.data.Latitude, sensorValue.data.Longitude], 13);
+
+                      // Add a tile layer (OSM) to the map
+                      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      }).addTo(map);
+
+                      // Add a marker to the map
+                      var marker = L.marker([sensorValue.data.Latitude, sensorValue.data.Longitude]).addTo(map);
+
+                      console.log("X: " + sensorValue.data.x + ", Y: " + sensorValue.data.y);
+                    
+                    
+                });
+
             }
 
         }
