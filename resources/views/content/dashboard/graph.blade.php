@@ -506,6 +506,7 @@
         dataType: 'json',
         success: function (response) {
           if (response.success == 'success') {
+            $("#mapedit"+device_id).modal('hide');
             Swal.fire({
                 // title: 'You Dial Number!',
                 title: response.msg,
