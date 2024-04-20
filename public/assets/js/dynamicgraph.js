@@ -49,12 +49,38 @@ $('.datefilter').on('click', function() {
     }, 50000);
 });
 
+$('.changegraphtime').on('click', function() {
+    var device_id = $(this).attr('device-id');
+    $('.append_graph_blank').html("");
+    $('.append_graph_single').html("");
+    $('#spinner'+device_id).show();
+    $('#datefilter'+device_id).modal('hide');
+
+    var changetime = document.getElementById("changetime");
+    var selectedValuechangetime = changetime.value;
+    var changematrix = document.getElementById("matrix");
+    var selectedValuechangematrix = changematrix.value;
+    
+    console.log(device_id);
+    
+    // Call the function
+    graphdata(device_id, '','',selectedValuechangetime, selectedValuechangematrix);
+    
+    // Clear previous interval, if any
+    clearInterval(intervalID);
+    
+    // Start a new interval
+    intervalID = setInterval(function() {
+        graphdata(device_id, '','',selectedValuechangetime, selectedValuechangematrix);
+    }, 50000);
+});
+
 // });
-  function graphdata(device_id,from_date,to_date) {
+  function graphdata(device_id,from_date,to_date,changetime = null, changematrix = null) {
     $.ajax({
         type: 'post',
         url: getGraphDataRoute,
-        data: {device_id:device_id,from_date:from_date,to_date:to_date,_token:csrfToken},
+        data: {device_id:device_id,from_date:from_date,to_date:to_date,changetime:changetime,changematrix:changematrix,_token:csrfToken},
         dataType: 'json',
         success: function (response) {
           //console.log('resp');
@@ -346,3 +372,4 @@ $('.datefilter').on('click', function() {
     $("#change_name"+device_id).hide();
   }
 
+  

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\ChangeDeviceName;
 use App\Models\User;
 use App\Models\SensorData;
+use App\Models\SetLatLong;
 use App\Models\Setalarm;
 use App\Models\AlarmHistory;
 use App\Models\Country;
@@ -70,6 +71,10 @@ class Analytics extends Controller
     $device_id = $post_data['device_id'];
     $fromDate = $post_data['from_date'];
     $toDate = $post_data['to_date'];
+
+    $changetime = $post_data['changetime'];
+    $changematrix = $post_data['changematrix'];
+
     if (!empty($device_id)) {
        // echo $post_data['device_id']; die();
       if ($fromDate != '' && $toDate != '') {
@@ -81,7 +86,37 @@ class Analytics extends Controller
               ->limit(15)
               ->get()
               ->toArray();
-      } else {
+
+      } 
+      /*else if($changetime != '' && $changematrix != ''){
+        $aggregationFunction = 'AVG';
+
+        // Check the value of $changematrix and set the aggregation function accordingly
+        switch ($changematrix) {
+            case 'MIN':
+                $aggregationFunction = 'MIN';
+                break;
+            case 'MAX':
+                $aggregationFunction = 'MAX';
+                break;
+            // If $changematrix is not MIN or MAX, it defaults to AVG
+        }
+          $sensor_data_query = SensorData::select(
+              DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d %H:") AS time_hour'),
+              DB::raw('FLOOR(MINUTE(created_at) / ' . $changetime . ') AS created_at'),
+              DB::raw($aggregationFunction . '(sensor_value) AS sensor_value')
+          )
+          ->where('device_id', $device_id)
+          ->groupBy('time_hour', 'created_at')
+          ->orderBy('time_hour', 'asc')
+          ->orderBy('time_minute', 'asc');
+
+      // Execute the query
+      $sensor_data = $sensor_data_query->get()->toArray();
+      // echo "<pre>"; print_r($sensor_data); die();
+      }*/
+
+      else {
           $sensor_data = SensorData::where('device_id', $device_id)->orderByDesc('created_at')->limit(15)
               ->get()
               ->toArray();
@@ -97,22 +132,126 @@ class Analytics extends Controller
           $createdAt = $dateTime->format('Y-m-d H:i:s');
           // echo "<pre>"; print_r($item['sensor_data']); die;
           $changedateBycountry =  Country::changedateBytimezone($dateTime, $authuser->timezone)->format('Y-m-d H:i:s');
+          $temperatureValues = [];
+          $humidityValues = [];
           // Initialize an array to store sensor values dynamically
           foreach ($item['sensor_data'] as $sensorName => $sensorDetails) {
              
               $sensorValueKey = $sensorName;
-                $sensorValueType = isset($sensor_data[0]['sensor_data'][$sensorValueKey]['type']) ? $sensor_data[0]['sensor_data'][$sensorValueKey]['type'] : "graph" ;
+              $sensorValueType = isset($sensor_data[0]['sensor_data'][$sensorValueKey]['type']) ? $sensor_data[0]['sensor_data'][$sensorValueKey]['type'] : "graph" ;
               $sensorValueColor = $sensorDetails['unit'];
                 // Add sensor values to the dynamically generated array
-                $sensorValues[$sensorName]['type'] = $sensorValueType;
-                $sensorValues[$sensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $sensorDetails['value']];
-                $sensorValues[$sensorName]['spname'] = $sensorName;
-                $sensorValues[$sensorName]['unit'] = $sensorDetails['unit'];
-                $sensorValues[$sensorName]['color'] = '#E31A1A';
+              $sensorValues[$sensorName]['type'] = $sensorValueType;
+              $sensorValues[$sensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $sensorDetails['value']];
+                
+              $sensorValues[$sensorName]['spname'] = $sensorName;
+              $sensorValues[$sensorName]['unit'] = $sensorDetails['unit'];
+              
+              if (strpos($sensorName, "AirPressure") !== false) {
+                $sensorValues[$sensorName]['color'] = '#33FF57';
+                $sensorValues[$sensorName]['icon'] = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#33FF57" width="50"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M14,19V17.73a8,8,0,1,0-4,0V19H2v3H22V19ZM6.12,11.17A5.9,5.9,0,0,1,6.46,7.7a6,6,0,1,1,7.84,7.84,5.9,5.9,0,0,1-3.47.34,6,6,0,0,1-4.71-4.71ZM11,14.05A1.41,1.41,0,0,1,10.5,13c.17-1.9,1.5-7.5,1.5-7.5s1.33,5.6,1.5,7.5a1.39,1.39,0,0,1-.45,1.05h0l0,0A1.45,1.45,0,0,1,11,14.05ZM7,10H8v1H7Zm9,0h1v1H16Zm0-2H15V7h1ZM8,7H9V8H8Zm3-1H10V5h1Zm3,0H13V5h1Z"></path><rect width="24" height="24" fill="none"></rect></g></svg>';
+              } else if (strpos($sensorName, "SoilWetness") !== false){
+                $sensorValues[$sensorName]['color'] = '#FF5733';
+                $sensorValues[$sensorName]['icon'] = '<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" fill="#FF5733" width="50">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                  <defs>
+                    <style>.cls-1{fill:#FF5733;}</style>
+                  </defs>
+                  <g id="Soil">
+                    <path class="cls-1" d="M22,75.18H20a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M30,72.26H28a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M34,78.1H32a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M40,75.18H38a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M48,77.13H46a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M53,73.23H51a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M60,75.18H58a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M68,72.26H66a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M72,78.1H70a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M78,75.18H76a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M86,77.13H84a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M91,73.23H89a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M97,75.18H95a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M105,72.26h-2a1,1,0,0,0,0,2h2a1,1,0,0,0,0-2Z"></path>
+                    <path class="cls-1" d="M23,62.54a1,1,0,0,0-1-1H20a1,1,0,1,0,0,2h2A1,1,0,0,0,23,62.54Z"></path>
+                    <path class="cls-1" d="M28,60.62h2a1,1,0,1,0,0-2H28a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M32,66.46h2a1,1,0,0,0,0-2H32a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M38,63.54h2a1,1,0,0,0,0-2H38a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M46,65.49h2a1,1,0,0,0,0-2H46a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M51,61.59h2a1,1,0,0,0,0-2H51a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M58,63.54h2a1,1,0,0,0,0-2H58a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M66,60.62h2a1,1,0,0,0,0-2H66a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M70,66.46h2a1,1,0,0,0,0-2H70a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M76,63.54h2a1,1,0,0,0,0-2H76a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M84,65.49h2a1,1,0,1,0,0-2H84a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M89,61.59h2a1,1,0,0,0,0-2H89a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M95,63.54h2a1,1,0,0,0,0-2H95a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M103,60.62h2a1,1,0,0,0,0-2h-2a1,1,0,0,0,0,2Z"></path>
+                    <path class="cls-1" d="M112,44H16a1,1,0,0,0-1,1V83a1,1,0,0,0,1,1h96a1,1,0,0,0,1-1V45A1,1,0,0,0,112,44ZM17,56.81l6.07-2.94a13,13,0,0,1,9.86,0l1.27.61a13.4,13.4,0,0,0,11.6,0l1.27-.61a13,13,0,0,1,9.86,0l1.27.61a13.4,13.4,0,0,0,11.6,0l1.27-.61a13,13,0,0,1,9.86,0l1.27.61a13.4,13.4,0,0,0,11.6,0l1.27-.61a13,13,0,0,1,9.86,0L111,56.81V70.08l-5.2-2.52a14.87,14.87,0,0,0-11.6,0l-1.27.62a11.43,11.43,0,0,1-9.86,0l-1.27-.62a14.87,14.87,0,0,0-11.6,0l-1.27.62a11.43,11.43,0,0,1-9.86,0l-1.27-.62a14.87,14.87,0,0,0-11.6,0l-1.27.62a11.43,11.43,0,0,1-9.86,0l-1.27-.62a14.87,14.87,0,0,0-11.6,0L17,70.08ZM111,46v8.59l-5.2-2.52a14.87,14.87,0,0,0-11.6,0l-1.27.61a11.36,11.36,0,0,1-9.86,0l-1.27-.61a14.87,14.87,0,0,0-11.6,0l-1.27.61a11.36,11.36,0,0,1-9.86,0l-1.27-.61a14.87,14.87,0,0,0-11.6,0l-1.27.61a11.36,11.36,0,0,1-9.86,0l-1.27-.61a14.87,14.87,0,0,0-11.6,0L17,54.59V46ZM17,82V72.3l6.07-2.94a13,13,0,0,1,9.86,0L34.2,70a13.4,13.4,0,0,0,11.6,0l1.27-.62a13,13,0,0,1,9.86,0L58.2,70a13.4,13.4,0,0,0,11.6,0l1.27-.62a13,13,0,0,1,9.86,0L82.2,70a13.4,13.4,0,0,0,11.6,0l1.27-.62a13,13,0,0,1,9.86,0L111,72.3V82Z"></path>
+                  </g>
+                </g>
+              </svg>';
+              } else if (strpos($sensorName, "Humidity") !== false){
+                $sensorValues[$sensorName]['color'] = '#5733FF';
+                $sensorValues[$sensorName]['icon'] = '<svg viewBox="0 0 24 24" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15.0066 3.25608C16.8483 2.85737 19.1331 2.8773 22.2423 3.65268C22.7781 3.78629 23.1038 4.32791 22.9699 4.86241C22.836 5.39691 22.2931 5.7219 21.7573 5.58829C18.8666 4.86742 16.9015 4.88747 15.4308 5.20587C13.9555 5.52524 12.895 6.15867 11.7715 6.84363L11.6874 6.89494C10.6044 7.55565 9.40515 8.28729 7.82073 8.55069C6.17734 8.82388 4.23602 8.58235 1.62883 7.54187C1.11607 7.33724 0.866674 6.75667 1.0718 6.24513C1.27692 5.73359 1.85889 5.48479 2.37165 5.68943C4.76435 6.6443 6.32295 6.77699 7.492 6.58265C8.67888 6.38535 9.58373 5.83916 10.7286 5.14119C11.855 4.45445 13.1694 3.6538 15.0066 3.25608Z" fill="#5733FF"></path> <path d="M22.2423 7.64302C19.1331 6.86765 16.8483 6.84772 15.0066 7.24642C13.1694 7.64415 11.855 8.44479 10.7286 9.13153C9.58373 9.8295 8.67888 10.3757 7.492 10.573C6.32295 10.7673 4.76435 10.6346 2.37165 9.67977C1.85889 9.47514 1.27692 9.72393 1.0718 10.2355C0.866674 10.747 1.11607 11.3276 1.62883 11.5322C4.23602 12.5727 6.17734 12.8142 7.82073 12.541C9.40515 12.2776 10.6044 11.546 11.6874 10.8853L11.7715 10.834C12.895 10.149 13.9555 9.51558 15.4308 9.19621C16.9015 8.87781 18.8666 8.85777 21.7573 9.57863C22.2931 9.71224 22.836 9.38726 22.9699 8.85275C23.1038 8.31825 22.7781 7.77663 22.2423 7.64302Z" fill="#5733FF"></path> <path fill-rule="evenodd" clip-rule="evenodd" d="M18.9998 10.0266C18.6526 10.0266 18.3633 10.2059 18.1614 10.4772C18.0905 10.573 17.9266 10.7972 17.7089 11.111C17.4193 11.5283 17.0317 12.1082 16.6424 12.7555C16.255 13.3996 15.8553 14.128 15.5495 14.8397C15.2567 15.5213 14.9989 16.2614 14.9999 17.0117C15.0006 17.2223 15.0258 17.4339 15.0604 17.6412C15.1182 17.9872 15.2356 18.4636 15.4804 18.9521C15.7272 19.4446 16.1131 19.9674 16.7107 20.3648C17.3146 20.7664 18.0748 21 18.9998 21C19.9248 21 20.685 20.7664 21.2888 20.3648C21.8864 19.9674 22.2724 19.4446 22.5192 18.9522C22.764 18.4636 22.8815 17.9872 22.9393 17.6413C22.974 17.4337 22.9995 17.2215 22.9998 17.0107C23.0001 16.2604 22.743 15.5214 22.4501 14.8397C22.1444 14.128 21.7447 13.3996 21.3573 12.7555C20.968 12.1082 20.5803 11.5283 20.2907 11.111C20.073 10.7972 19.909 10.573 19.8382 10.4772C19.6363 10.2059 19.3469 10.0266 18.9998 10.0266ZM20.6119 15.6257C20.3552 15.0281 20.0049 14.3848 19.6423 13.782C19.4218 13.4154 19.2007 13.0702 18.9998 12.7674C18.7989 13.0702 18.5778 13.4154 18.3573 13.782C17.9948 14.3848 17.6445 15.0281 17.3878 15.6257L17.3732 15.6595C17.1965 16.0704 16.9877 16.5562 17.0001 17.0101C17.0121 17.3691 17.1088 17.7397 17.2693 18.0599C17.3974 18.3157 17.574 18.5411 17.8201 18.7048C18.06 18.8643 18.4248 19.0048 18.9998 19.0048C19.5748 19.0048 19.9396 18.8643 20.1795 18.7048C20.4256 18.5411 20.6022 18.3156 20.7304 18.0599C20.8909 17.7397 20.9876 17.3691 20.9996 17.01C21.0121 16.5563 20.8032 16.0705 20.6265 15.6597L20.6119 15.6257Z" fill="#5733FF"></path> <path d="M14.1296 11.5308C14.8899 11.2847 15.4728 12.076 15.1153 12.7892C14.952 13.1151 14.7683 13.3924 14.4031 13.5214C13.426 13.8666 12.6166 14.3527 11.7715 14.8679L11.6874 14.9192C10.6044 15.5799 9.40516 16.3115 7.82074 16.5749C6.17735 16.8481 4.23604 16.6066 1.62884 15.5661C1.11608 15.3615 0.866688 14.7809 1.07181 14.2694C1.27694 13.7578 1.8589 13.509 2.37167 13.7137C4.76436 14.6685 6.32297 14.8012 7.49201 14.6069C8.67889 14.4096 9.58374 13.8634 10.7286 13.1654C11.8166 12.5021 12.9363 11.9171 14.1296 11.5308Z" fill="#5733FF"></path> </g></svg>';
+              } else if (strpos($sensorName, "AirTemperature") !== false){ 
+                $sensorValues[$sensorName]['color'] = '#FF33C7';
                 $sensorValues[$sensorName]['icon'] = '<svg viewBox="0 0 24 24" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 4H20M15 8H20M17 12H20M8 15.9998C7.44772 15.9998 7 16.4475 7 16.9998C7 17.5521 7.44772 17.9998 8 17.9998C8.55228 17.9998 9 17.5521 9 16.9998C9 16.4475 8.55228 15.9998 8 15.9998ZM8 15.9998V9M8 16.9998L8.00707 17.0069M12 16.9998C12 19.209 10.2091 20.9998 8 20.9998C5.79086 20.9998 4 19.209 4 16.9998C4 15.9854 4.37764 15.0591 5 14.354L5 6C5 4.34315 6.34315 3 8 3C9.65685 3 11 4.34315 11 6V14.354C11.6224 15.0591 12 15.9854 12 16.9998Z" stroke="#FF33C7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>';
+              }
+              
+              if (strpos($sensorName, "AirTemperature") !== false) {
+                  // Store the air pressure value in a variable
+                  // $temperatureValues[] = $sensorDetails['value'];
+                  $temperatureValues[] = ['value' => $sensorDetails['value'], 'type' => $sensorValueType];
+                  // $temperatureValues['type'] = $sensorValueType;
+              }
+              
+              // Check if sensor name contains "humidity"
+              if (strpos($sensorName, "Humidity") !== false) {
+                  // Store the humidity value in the array
+                  // $humidityValues[] = $sensorDetails['value'];
+                  $humidityValues[] = ['value' => $sensorDetails['value'], 'type' => $sensorValueType];
+                  // $humidityValues['type'] = $sensorValueType;
+              }
               
           }
+          // echo "<pre>"; print_r($temperatureValues); die();
+          foreach ($temperatureValues as $key => $temperatureCelsius) {
+              // Check if the corresponding humidity value exists
+              if (isset($humidityValues[$key])) {
+
+                $temperatureCelsiusval = $temperatureCelsius['value'];
+                $temperatureType = $temperatureCelsius['type'];
+
+                // Get the humidity value and its type
+                $humidityValue = $humidityValues[$key]['value'];
+                $humidityType = $humidityValues[$key]['type'];
+
+                  // Calculate the DPV for the current set of temperature and humidity values
+                  $dewPoint = $this->calculateDewPoint($temperatureCelsiusval, $humidityValue);
+                  if ($dewPoint == '') {
+                    $dewPoint = 10;
+                  }
+                  // Create a new sensor name for DPV and store its value
+                  $dewPointSensorName = 'DewPoint_' . ($key + 1);
+                  if (!isset($sensorValues[$dewPointSensorName])) {
+                      $sensorValues[$dewPointSensorName] = [
+                          'type' => $temperatureType,
+                          'data' => [],
+                          'spname' => $dewPointSensorName,
+                          'unit' => 'MA',
+                          'color' => '#FF33C7',
+                          'icon' => '<svg viewBox="0 0 24 24" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 4H20M15 8H20M17 12H20M8 15.9998C7.44772 15.9998 7 16.4475 7 16.9998C7 17.5521 7.44772 17.9998 8 17.9998C8.55228 17.9998 9 17.5521 9 16.9998C9 16.4475 8.55228 15.9998 8 15.9998ZM8 15.9998V9M8 16.9998L8.00707 17.0069M12 16.9998C12 19.209 10.2091 20.9998 8 20.9998C5.79086 20.9998 4 19.209 4 16.9998C4 15.9854 4.37764 15.0591 5 14.354L5 6C5 4.34315 6.34315 3 8 3C9.65685 3 11 4.34315 11 6V14.354C11.6224 15.0591 12 15.9854 12 16.9998Z" stroke="#FF33C7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>',
+                          // You can add more properties here if needed
+                      ];
+                  }
+                  $sensorValues[$dewPointSensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $dewPoint];
+              }
+          }
       }
+
+      // echo "<pre>";print_r($sensorValues);exit;
       
       foreach ($sensorValues as $sensorName => $sensorData) {
         $sensorValueType = $sensorData['type'];
@@ -175,6 +314,21 @@ class Analytics extends Controller
      
     //return view('content/dashboard/graph', compact('soialSensorValues'));
     return response()->json($responseData);
+  }
+
+  public function calculateDewPoint($temperatureCelsius, $relativeHumidity) {
+    if (is_numeric($temperatureCelsius) && is_numeric($relativeHumidity)) {
+        // Calculate the vapor pressure
+        $vaporPressure = 6.112 * exp((17.67 * $temperatureCelsius) / ($temperatureCelsius + 243.5)) * ($relativeHumidity / 100);
+        
+        // Calculate the Dew Point Temperature (DPT)
+        $dewPoint = (243.5 * log($vaporPressure / 6.112)) / (17.67 - log($vaporPressure / 6.112));
+        
+        return $dewPoint;
+    } else {
+        // Handle the case when either $temperatureCelsius or $relativeHumidity is not numeric
+        return null; // Or any other appropriate action
+    }
   }
 
   public function change_device_name(Request $request){
@@ -636,6 +790,42 @@ class Analytics extends Controller
        // Return HTML in JSON response
       }
       return response()->json($responseData);
+  }
+
+  public function savelatlong(Request $request){
+
+    $post_data = $request->all();
+    // echo "<pre>"; print_r($post_data); die();
+    $device_id = $post_data['device_id'];
+    $user_id = $post_data['user_id'];
+    $LAT = $post_data['LAT'];
+    $LON = $post_data['LON'];
+
+    try {
+      $get_lat_long = SetLatLong::where('user_id', $user_id)->where('device_id', $device_id)->first();
+      //echo "<pre>"; print_r($change_text_data); die();
+      if (empty($get_lat_long)) {
+        SetLatLong::create([
+            'user_id' => $user_id,
+            'device_id' => $device_id,
+            'latitude' => $LAT,
+            'longitude' => $LON,
+        ]);
+        $message = "Location Add Successfully!";
+      }else{
+        $updateData = ['latitude'=>$LAT,'longitude'=>$LON, "updated_at" => date('Y-m-d H:i:s')];
+        SetLatLong::where("user_id", $user_id)->where("device_id", $device_id)->update($updateData);
+        $message = "Location Update Successfully!";
+      }
+      
+      $responseData = ['success' => 'success', 'error' => '', 'msg' => $message];
+    } catch (Exception $ex) {
+      $message = $ex->getMessage();
+      $responseData = ['success' => 'failure', 'error' => '', 'msg' => $message];
+    }
+
+    return response()->json($responseData);
+
   }
 
 }

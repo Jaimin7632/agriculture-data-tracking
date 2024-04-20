@@ -65,6 +65,7 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::post('/file-export', [Analytics::class, 'fileExport'])->name('file-export');
 	Route::post('/update-alarm', [Analytics::class, 'updateAlarm'])->name('update-alarm');
 	Route::post('/get-alarm-history', [Analytics::class, 'get_alarm_history'])->name("get-alarm-history");
+	Route::post('/savelatlong', [Analytics::class, 'savelatlong'])->name("savelatlong");
 
 	Route::post('/get-alarm-data-by-sensorname', [Analytics::class, 'get_alarm_data_by_sensorname'])->name("get-alarm-data-by-sensorname");
 	// Graph Data End
