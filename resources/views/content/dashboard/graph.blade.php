@@ -68,7 +68,7 @@
           <!-- <div class="demo-inline-spacing"> -->
             <div class="row" style="padding: 15px 10px 15px 10px;">
               <div class="col-md-5 col-sm-6">
-                  <div class="btn-group graphDiv align-items-center" device-id="<?php echo $value; ?>" onclick="show_alarmhistory('<?php echo $value; ?>')" style="cursor: pointer; color: #215732;">
+                  <div class="btn-group graphDiv align-items-center" device-id="<?php echo $value; ?>" onclick="show_summary('<?php echo $value; ?>')" style="cursor: pointer; color: #215732;">
                       <?php
                       $device_name = $value;
 
@@ -96,7 +96,7 @@
                 <i class="fas fa-cog" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="justify-content: end;"></i>
 
                 <ul class="dropdown-menu dropdown-menu-start dropdown-menu-lg-end">
-                  <li><button class="dropdown-item btn btn-outline-secondary show_summary" data-bs-toggle="modal" type="button" onclick="show_summary('<?php echo $value; ?>')" data-bs-target="#summury<?php echo $value; ?>">Resumen</button></li>
+                  <li><button class="dropdown-item btn btn-outline-secondary show_summary" data-bs-toggle="modal" type="button" onclick="show_alarmhistory('<?php echo $value; ?>')" data-bs-target="#summury<?php echo $value; ?>">Alarm History</button></li>
 
                   <li><button class="dropdown-item btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#datefilter<?php echo $value; ?>">Filtrar</button></li>
 
@@ -329,7 +329,7 @@
           <div class="modal-dialog" role="document" style="max-width: 57rem">
               <div class="modal-content">
                   <div class="modal-header">
-                      <h5 class="modal-title" id="changeNameModalLabel"><?php echo $value; ?> Resumen</h5>
+                      <h5 class="modal-title" id="changeNameModalLabel"><?php echo $value; ?> Alarm History</h5>
                   </div>
                   <div class="modal-body">
                       <div class="table-responsive text-nowrap show_summary<?php echo $value; ?>">
@@ -615,6 +615,9 @@
 
   function show_summary(device_id) {
     $("#changeNameModal"+device_id).modal('hide');
+    getUserLocation(device_id);
+    $("#show_alarm_history").html('');
+    $(".weather_hd").hide();
     var device_id = device_id;
     var user_id = $("#User_Id").val();
     console.log(user_id);
@@ -626,30 +629,17 @@
         data: {device_id:device_id,user_id:user_id,_token:"{{ csrf_token() }}"},
         success: function (response) {
             console.log(response);
+            var latitude = $('#onloadlatitude'+device_id).val();
+            var longitude = $('#onloadlongitude'+device_id).val();
+            showweather(device_id,latitude,longitude);
             //return false;
             if (response.success == 'success') {
 
                 // location.reload(true);
-                $('.show_summary'+device_id).html(response.html);
+                $('.show_alarm_history'+device_id).html(response.html);
 
             }else{
-                // Swal.fire({
-                //     // title: 'You Dial Number!',
-                //     title: 'Device Name Does Not Update Successfully!',
-                //     icon: 'failure',
-                //     allowOutsideClick: false,
-                //     confirmButtonText: 'Ok',
-                //     customClass: {
-                //         confirmButton: 'btn btn-danger ml-1'
-                //     },
-                //     buttonsStyling: true
-                // }).then(function(result) {
-                //   if (result.isConfirmed) {
-                //       location.reload(true);
-                //   } else {
-                //       location.reload(true);
-                //   }
-                // });
+                
             }
             // $('.loader').fadeOut();
         }
@@ -659,10 +649,6 @@
 
   function show_alarmhistory(device_id) {
     getUserLocation(device_id);
-    $("#show_alarm_history").html('');
-    $(".weather_hd").hide();
-    
-    
     
     var device_id = device_id;
     var user_id = $("#User_Id").val();
@@ -673,17 +659,14 @@
         data: {device_id:device_id,user_id:user_id,_token:"{{ csrf_token() }}"},
         success: function (response) {
             console.log(response);
-            var latitude = $('#onloadlatitude'+device_id).val();
-            var longitude = $('#onloadlongitude'+device_id).val();
-            showweather(device_id,latitude,longitude);
             //return false;
             if (response.success == 'success') {
                 // location.reload(true);
-                $('.show_alarm_history'+device_id).html(response.html);
+                $('.show_summary'+device_id).html(response.html);
 
             }else{
                 $("#alarmhistry"+device_id).modal('hide');
-                $('.show_alarm_history'+device_id).html("");
+                $('.show_summary'+device_id).html("");
                 
             }
             // $('.loader').fadeOut();

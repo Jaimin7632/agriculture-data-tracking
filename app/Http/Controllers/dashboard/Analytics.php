@@ -228,6 +228,7 @@ class Analytics extends Controller
                 $humidityValue = $humidityValues[$key]['value'];
                 $humidityType = $humidityValues[$key]['type'];
 
+                if ($temperatureCelsiusval != '' && $humidityValue != '') {
                   // Calculate the DPV for the current set of temperature and humidity values
                   $dewPoint = $this->calculateDewPoint($temperatureCelsiusval, $humidityValue);
                   if ($dewPoint == '') {
@@ -247,6 +248,8 @@ class Analytics extends Controller
                       ];
                   }
                   $sensorValues[$dewPointSensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $dewPoint];
+                }
+                  
               }
           }
       }
@@ -509,8 +512,6 @@ class Analytics extends Controller
       $sensor_data[] = SensorData::where('device_id', $device_id)->latest('created_at')->first()->toArray();
       
       $outputArray = [];
-
-      $sensorConfig = config('global');
       $sensorValues = [];
       $sensorColors = [];
       foreach ($sensor_data as $item) {
@@ -520,28 +521,55 @@ class Analytics extends Controller
 
           $changedateBycountry =  Country::changedateBytimezone($dateTime, $authuser->timezone)->format('Y-m-d H:i:s');
           // Initialize an array to store sensor values dynamically
+          foreach ($item['sensor_data'] as $sensorName => $sensorDetails) {
 
-          foreach ($sensorConfig as $sensorName => $sensorDetails) {
-              $sensorValueKey = $sensorDetails['key'];
-              $sensorValueType = $sensorDetails['type'];
-              $sensorValueColor = $sensorDetails['color'];
-              $sensorValueIcon = $sensorDetails['icon'];
+            $sensorValueKey = $sensorName;
+            $sensorValueType = isset($sensor_data[0]['sensor_data'][$sensorValueKey]['type']) ? $sensor_data[0]['sensor_data'][$sensorValueKey]['type'] : "graph" ;
+            $sensorValueColor = $sensorDetails['unit'];
+              // Add sensor values to the dynamically generated array
+            $sensorValues[$sensorName]['type'] = $sensorValueType;
+            $sensorValues[$sensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $sensorDetails['value']];
+              
+            $sensorValues[$sensorName]['spname'] = $sensorName;
+            $sensorValues[$sensorName]['unit'] = $sensorDetails['unit'];
 
-              if (array_key_exists($sensorValueKey, $item)) {
-                if ($sensorValueType == 'single') {
-                  $sensorValues[$sensorName]['data'] = ['x' => $changedateBycountry, 'y' => $item[$sensorValueKey]];
-                }else{
-                  $sensorValues[$sensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $item[$sensorValueKey]];
-                }
-                // Add sensor values to the dynamically generated array
-                $sensorValues[$sensorName]['color'] = $sensorValueColor;
-                $sensorValues[$sensorName]['icon'] = $sensorValueIcon;
-              }
           }
       }
 
+      foreach ($sensorValues as $sensorName => $sensorData) {
+        $sensorValueType = $sensorData['type'];
+        //echo $sensorValueType;
+        if ($sensorValueType == 'lastvalue') {
+          $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][0];
+          $sensorValues[$sensorName]['type'] = 'single';
+        }else if($sensorValueType == 'location'){
+          $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][0];
+          $sensorValues[$sensorName]['type'] = 'location';
+          $locationData = $sensorData['data'][0];
+          $xValue = $locationData['x'];
+          $yValue = $locationData['y'];
+
+          $coordinates = explode(',', $yValue);
+          $latitude = $coordinates[0];
+          $longitude = $coordinates[1];
+          $latLongStr = 'Latitude: '.$latitude.'° N'.', Longitude: '.$longitude.'° W';
+
+          $address = $this->getAddressFromCoordinates($latitude,$longitude);
+
+          $LocationAddress = $address->original['address'];
+          $sensorValues[$sensorName]['data'] = ['x' => $xValue, 'y' => $latLongStr, 'address' => $LocationAddress,'Latitude' => $latitude, 'Longitude' => $longitude];
+
+          //print_r($sensorData['data']);
+        }
+        else{
+          
+           $sensorValues[$sensorName]['type'] = 'multi';
+
+        }
+      }
+
       // Check if 'location' key exists
-      if (isset($sensorValues['location'])) {
+      /*if (isset($sensorValues['location'])) {
           // Accessing 'location' data
           $locationData = $sensorValues['location']['data'];
           $xValue = $locationData['x'];
@@ -555,35 +583,41 @@ class Analytics extends Controller
           $address = $this->getAddressFromCoordinates($latitude,$longitude);
           $LocationAddress = $address->original['address'];
           $sensorValues['location']['data'][0] = ['x' => $xValue, 'y' => $LocationAddress, 'address' => $LocationAddress];
+      }*/
+
+      $html = '<table class="table table-bordered">';
+      $html .= '<thead>';
+      $html .= '<tr style="text-align:center; font-family:math">';
+      $html .= '<th colspan="3">Summary</th>'; // Spanning all columns for the title
+      $html .= '</tr>';
+      $html .= '<tr style="text-align:center; font-family:math">';
+      $html .= '<th>Sensor Name</th>';
+      $html .= '<th>Value</th>';
+      $html .= '<th>Date</th>';
+      $html .= '</tr>';
+      $html .= '</thead>';
+      $html .= '<tbody>';
+      
+      // Add rows for each sensor type
+      foreach ($sensorValues as $sensorName => $sensorData) {
+      // Extract value and date from sensorData array
+          $sensorValue = $sensorData['data'][0]['y'];
+          $sensorDate = $sensorData['data'][0]['x'];
+          $unit = $sensorData['unit'];
+
+          $html .= '<tr style="text-align:center;">';
+          $html .= '<td>' . $sensorName . '</td>';
+          $html .= '<td>' . $sensorValue .' '. $unit . '</td>';
+          $html .= '<td>' . $sensorDate . '</td>';
+          $html .= '</tr>';
       }
 
+      $html .= '</tbody>';
+      $html .= '</table>';
+
     }
 
-    $html = '<table class="table table-bordered">';
-    $html .= '<thead>';
-    $html .= '<tr style="text-align:center; font-family:math">';
-    $html .= '<th>Sensor Name</th>';
-    $html .= '<th>Value</th>';
-    $html .= '<th>Date</th>';
-    $html .= '</tr>';
-    $html .= '</thead>';
-    $html .= '<tbody>';
-
-    // Add rows for each sensor type
-    foreach ($sensorValues as $sensorName => $sensorData) {
-    // Extract value and date from sensorData array
-        $sensorValue = $sensorData['data'][0]['y'];
-        $sensorDate = $sensorData['data'][0]['x'];
-
-        $html .= '<tr style="text-align:center;">';
-        $html .= '<td>' . $sensorName . '</td>';
-        $html .= '<td>' . $sensorValue . '</td>';
-        $html .= '<td>' . $sensorDate . '</td>';
-        $html .= '</tr>';
-    }
-
-    $html .= '</tbody>';
-    $html .= '</table>';
+    
     $responseData = ['success' => 'success', 'error' => '', 'html' => $html];
     return response()->json($responseData);
   }
