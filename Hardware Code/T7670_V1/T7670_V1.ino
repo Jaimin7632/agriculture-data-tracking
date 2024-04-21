@@ -1,5 +1,6 @@
 #include <ArduinoJson.h>
 #include <Adafruit_AHTX0.h>
+#include <Wire.h>
 
 
 #define TINY_GSM_USE_GPRS true
@@ -19,6 +20,15 @@ float sensorValues[numSensors] = {0};
 const char server[] = "16.171.60.141";
 const int port = 8000;
 const char endpoint[] = "/api/sensordatastore";
+
+// lora code with i2c
+#define BUFFER_SIZE 50 // Tamaño máximo del buffer para almacenar el paquete JSON
+
+DynamicJsonDocument jsonDoc(BUFFER_SIZE); // Crear un documento JSON dinámico
+char rxBuffer[BUFFER_SIZE]; // Buffer para almacenar los datos recibidos por I2C
+int rxIndex = 0; // Índice para realizar un seguimiento del tamaño actual del buffer
+JsonObject receivedData;
+// end lora code with i2c
 
 #include <ArduinoHttpClient.h>
 #if TINY_GSM_USE_GPRS
@@ -85,6 +95,78 @@ void addSensorDataToJson(DynamicJsonDocument& jsonDocument) {
         sensor["unit"] = sensorUnits[i];
     }
 }
+// lora code with i2c
+void receiveEvent(int numBytes) {
+  // Reiniciar el buffer y el índice
+  memset(rxBuffer, 0, BUFFER_SIZE);
+  rxIndex = 0;
+
+  // Leer los datos recibidos por I2C y almacenarlos en el buffer
+  while (Wire.available() > 0 && rxIndex < BUFFER_SIZE) {
+    char c = Wire.read(); // Leer un byte del bus I2C
+    rxBuffer[rxIndex++] = c; // Almacenar el byte en el buffer
+  }
+
+  // Deserializar el JSON solo si se recibieron datos
+  if (rxIndex > 0) {
+    // Deserializar el JSON almacenado en el buffer
+    DeserializationError error = deserializeJson(jsonDoc, rxBuffer);
+
+    // Verificar si se pudo deserializar correctamente
+    if (error) {
+      Serial.println("Error al parsear el JSON recibido");
+    } else {
+      // Obtener el ID del JSON recibido
+      const char* id = jsonDoc["id"];
+
+      // Verificar si ya hay datos almacenados para este ID
+      if (receivedData.containsKey(id)) {
+        // Remover los datos antiguos para este ID
+        receivedData.remove(id);
+      }
+
+      // Almacenar los nuevos datos en el global variable usando el ID como clave
+      receivedData[id] = jsonDoc;
+      // Imprimir el JSON recibido
+      serializeJsonPretty(jsonDoc, Serial);
+    }
+  }
+}
+
+
+void updateJsonDocument(DynamicJsonDocument& jsonDocument, const JsonObject& receivedData) {
+    // Iterate over each entry in the received data
+    for (JsonPair entry : receivedData) {
+        const char* id = entry.key().c_str();
+        JsonObject sensorData = entry.value().as<JsonObject>();
+
+        // Create a new JSON object for the sensor data under the ID key
+        JsonObject sensorDataNode = jsonDocument.createNestedObject("sensor_data");
+        // Iterate over each sensor in the sensor data
+        for (JsonPair sensorEntry : sensorData) {
+            // Skip the entry if its key is "id"
+            if (strcmp(sensorEntry.key().c_str(), "id") == 0) {
+                continue;
+            }
+
+            // Extract sensor name, value, and unit from sensor data
+            const char* sensorName = sensorEntry.key().c_str();
+            JsonObject sensor = sensorEntry.value().as<JsonObject>();
+            float value = sensor["value"];
+            const char* unit = sensor["unit"];
+
+            // Create a new JSON object for the sensor
+            JsonObject sensorNode = sensorDataNode.createNestedObject(sensorName);
+            sensorNode["name"] = sensorName;
+
+            // Create a JSON object for the sensor value and unit
+            JsonObject dataNode = sensorNode.createNestedObject("data");
+            dataNode["value"] = value;
+            dataNode["unit"] = unit;
+        }
+    }
+}
+// end lora code with i2c
 
 void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
     String jsonString;
@@ -134,6 +216,8 @@ void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
 
 void setup() {
     Serial.begin(115200);
+    Wire.begin(8); // Inicializar el dispositivo I2C con dirección 8
+    Wire.onReceive(receiveEvent); // Configurar el evento de recepción de datos por I2C
 
     #if TINY_GSM_USE_GPRS
     // start sim part
@@ -255,10 +339,11 @@ void setup() {
 
 
     if (!aht.begin()) {
-        Serial.println("Could not find AHT? Check wiring");
-        while (1) delay(10);
+       Serial.println("Could not find AHT? Check wiring");
+    }else{
+      Serial.println("AHT10 or AHT20 found");
     }
-    Serial.println("AHT10 or AHT20 found");
+
 
 }
 
@@ -268,8 +353,9 @@ void loop() {
     readSensors();
 
     // Create JSON object
-    DynamicJsonDocument jsonDocument(256);
+    DynamicJsonDocument jsonDocument(1024);
     addSensorDataToJson(jsonDocument);
+    updateJsonDocument(jsonDocument, receivedData);
 
     // Serialize JSON document
     String jsonString;
