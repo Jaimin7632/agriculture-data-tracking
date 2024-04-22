@@ -1,6 +1,7 @@
 #include "LoRaWan_APP.h"
 #include "Arduino.h"
 #include <Adafruit_AM2315.h> // Include the Adafruit AM2315 library
+#include <ArduinoJson.h>
 
 #define RF_FREQUENCY        868000000 // Hz
 #define TX_OUTPUT_POWER     14        // dBm
@@ -50,10 +51,10 @@ void loop() {
     // Construct the packet with the slave ID, temperature, and humidity
     DynamicJsonDocument jsonDoc(256);
     jsonDoc["id"] = SLAVE_ID;
-    sensor1 = jsonDoc.createNestedObject("temperature");
+    JsonObject sensor1 = jsonDoc.createNestedObject("temperature");
     sensor1["value"] = temperature;
     sensor1["unit"] = "C";
-    sensor1 = jsonDoc.createNestedObject("humidity");
+    JsonObject sensor1 = jsonDoc.createNestedObject("humidity");
     sensor1["value"] = humidity;
     sensor1["unit"] = ".";
 
