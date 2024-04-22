@@ -22,12 +22,11 @@ const int port = 8000;
 const char endpoint[] = "/api/sensordatastore";
 
 // lora code with i2c
-#define BUFFER_SIZE 50 // Tamaño máximo del buffer para almacenar el paquete JSON
+#define BUFFER_SIZE 400 // Tamaño máximo del buffer para almacenar el paquete JSON
 
 DynamicJsonDocument jsonDoc(BUFFER_SIZE); // Crear un documento JSON dinámico
 char rxBuffer[BUFFER_SIZE]; // Buffer para almacenar los datos recibidos por I2C
 int rxIndex = 0; // Índice para realizar un seguimiento del tamaño actual del buffer
-JsonObject receivedData;
 // end lora code with i2c
 
 #include <ArduinoHttpClient.h>
@@ -107,43 +106,32 @@ void receiveEvent(int numBytes) {
     rxBuffer[rxIndex++] = c; // Almacenar el byte en el buffer
   }
 
-  // Deserializar el JSON solo si se recibieron datos
-  if (rxIndex > 0) {
-    // Deserializar el JSON almacenado en el buffer
-    DeserializationError error = deserializeJson(jsonDoc, rxBuffer);
 
-    // Verificar si se pudo deserializar correctamente
-    if (error) {
-      Serial.println("Error al parsear el JSON recibido");
-    } else {
-      // Obtener el ID del JSON recibido
-      const char* id = jsonDoc["id"];
-
-      // Verificar si ya hay datos almacenados para este ID
-      if (receivedData.containsKey(id)) {
-        // Remover los datos antiguos para este ID
-        receivedData.remove(id);
-      }
-
-      // Almacenar los nuevos datos en el global variable usando el ID como clave
-      receivedData[id] = jsonDoc;
-      // Imprimir el JSON recibido
-      serializeJsonPretty(jsonDoc, Serial);
-    }
-  }
 }
 
 
-void updateJsonDocument(DynamicJsonDocument& jsonDocument, const JsonObject& receivedData) {
-    // Iterate over each entry in the received data
-    for (JsonPair entry : receivedData) {
-        const char* id = entry.key().c_str();
-        JsonObject sensorData = entry.value().as<JsonObject>();
+void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
+     // Deserializar el JSON solo si se recibieron datos
+    JsonObject receivedData;
+    if (rxIndex > 0) {
+      // Deserializar el JSON almacenado en el buffer
+      DeserializationError error = deserializeJson(jsonDoc, rxBuffer);
+      Serial.println(rxBuffer);
+      // Verificar si se pudo deserializar correctamente
+      if (error) {
+        Serial.println("Error al parsear el JSON recibido");
+      } else {
+        // Obtener el ID del JSON recibido
+        const char* id = jsonDoc["id"];
+         serializeJsonPretty(jsonDoc, Serial);
 
         // Create a new JSON object for the sensor data under the ID key
-        JsonObject sensorDataNode = jsonDocument.createNestedObject("sensor_data");
+        JsonObject sensorDataNode = jsonDocument["sensor_data"];
+        if(sensorDataNode.isNull()){
+          sensorDataNode = jsonDocument.createNestedObject("sensor_data");
+        }
         // Iterate over each sensor in the sensor data
-        for (JsonPair sensorEntry : sensorData) {
+        for (JsonPair sensorEntry : jsonDoc.as<JsonObject>()) {
             // Skip the entry if its key is "id"
             if (strcmp(sensorEntry.key().c_str(), "id") == 0) {
                 continue;
@@ -151,20 +139,21 @@ void updateJsonDocument(DynamicJsonDocument& jsonDocument, const JsonObject& rec
 
             // Extract sensor name, value, and unit from sensor data
             const char* sensorName = sensorEntry.key().c_str();
+            String finalSensorName = String(id) + sensorName;
             JsonObject sensor = sensorEntry.value().as<JsonObject>();
             float value = sensor["value"];
             const char* unit = sensor["unit"];
 
             // Create a new JSON object for the sensor
-            JsonObject sensorNode = sensorDataNode.createNestedObject(sensorName);
-            sensorNode["name"] = sensorName;
-
-            // Create a JSON object for the sensor value and unit
-            JsonObject dataNode = sensorNode.createNestedObject("data");
-            dataNode["value"] = value;
-            dataNode["unit"] = unit;
+            JsonObject sensorNode = sensorDataNode.createNestedObject(finalSensorName);
+            sensorDataNode["value"] = value;
+            sensorDataNode["unit"] = unit;
         }
+        receivedData[id] = jsonDoc;
+        // Imprimir el JSON recibido
+      }
     }
+
 }
 // end lora code with i2c
 
@@ -355,7 +344,7 @@ void loop() {
     // Create JSON object
     DynamicJsonDocument jsonDocument(1024);
     addSensorDataToJson(jsonDocument);
-    updateJsonDocument(jsonDocument, receivedData);
+    updateJsonDocument(jsonDocument);
 
     // Serialize JSON document
     String jsonString;
