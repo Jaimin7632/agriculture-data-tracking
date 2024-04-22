@@ -20,17 +20,10 @@ char txpacket[BUFFER_SIZE];
 char rxpacket[BUFFER_SIZE];
 
 static RadioEvents_t RadioEvents;
-Adafruit_AM2315 am2315; // Create an instance of the Adafruit AM2315 sensor
 
 void setup() {
     Serial.begin(115200);
     Mcu.begin(HELTEC_BOARD, SLOW_CLK_TPYE);
-
-    // Initialize the Adafruit AM2315 sensor
-    if (!am2315.begin()) {
-        Serial.println("Couldn't find AM2315 sensor!");
-        while (1);
-    }
 
     RadioEvents.TxDone = OnTxDone;
     RadioEvents.TxTimeout = OnTxTimeout;
@@ -44,19 +37,14 @@ void setup() {
 }
 
 void loop() {
-    // Read temperature and humidity from the AM2315 sensor
-    float temperature = am2315.readTemperature();
-    float humidity = am2315.readHumidity();
+    int pressureValue = analogRead(A0);
 
     // Construct the packet with the slave ID, temperature, and humidity
     DynamicJsonDocument jsonDoc(256);
     jsonDoc["id"] = SLAVE_ID;
-    JsonObject sensor1 = jsonDoc.createNestedObject("temperature");
-    sensor1["value"] = temperature;
+    JsonObject sensor1 = jsonDoc.createNestedObject("pressureSensor");
+    sensor1["value"] = pressureValue;
     sensor1["unit"] = "C";
-    JsonObject sensor2 = jsonDoc.createNestedObject("humidity");
-    sensor2["value"] = humidity;
-    sensor2["unit"] = ".";
 
     char txpacket[256];
     serializeJson(jsonDoc, txpacket);
