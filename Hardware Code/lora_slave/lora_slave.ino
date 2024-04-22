@@ -40,7 +40,7 @@ void loop() {
     int pressureValue = analogRead(A0);
 
     // Construct the packet with the slave ID, temperature, and humidity
-    DynamicJsonDocument jsonDoc(256);
+    DynamicJsonDocument jsonDoc(2048);
     jsonDoc["id"] = SLAVE_ID;
     JsonObject sensor1 = jsonDoc.createNestedObject("pressureSensor");
     sensor1["value"] = pressureValue;
