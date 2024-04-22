@@ -54,9 +54,9 @@ void loop() {
     JsonObject sensor1 = jsonDoc.createNestedObject("temperature");
     sensor1["value"] = temperature;
     sensor1["unit"] = "C";
-    JsonObject sensor1 = jsonDoc.createNestedObject("humidity");
-    sensor1["value"] = humidity;
-    sensor1["unit"] = ".";
+    JsonObject sensor2 = jsonDoc.createNestedObject("humidity");
+    sensor2["value"] = humidity;
+    sensor2["unit"] = ".";
 
     char txpacket[256];
     serializeJson(jsonDoc, txpacket);
