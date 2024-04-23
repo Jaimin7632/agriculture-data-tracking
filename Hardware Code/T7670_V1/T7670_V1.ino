@@ -17,9 +17,9 @@ const float pressureMaxRange = 0.2; // set pressure sensor range in MPa
 float sensorValues[numSensors] = {0};
 
 // Server details
-const char server[] = "16.171.60.141";
-const int port = 8000;
-const char endpoint[] = "/api/sensordatastore";
+// const char server[] = "16.171.60.141";
+// const int port = 8000;
+const char endpoint[] = "http://16.171.60.141:8000/api/sensordatastore";
 
 // lora code with i2c
 #define BUFFER_SIZE 400 // Tamaño máximo del buffer para almacenar el paquete JSON
@@ -45,7 +45,7 @@ int rxIndex = 0; // Índice para realizar un seguimiento del tamaño actual del 
 
   #endif
   TinyGsmClient client(modem);
-  HttpClient    http(client, server, port);
+//   HttpClient    http(client, server, port);
 
 #endif
 
