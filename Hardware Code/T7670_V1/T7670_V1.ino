@@ -205,8 +205,10 @@ void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
 
 void setup() {
     Serial.begin(115200);
+    // start lora code with i2c
     Wire.begin(8); // Inicializar el dispositivo I2C con dirección 8
     Wire.onReceive(receiveEvent); // Configurar el evento de recepción de datos por I2C
+    // end lora code with i2c
 
     #if TINY_GSM_USE_GPRS
     // start sim part
