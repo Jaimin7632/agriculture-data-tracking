@@ -22,6 +22,14 @@ const char endpoint[] = "/api/sensordatastore";
 #include <ArduinoJson.h>
 #include <Adafruit_AHTX0.h>
 
+// lora code with i2c
+#define BUFFER_SIZE 400 // Tamaño máximo del buffer para almacenar el paquete JSON
+
+DynamicJsonDocument jsonDoc(BUFFER_SIZE); // Crear un documento JSON dinámico
+char rxBuffer[BUFFER_SIZE]; // Buffer para almacenar los datos recibidos por I2C
+int rxIndex = 0; // Índice para realizar un seguimiento del tamaño actual del buffer
+// end lora code with i2c
+
 WiFiClient client;
 HttpClient http(client, server, port);
 
@@ -72,8 +80,75 @@ void addSensorDataToJson(DynamicJsonDocument& jsonDocument) {
     }
 }
 
+// lora code with i2c
+void receiveEvent(int numBytes) {
+  // Reiniciar el buffer y el índice
+  memset(rxBuffer, 0, BUFFER_SIZE);
+  rxIndex = 0;
+
+  // Leer los datos recibidos por I2C y almacenarlos en el buffer
+  while (Wire.available() > 0 && rxIndex < BUFFER_SIZE) {
+    char c = Wire.read(); // Leer un byte del bus I2C
+    rxBuffer[rxIndex++] = c; // Almacenar el byte en el buffer
+  }
+
+
+}
+
+
+void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
+     // Deserializar el JSON solo si se recibieron datos
+    JsonObject receivedData;
+    if (rxIndex > 0) {
+      // Deserializar el JSON almacenado en el buffer
+      DeserializationError error = deserializeJson(jsonDoc, rxBuffer);
+      Serial.println(rxBuffer);
+      // Verificar si se pudo deserializar correctamente
+      if (error) {
+        Serial.println("Error al parsear el JSON recibido");
+      } else {
+        // Obtener el ID del JSON recibido
+        const char* id = jsonDoc["id"];
+         serializeJsonPretty(jsonDoc, Serial);
+
+        // Create a new JSON object for the sensor data under the ID key
+        JsonObject sensorDataNode = jsonDocument["sensor_data"];
+        if(sensorDataNode.isNull()){
+          sensorDataNode = jsonDocument.createNestedObject("sensor_data");
+        }
+        // Iterate over each sensor in the sensor data
+        for (JsonPair sensorEntry : jsonDoc.as<JsonObject>()) {
+            // Skip the entry if its key is "id"
+            if (strcmp(sensorEntry.key().c_str(), "id") == 0) {
+                continue;
+            }
+
+            // Extract sensor name, value, and unit from sensor data
+            const char* sensorName = sensorEntry.key().c_str();
+            String finalSensorName = String(id) + sensorName;
+            JsonObject sensor = sensorEntry.value().as<JsonObject>();
+            float value = sensor["value"];
+            const char* unit = sensor["unit"];
+
+            // Create a new JSON object for the sensor
+            JsonObject sensorNode = sensorDataNode.createNestedObject(finalSensorName);
+            sensorDataNode["value"] = value;
+            sensorDataNode["unit"] = unit;
+        }
+        receivedData[id] = jsonDoc;
+        // Imprimir el JSON recibido
+      }
+    }
+
+}
+// end lora code with i2c
+
 void setup() {
     Serial.begin(115200);
+    // start lora code with i2c
+    Wire.begin(8); // Inicializar el dispositivo I2C con dirección 8
+    Wire.onReceive(receiveEvent); // Configurar el evento de recepción de datos por I2C
+    // end lora code with i2c
     Serial.println("Connecting to WiFi...");
 
     // Connect to WiFi
@@ -99,6 +174,7 @@ void loop() {
     // Create JSON object
     DynamicJsonDocument jsonDocument(256);
     addSensorDataToJson(jsonDocument);
+    updateJsonDocument(jsonDocument);
 
     // Serialize JSON document
     String jsonString;
@@ -125,8 +201,8 @@ void loop() {
             DeserializationError error = deserializeJson(responseData, body);
             const char* wifi_id = responseData["data"]["wifi_id"];
             const char* wifi_password = responseData["data"]["wifi_password"];
-            
-            
+
+
         } else {
             Serial.println("Error: Blank line indicating end of headers not found.");
         }
