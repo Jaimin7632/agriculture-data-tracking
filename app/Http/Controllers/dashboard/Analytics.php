@@ -238,7 +238,7 @@ class Analytics extends Controller
                   $dewPointSensorName = 'DewPoint_' . ($key + 1);
                   if (!isset($sensorValues[$dewPointSensorName])) {
                       $sensorValues[$dewPointSensorName] = [
-                          'type' => $temperatureType,
+                          'type' => 'multi',
                           'data' => [],
                           'spname' => $dewPointSensorName,
                           'unit' => 'MA',
@@ -270,6 +270,7 @@ class Analytics extends Controller
           $yValue = $locationData['y'];
 
           $coordinates = explode(',', $yValue);
+
           $latitude = $coordinates[0];
           $longitude = $coordinates[1];
           $latLongStr = 'Latitude: '.$latitude.'° N'.', Longitude: '.$longitude.'° W';
@@ -280,13 +281,12 @@ class Analytics extends Controller
           $sensorValues[$sensorName]['data'] = ['x' => $xValue, 'y' => $latLongStr, 'address' => $LocationAddress,'Latitude' => $latitude, 'Longitude' => $longitude];
 
           //print_r($sensorData['data']);
-        }
-        else{
+        }else{
           
            $sensorValues[$sensorName]['type'] = 'multi';
 
         }
-      } 
+      }  
       //echo "<pre>";print_r($sensorValues);exit;
 
       // Check if 'location' key exists
@@ -601,8 +601,24 @@ class Analytics extends Controller
       // Add rows for each sensor type
       foreach ($sensorValues as $sensorName => $sensorData) {
       // Extract value and date from sensorData array
-          $sensorValue = $sensorData['data'][0]['y'];
-          $sensorDate = $sensorData['data'][0]['x'];
+        // echo "<pre>"; print_r($sensorData['data']['y']); die();
+        if ($sensorData['type'] === 'single' || $sensorData['type'] === 'location') {
+            // Handle single value
+            $sensorValue = $sensorData['data']['y'];
+            $sensorDate = $sensorData['data']['x'];
+        } elseif ($sensorData['type'] === 'multi' && count($sensorData['data']) > 0) {
+            // Handle multiple values
+            $sensorValue = $sensorData['data'][0]['y'];
+            $sensorDate = $sensorData['data'][0]['x'];
+        }
+        // if (count($sensorData['data']) > 3) {
+        //   $sensorValue = $sensorData['data'][0]['y'];
+        //   $sensorDate = $sensorData['data'][0]['x'];
+        // }else{
+        //   $sensorValue = $sensorData['data']['y'];
+        //   $sensorDate = $sensorData['data']['x'];
+        // }
+          
           $unit = $sensorData['unit'];
 
           $html .= '<tr style="text-align:center;">';
