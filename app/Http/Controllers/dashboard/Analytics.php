@@ -126,7 +126,7 @@ class Analytics extends Controller
       $sensorConfig = config('global');
       $sensorValues = [];
       $sensorColors = [];
-      foreach ($sensor_data as $item) {
+      foreach (array_reverse($sensor_data) as $item) {
           $formattedDateTime = $item['created_at'];
           $dateTime = new \DateTime($formattedDateTime);
           $createdAt = $dateTime->format('Y-m-d H:i:s');
