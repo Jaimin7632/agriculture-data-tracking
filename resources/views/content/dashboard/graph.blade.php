@@ -2,10 +2,10 @@
 <!--  -->
 <input type="hidden" name="user_id" id="User_Id" value="{{$user->id}}">
 
- <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<link rel="stylesheet" href="{{ asset('assets/css/Control.Geocoder.css') }}" />
+<link rel="stylesheet" href="{{ asset('assets/css/leaflet.css') }}" />
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{asset('assets/js/jquery-3.6.0.min.js')}}"></script>
 <?php $authuser = Auth::user();
 
   if ($user->device_id != "") {   
@@ -115,14 +115,12 @@
 
               </br>
 
-              <span class="weather_wiedget<?php echo $value; ?> weather_hd" style="display: none;">
+              <!-- <span class="weather_wiedget<?php echo $value; ?> weather_hd" style="display: none;">
                 <section class="">
                   <div class="container py-5">
                   
                   <button class="btn"  type="button" data-bs-toggle="modal" data-bs-toggle="modal" data-bs-target="#mapedit<?php echo $value; ?>"><i class="fas fa-edit"></i></button>
                     <div id="wrapper-bg" class="row d-flex justify-content-center align-items-center h-100" style="background-color: #eeefed">
-                      <!-- <span id="wrapper-bg" class="card text-white bg-image shadow-4-strong"
-                          style="background-image: url('img/clouds.gif')"> -->
                       <div class="col-sm-3">
                         <div class="card-header p-4 border-0">
                           <div class="text-center mb-3">
@@ -221,13 +219,12 @@
                             </div>
                           </div>
                       </div>
-                    <!-- </span> -->
 
                     </div>
 
                   </div>
                 </section>
-              </span>
+              </span> -->
 
               <span class="show_alarm_history<?php echo $value; ?>" id="show_alarm_history"></span>
               <span class="append_graph_blank" id="append_graph<?php echo $value; ?>"></span>
@@ -363,7 +360,7 @@
 
 
       <!-- Leaflet and Leaflet Control Search JavaScript -->
-      <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+      <script src="{{asset('assets/js/leaflet.js')}}"></script>
       <!-- JavaScript -->
       <script>
           $(document).ready(function () {
@@ -632,7 +629,7 @@
             console.log(response);
             var latitude = $('#onloadlatitude'+device_id).val();
             var longitude = $('#onloadlongitude'+device_id).val();
-            showweather(device_id,latitude,longitude);
+            // showweather(device_id,latitude,longitude);
             //return false;
             if (response.success == 'success') {
 
@@ -962,32 +959,32 @@
     } else {
         console.log("Geolocation is not supported by this browser.");
     }
-}
+  }
 
-function showPosition(position, deviceid) {
-    var latitude = position.coords.latitude;
-    var longitude = position.coords.longitude;
+  function showPosition(position, deviceid) {
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
 
-    
-    var setlatitude = $('#setlatitude'+deviceid).val();
-    var setlongitude = $('#setlongitude'+deviceid).val();
+      
+      var setlatitude = $('#setlatitude'+deviceid).val();
+      var setlongitude = $('#setlongitude'+deviceid).val();
 
-    // console.log("setlatitude: " + setlatitude);
-    // console.log("setlongitude: " + setlongitude);
+      // console.log("setlatitude: " + setlatitude);
+      // console.log("setlongitude: " + setlongitude);
 
-    if (setlatitude === '' && setlongitude === '') {
-      $('#onloadlatitude'+deviceid).val(latitude);
-      $('#onloadlongitude'+deviceid).val(longitude);
-    }else{
-      $('#onloadlatitude'+deviceid).val(setlatitude);
-      $('#onloadlongitude'+deviceid).val(setlongitude);
-    }
+      if (setlatitude === '' && setlongitude === '') {
+        $('#onloadlatitude'+deviceid).val(latitude);
+        $('#onloadlongitude'+deviceid).val(longitude);
+      }else{
+        $('#onloadlatitude'+deviceid).val(setlatitude);
+        $('#onloadlongitude'+deviceid).val(setlongitude);
+      }
 
-    // You can send the latitude, longitude, and deviceid to your Laravel backend via AJAX
-    console.log("Latitude: " + latitude);
-    console.log("Longitude: " + longitude);
-    console.log("Device ID: " + deviceid);
-}
+      // You can send the latitude, longitude, and deviceid to your Laravel backend via AJAX
+      console.log("Latitude: " + latitude);
+      console.log("Longitude: " + longitude);
+      console.log("Device ID: " + deviceid);
+  }
 
 // Call the function with the deviceid parameter
 
