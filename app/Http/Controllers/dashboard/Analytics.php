@@ -584,8 +584,8 @@ class Analytics extends Controller
           $LocationAddress = $address->original['address'];
           $sensorValues['location']['data'][0] = ['x' => $xValue, 'y' => $LocationAddress, 'address' => $LocationAddress];
       }*/
-
-      $html = '<table class="table table-bordered">';
+      $html = '<div class="table-responsive">';
+      $html .= '<table class="table table-bordered">';
       $html .= '<thead>';
       $html .= '<tr style="text-align:center; font-family:math">';
       $html .= '<th colspan="3">Summary</th>'; // Spanning all columns for the title
@@ -630,6 +630,7 @@ class Analytics extends Controller
 
       $html .= '</tbody>';
       $html .= '</table>';
+      $html .= '</div>';
 
     }
 
