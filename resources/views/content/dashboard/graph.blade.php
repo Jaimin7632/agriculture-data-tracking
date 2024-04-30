@@ -4,7 +4,20 @@
 
 <link rel="stylesheet" href="{{ asset('assets/css/Control.Geocoder.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/css/leaflet.css') }}" />
-
+<style type="text/css">
+  @media screen and (max-width: 600px) { /* Change the max-width value according to your needs */
+    .sensor-section {
+        position: relative; /* Fixed position */
+        top: 0; /* Position from the top of the viewport */
+        left: 0; /* Position from the left of the viewport */
+        width: 100%; /* Full width */
+        z-index: 999; /* Ensure it's above other content */
+        background-color: #fff; /* Optional: Set background color */
+        padding: 10px; /* Optional: Add padding */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add box shadow */
+    }
+}
+</style>
 <script src="{{asset('assets/js/jquery-3.6.0.min.js')}}"></script>
 <?php $authuser = Auth::user();
 

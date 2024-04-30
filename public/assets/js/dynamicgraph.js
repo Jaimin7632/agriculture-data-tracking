@@ -132,16 +132,16 @@ $('.changegraphtime').on('click', function() {
 
                     var divElement = $('<div>', {
                         id: 'lineChart'+sensorName+response.devide_id,
-                        class: '',
+                        class: 'px-2 col-12',
                         style: 'margin: 40px 0px;'
                     });
 
                     var divElement = $('<div>', {
                         id: 'lineChart'+sensorName+response.devide_id,
-                        class: ''
+                        class: 'px-2 col-12'
                     });
                     // Create a container div for centering
-                    var container = $('<div>', {
+                    var container = $('<div class="sensor-section">', {
                       style: 'text-align: center; margin-top: 20px;'  // Adjust margin as needed
                     });
 
