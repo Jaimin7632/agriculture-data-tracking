@@ -141,7 +141,7 @@ $('.changegraphtime').on('click', function() {
                         class: 'px-2 col-12'
                     });
                     // Create a container div for centering
-                    var container = $('<div class="sensor-section">', {
+                    var container = $('<div>', {
                       style: 'text-align: center; margin-top: 20px;'  // Adjust margin as needed
                     });
 
