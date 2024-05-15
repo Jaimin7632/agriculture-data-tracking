@@ -969,8 +969,8 @@
       var setlatitude = $('#setlatitude'+deviceid).val();
       var setlongitude = $('#setlongitude'+deviceid).val();
 
-      // console.log("setlatitude: " + setlatitude);
-      // console.log("setlongitude: " + setlongitude);
+      console.log("setlatitude: " + setlatitude);
+      console.log("setlongitude: " + setlongitude);
 
       if (setlatitude === '' && setlongitude === '') {
         $('#onloadlatitude'+deviceid).val(latitude);
