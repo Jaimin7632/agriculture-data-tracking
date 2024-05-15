@@ -4,7 +4,7 @@
 
 @section('page-style')
 <!-- Page -->
-<link rel="stylesheet" href="{{asset('assets/vendor/css/pages/page-auth.css')}}">
+<link rel="stylesheet" href="{{secure_asset('assets/vendor/css/pages/page-auth.css')}}">
 @endsection
 
 
