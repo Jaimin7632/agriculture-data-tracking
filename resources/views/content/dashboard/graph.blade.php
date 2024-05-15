@@ -115,7 +115,7 @@
 
               </br>
 
-              <!-- <span class="weather_wiedget<?php echo $value; ?> weather_hd" style="display: none;">
+              <span class="weather_wiedget<?php echo $value; ?> weather_hd" style="display: none;">
                 <section class="">
                   <div class="container py-5">
                   
@@ -224,7 +224,7 @@
 
                   </div>
                 </section>
-              </span> -->
+              </span>
 
               <span class="show_alarm_history<?php echo $value; ?>" id="show_alarm_history"></span>
               <span class="append_graph_blank" id="append_graph<?php echo $value; ?>"></span>
@@ -629,7 +629,7 @@
             console.log(response);
             var latitude = $('#onloadlatitude'+device_id).val();
             var longitude = $('#onloadlongitude'+device_id).val();
-            // showweather(device_id,latitude,longitude);
+            showweather(device_id,latitude,longitude);
             //return false;
             if (response.success == 'success') {
 
