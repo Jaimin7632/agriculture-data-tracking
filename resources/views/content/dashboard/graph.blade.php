@@ -629,12 +629,12 @@
             console.log(response);
             var latitude = $('#onloadlatitude'+device_id).val();
             var longitude = $('#onloadlongitude'+device_id).val();
-            showweather(device_id,latitude,longitude);
+            
             //return false;
             if (response.success == 'success') {
-
+              showweather(device_id,latitude,longitude);
                 // location.reload(true);
-                $('.show_alarm_history'+device_id).html(response.html);
+              $('.show_alarm_history'+device_id).html(response.html);
 
             }else{
                 
@@ -821,9 +821,9 @@
 
   function showweather(device_id,latitude,longitude){
     $(".weather_wiedget"+device_id).show();
-    console.log('deviceid'+device_id);
-    console.log('latitude'+latitude);
-    console.log('longitude'+longitude);
+    console.log('deviceid16'+device_id);
+    console.log('latitude16'+latitude);
+    console.log('longitude16'+longitude);
     // API call
     let queryUrl = "https://api.openweathermap.org/data/2.5/onecall?";
     let lat = "lat=" + latitude + "&";
@@ -969,8 +969,8 @@
       var setlatitude = $('#setlatitude'+deviceid).val();
       var setlongitude = $('#setlongitude'+deviceid).val();
 
-      console.log("setlatitude: " + setlatitude);
-      console.log("setlongitude: " + setlongitude);
+      // console.log("setlatitude: " + setlatitude);
+      // console.log("setlongitude: " + setlongitude);
 
       if (setlatitude === '' && setlongitude === '') {
         $('#onloadlatitude'+deviceid).val(latitude);
