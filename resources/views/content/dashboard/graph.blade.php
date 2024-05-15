@@ -632,7 +632,7 @@
             
             setInterval(() => {
                 showweather(device_id,latitude,longitude);
-            }, 2000);
+            }, 1000);
             //return false;
             if (response.success == 'success') {
 
