@@ -1,16 +1,16 @@
 <!-- BEGIN: Vendor JS-->
-<script src="{{ asset(mix('assets/vendor/libs/jquery/jquery.js')) }}"></script>
-<script src="{{ asset(mix('assets/vendor/libs/popper/popper.js')) }}"></script>
-<script src="{{ asset(mix('assets/vendor/js/bootstrap.js')) }}"></script>
-<script src="{{ asset(mix('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js')) }}"></script>
-<script src="{{ asset(mix('assets/vendor/js/menu.js')) }}"></script>
+<script src="{{ secure_asset(mix('assets/vendor/libs/jquery/jquery.js')) }}"></script>
+<script src="{{ secure_asset(mix('assets/vendor/libs/popper/popper.js')) }}"></script>
+<script src="{{ secure_asset(mix('assets/vendor/js/bootstrap.js')) }}"></script>
+<script src="{{ secure_asset(mix('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js')) }}"></script>
+<script src="{{ secure_asset(mix('assets/vendor/js/menu.js')) }}"></script>
 @yield('vendor-script')
 <!-- END: Page Vendor JS-->
 <!-- BEGIN: Theme JS-->
-<script src="{{ asset(mix('assets/js/main.js')) }}"></script>
-<script src="{{asset('assets/sweet-alert2/sweetalert2.all.min.js')}}"></script>
-<script src="{{asset('assets/datatable/js/jquery.dataTables.min.js')}}"></script>
-<script src="{{asset('assets/datatable/js/dataTables.bootstrap5.min.js')}}"></script>
+<script src="{{ secure_asset(mix('assets/js/main.js')) }}"></script>
+<script src="{{secure_asset('assets/sweet-alert2/sweetalert2.all.min.js')}}"></script>
+<script src="{{secure_asset('assets/datatable/js/jquery.dataTables.min.js')}}"></script>
+<script src="{{secure_asset('assets/datatable/js/dataTables.bootstrap5.min.js')}}"></script>
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
