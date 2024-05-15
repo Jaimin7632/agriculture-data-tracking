@@ -630,17 +630,14 @@
             var latitude = $('#onloadlatitude'+device_id).val();
             var longitude = $('#onloadlongitude'+device_id).val();
             
-            setInterval(() => {
-                showweather(device_id,latitude,longitude);
-            }, 1000);
             //return false;
             if (response.success == 'success') {
-
+              showweather(device_id,latitude,longitude);
                 // location.reload(true);
               $('.show_alarm_history'+device_id).html(response.html);
 
             }else{
-                
+               showweather(device_id,latitude,longitude); 
             }
             // $('.loader').fadeOut();
         }
