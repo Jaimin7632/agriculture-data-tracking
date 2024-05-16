@@ -130,6 +130,10 @@
                             <span class="">Pressure: <span id="wrapper-pressure<?php echo $value; ?>"></span></span>
                             <span class="mx-2">|</span>
                             <span class="">Humidity: <span id="wrapper-humidity<?php echo $value; ?>"></span></span>
+                            <span class="mx-2">|</span>
+                            <span class="">Wind Speed: <span id="wrapper-windspeed<?php echo $value; ?>"></span></span>
+                            <span class="mx-2">|</span>
+                            <span class="">Wind Direction: <span id="wrapper-winddirection<?php echo $value; ?>"></span></span>
                           </div>
                         </div>
                       </div>
@@ -381,7 +385,7 @@
                       var lng = e.latlng.lng;
                       $(".LAT<?php echo $value; ?>").val(lat);
                       $(".LON<?php echo $value; ?>").val(lng);
-                      console.log('Latitude: ' + lat + ', Longitude: ' + lng);
+                      //console.log('Latitude: ' + lat + ', Longitude: ' + lng);
                   });
               });
           });
@@ -487,8 +491,8 @@
       var user_id = $("#User_Id").val();
       var LAT = $(".LAT"+device_id).val();
       var LON = $(".LON"+device_id).val();
-      console.log(LAT);
-      console.log(LON);
+      // console.log(LAT);
+      // console.log(LON);
       save_latlong(device_id,user_id,LAT,LON);
       // Call the function
       // graphdata(device_id, from_date, to_date);
@@ -564,7 +568,7 @@
         //     $('.loader').show();
         // },
         success: function (response) {
-            console.log(response);
+            //console.log(response);
             //return false;
             if (response.success == 'success') {
 
@@ -626,7 +630,7 @@
         url: '{{ route("get-show-summary") }}',
         data: {device_id:device_id,user_id:user_id,_token:"{{ csrf_token() }}"},
         success: function (response) {
-            console.log(response);
+            //console.log(response);
             var latitude = $('#onloadlatitude'+device_id).val();
             var longitude = $('#onloadlongitude'+device_id).val();
             
@@ -656,7 +660,7 @@
         url: '{{ route("get-alarm-history") }}',
         data: {device_id:device_id,user_id:user_id,_token:"{{ csrf_token() }}"},
         success: function (response) {
-            console.log(response);
+            //console.log(response);
             //return false;
             if (response.success == 'success') {
                 // location.reload(true);
@@ -678,8 +682,8 @@
     var user_id = $("#User_Id").val();
     var from_date = $(".from_date_export"+device_id).val();
     var to_date = $(".to_date_export"+device_id).val();
-    console.log(from_date);
-    console.log(to_date);
+    //console.log(from_date);
+    //console.log(to_date);
     // console.log(user_id);
     // console.log(change_text);
     $.ajax({
@@ -715,8 +719,8 @@
     //$('.minmaxadd').empty();
     $(".sname").val(sensorName);
     $(".Sensor_Name").text(sensorName);
-    console.log(sensorName);
-    console.log(device_id);
+    //console.log(sensorName);
+    //console.log(device_id);
     var user_id = $("#User_Id").val();
     // return false;
     $.ajax({
@@ -724,7 +728,7 @@
         url: '{{ route("get-alarm-data-by-sensorname") }}',
         data: {device_id:device_id,user_id:user_id,sensorName:sensorName,_token:"{{ csrf_token() }}"},
         success: function (response) {
-            console.log(response);
+            //console.log(response);
             //return false;
             if (response.success == 'success') {
 
@@ -830,12 +834,14 @@
     let lon = "lon=" + longitude + "&";
 
     let apiOptions = "units=metric&exclude=minutely,alerts&";
+    let windSpeedParam = "wind_speed&";
     let apiKey = "appid=dbb76c5d98d5dbafcb94441c6a10236e";
-    let file = queryUrl + lat + lon + apiOptions + apiKey;
+    let file = queryUrl + lat + lon + apiOptions + windSpeedParam + apiKey;
     console.log(file);
     fetch(file)
     .then((response) => response.json())
     .then((data) => {
+      console.log('apidata'+data);
     // Weather main data
     let main = data.current.weather[0].main;
     let description = data.current.weather[0].description;
@@ -843,11 +849,15 @@
     let pressure = data.current.pressure;
     let humidity = data.current.humidity;
     let name = data.timezone;
+    let windspeed = data.current.wind_speed;
+    let winddirection = data.current.wind_deg;
 
     document.getElementById("wrapper-description"+device_id).innerHTML = description;
     document.getElementById("wrapper-temp"+device_id).innerHTML = temp + "°C";
     document.getElementById("wrapper-pressure"+device_id).innerHTML = pressure;
-    document.getElementById("wrapper-humidity"+device_id).innerHTML = humidity + "°C";
+    document.getElementById("wrapper-windspeed"+device_id).innerHTML = windspeed + "(m/s)";
+    document.getElementById("wrapper-winddirection"+device_id).innerHTML = winddirection + "°";
+    document.getElementById("wrapper-humidity"+device_id).innerHTML = humidity + "%";
     document.getElementById("wrapper-name"+device_id).innerHTML = name;
 
     // Weather hourly data
@@ -981,9 +991,9 @@
       }
 
       // You can send the latitude, longitude, and deviceid to your Laravel backend via AJAX
-      console.log("Latitude: " + latitude);
-      console.log("Longitude: " + longitude);
-      console.log("Device ID: " + deviceid);
+      // console.log("Latitude: " + latitude);
+      // console.log("Longitude: " + longitude);
+      // console.log("Device ID: " + deviceid);
   }
 
 // Call the function with the deviceid parameter

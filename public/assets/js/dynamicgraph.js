@@ -84,7 +84,7 @@ $('.changegraphtime').on('click', function() {
         dataType: 'json',
         success: function (response) {
           //console.log('resp');
-            console.log(response);
+            //console.log(response);
               $('#spinner'+device_id).hide();
               // localStorage.screenname = "callcenter";
               // setCurrentScreen(localStorage.screenname);
@@ -103,7 +103,7 @@ $('.changegraphtime').on('click', function() {
                 var devide_id = response.devide_id;
                 // Iterate over each sensor
                 $.each(sensorData, function(sensorName, sensorValues) {
-                  console.log(sensorValues.type);
+                  //console.log(sensorValues.type);
                     if (sensorValues.type != 'multi'){
                       return true;
                     }
@@ -153,10 +153,10 @@ $('.changegraphtime').on('click', function() {
                     });
 
 
-                    console.log(sensorValues.data);
-                    console.log(sensorValues.data[-1]);
-                    console.log(sensorValues.data.length);
-                    console.log(sensorValues.data[0]);
+                    // console.log(sensorValues.data);
+                    // console.log(sensorValues.data[-1]);
+                    // console.log(sensorValues.data.length);
+                    // console.log(sensorValues.data[0]);
                     // Last Y Value
                     var lastYValue = $('<h3>', {
                       text: Math.round(sensorValues.data[sensorValues.data.length - 1].y * 100)/100 + ' ' + sensorValues.unit,
