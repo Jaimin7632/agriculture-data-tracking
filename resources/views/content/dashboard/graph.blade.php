@@ -115,7 +115,7 @@
 
               </br>
 
-              <span class="weather_wiedget<?php echo $value; ?> weather_hd" style="display: none;">
+              <!-- <span class="weather_wiedget<?php echo $value; ?> weather_hd" style="display: none;">
                 <section class="">
                   <div class="container py-5">
                   
@@ -227,8 +227,75 @@
                     </div>
 
                   </div>
-                </section>
-              </span>
+                </section> -->
+
+                <div class="mainweather container weather_wiedget<?php echo $value; ?> weather_hd" style="display: none;">
+                  <button class="btn"  type="button" data-bs-toggle="modal" data-bs-toggle="modal" data-bs-target="#mapedit<?php echo $value; ?>"><i class="fas fa-edit"></i></button>
+                  <div class="row">
+                    <div class="col-xs-12">
+                      <!-- <div class="col-xs-12 col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4 weather-panel"> -->
+                      <div class="col-xs-12 weather-panel">
+                        <div class="col-xs-6 weather_head">
+                          <!-- <h2>Lucerne<br><small>May 24, 2016</small></h2>
+                          <p class="h3"><i class="mi mi-fw mi-lg mi-rain-heavy"></i> Rainy</p> -->
+                          <h4 class="text-white" id="timezone<?php echo $value; ?>">Lucerne</h4><br><h2><small class="text-white" id="daynow<?php echo $value; ?>">May 24, 2016</small><h2>
+                          <p class="h3 text-white" id="wrapper-description"><i class="mi mi-fw mi-lg mi-rain-heavy" id="cloud<?php echo $value; ?>"></i> Rainy</p>
+                        </div>
+                        <div class="col-xs-6 text-center">
+                          <div class="h1 text-white">
+                            <span id="temperature<?php echo $value; ?>">12°</span>
+                            <br>
+                            <small id="pressure<?php echo $value; ?>">Pressure: 8°</small>
+                            <small id="humidity<?php echo $value; ?>">Humidity: 13°</small>
+                            <small id="windspeed<?php echo $value; ?>">Wind Speed: 13°</small>
+                            <small id="winddirection<?php echo $value; ?>">Wind Direction: 13°</small>
+                          </div>
+                        </div>
+                        <div class="col-xs-12">
+                          <ul class="list-inline row forecast">
+                            <li class="col-xs-4 col-sm-2 text-center">
+                              <h3 class="h5 text-white" id="day1<?php echo $value; ?>">Wed</h3>
+                              <!-- <p><i class="mi mi-fw mi-2x mi-cloud-sun"></i><br>9°/18°</p> -->
+                              <p id="day1ph<?php echo $value; ?>">9°/18°</p>
+                              <p id="day1ww<?php echo $value; ?>">9°/18°</p>
+                            </li>
+                            <li class="col-xs-4 col-sm-2 text-center">
+                              <h3 class="h5 text-white" id="day2<?php echo $value; ?>">Thu</h3>
+                              <!-- <p><i class="mi mi-fw mi-2x mi-sun"></i><br>12°/23°</p> -->
+                              <p id="day2ph<?php echo $value; ?>">9°/18°</p>
+                              <p id="day2ww<?php echo $value; ?>">9°/18°</p>
+                            </li>
+                            <li class="col-xs-4 col-sm-2 text-center">
+                              <h3 class="h5 text-white" id="day3<?php echo $value; ?>">Fri</h3>
+                              <!-- <p><i class="mi mi-fw mi-2x mi-cloud-sun"></i><br>14°/24°</p> -->
+                              <p id="day3ph<?php echo $value; ?>">9°/18°</p>
+                              <p id="day3ww<?php echo $value; ?>">9°/18°</p>
+                            </li>
+                            <li class="col-xs-4 col-sm-2 text-center">
+                              <h3 class="h5 text-white" id="day4<?php echo $value; ?>">Sat</h3>
+                              <!-- <p><i class="mi mi-fw mi-2x mi-rain"></i><br>15°/23°</p> -->
+                              <p id="day4ph<?php echo $value; ?>">9°/18°</p>
+                              <p id="day4ww<?php echo $value; ?>">9°/18°</p>
+                            </li>
+                            <li class="col-xs-4 col-sm-2 text-center">
+                              <h3 class="h5 text-white" id="day5<?php echo $value; ?>">Sun</h3>
+                              <!-- <p><i class="mi mi-fw mi-2x mi-rain-heavy"></i><br>15°/22°</p> -->
+                              <p id="day5ph<?php echo $value; ?>">9°/18°</p>
+                              <p id="day5ww<?php echo $value; ?>">9°/18°</p>
+                            </li>
+                            <li class="col-xs-4 col-sm-2 text-center">
+                              <h3 class="h5 text-white" id="day6<?php echo $value; ?>">Mon</h3>
+                              <!-- <p><i class="mi mi-fw mi-2x mi-clouds"></i><br>12°/17°</p> -->
+                              <p id="day6ph<?php echo $value; ?>">9°/18°</p>
+                              <p id="day6ww<?php echo $value; ?>">9°/18°</p>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <!-- </span> -->
 
               <span class="show_alarm_history<?php echo $value; ?>" id="show_alarm_history"></span>
               <span class="append_graph_blank" id="append_graph<?php echo $value; ?>"></span>
@@ -834,14 +901,49 @@
     let lon = "lon=" + longitude + "&";
 
     let apiOptions = "units=metric&exclude=minutely,alerts&";
-    let windSpeedParam = "wind_speed&";
+    // let windSpeedParam = "wind_speed&";
     let apiKey = "appid=dbb76c5d98d5dbafcb94441c6a10236e";
-    let file = queryUrl + lat + lon + apiOptions + windSpeedParam + apiKey;
+    let file = queryUrl + lat + lon + apiOptions + apiKey;
     console.log(file);
     fetch(file)
     .then((response) => response.json())
     .then((data) => {
-      console.log('apidata'+data);
+      console.log(data);
+
+    // Daily Data
+    let dayNames = [];
+    let daydates = [];
+    let windspeeds = [];
+    let winddirections = [];
+    let pressures = [];
+    let humiditys = [];
+    for (let i = 0; i < 7; i++) {
+        const dayTimestamp = data.daily[i].dt;
+        const date = new Date(dayTimestamp * 1000);
+        const options = { weekday: 'short' };
+        const dayName = date.toLocaleDateString('en-US', options);
+        dayNames.push(dayName);
+        const daydate = date.toDateString();
+        daydates.push(daydate);
+        const windspeed = data.daily[i].wind_speed;
+        windspeeds.push(windspeed);
+        const winddirection = data.daily[i].wind_deg;
+        winddirections.push(winddirection);
+        const pressure = data.daily[i].pressure;
+        pressures.push(pressure);
+        const humidity = data.daily[i].humidity;
+        humiditys.push(humidity);
+    }
+
+    document.getElementById("daynow"+device_id).innerHTML = daydates[0];
+    document.getElementById("day1"+device_id).innerHTML = dayNames[1];
+    document.getElementById("day2"+device_id).innerHTML = dayNames[2];
+    document.getElementById("day3"+device_id).innerHTML = dayNames[3];
+    document.getElementById("day4"+device_id).innerHTML = dayNames[4];
+    document.getElementById("day5"+device_id).innerHTML = dayNames[5];
+    document.getElementById("day6"+device_id).innerHTML = dayNames[6];
+    document.getElementById("timezone"+device_id).innerHTML = data.timezone;
+
     // Weather main data
     let main = data.current.weather[0].main;
     let description = data.current.weather[0].description;
@@ -852,7 +954,58 @@
     let windspeed = data.current.wind_speed;
     let winddirection = data.current.wind_deg;
 
-    document.getElementById("wrapper-description"+device_id).innerHTML = description;
+    $("#cloud"+device_id).text(description);
+    $("#temperature"+device_id).text(temp + "°C");
+    $("#pressure"+device_id).text("Pressure:" + pressure +' |');
+    $("#humidity"+device_id).text("Humidity:" + humidity + "%" +' |');
+    $("#windspeed"+device_id).text("Wind Speed:" + windspeed + "(m/s)" +' |');
+    $("#winddirection"+device_id).text("Wind Direction:" + winddirection + "°");
+
+    let day1ph = pressures[1]+'/'+humiditys[1]+'%';
+    let day1ww = windspeeds[1]+'(m/s) /'+winddirections[1]+'°';
+
+    let day2ph = pressures[2]+'/'+humiditys[2]+'%';
+    let day2ww = windspeeds[2]+'(m/s) /'+winddirections[2]+'°';
+
+    let day3ph = pressures[3]+'/'+humiditys[3]+'%';
+    let day3ww = windspeeds[3]+'(m/s) /'+winddirections[3]+'°';
+
+    let day4ph = pressures[4]+'/'+humiditys[4]+'%';
+    let day4ww = windspeeds[4]+'(m/s) /'+winddirections[4]+'°';
+
+    let day5ph = pressures[5]+'/'+humiditys[5]+'%';
+    let day5ww = windspeeds[5]+'(m/s) /'+winddirections[5]+'°';
+
+    let day6ph = pressures[6]+'/'+humiditys[6]+'%';
+    let day6ww = windspeeds[6]+'(m/s) /'+winddirections[6]+'°';
+
+    $("#day1ph"+device_id).text(day1ph);
+    $("#day1ww"+device_id).text(day1ww);
+
+    $("#day2ph"+device_id).text(day2ph);
+    $("#day2ww"+device_id).text(day2ww);
+
+    $("#day3ph"+device_id).text(day3ph);
+    $("#day3ww"+device_id).text(day3ww);
+
+    $("#day4ph"+device_id).text(day4ph);
+    $("#day4ww"+device_id).text(day4ww);
+
+    $("#day5ph"+device_id).text(day5ph);
+    $("#day5ww"+device_id).text(day5ww);
+
+    $("#day6ph"+device_id).text(day6ph);
+    $("#day6ww"+device_id).text(day6ww);
+    /*document.getElementById("cloud"+device_id) = description;
+    document.getElementById("temperature"+device_id) = temp + "°C";
+    document.getElementById("pressure"+device_id) = pressure;
+    document.getElementById("humidity"+device_id) = humidity + "%";
+    document.getElementById("windspeed"+device_id) = windspeed + "(m/s)";
+    document.getElementById("winddirection"+device_id) = winddirection + "°";*/
+
+    
+
+    /*document.getElementById("wrapper-description"+device_id).innerHTML = description;
     document.getElementById("wrapper-temp"+device_id).innerHTML = temp + "°C";
     document.getElementById("wrapper-pressure"+device_id).innerHTML = pressure;
     document.getElementById("wrapper-windspeed"+device_id).innerHTML = windspeed + "(m/s)";
@@ -873,10 +1026,10 @@
     document.getElementById("wrapper-hour2"+device_id).innerHTML = hour2 + "°";
     document.getElementById("wrapper-hour3"+device_id).innerHTML = hour3 + "°";
     document.getElementById("wrapper-hour4"+device_id).innerHTML = hour4 + "°";
-    document.getElementById("wrapper-hour5"+device_id).innerHTML = hour5 + "°";
+    document.getElementById("wrapper-hour5"+device_id).innerHTML = hour5 + "°";*/
 
     // Time
-    let timeNow = new Date().getHours();
+    /*let timeNow = new Date().getHours();
     console.log(timeNow);
     let time1 = timeNow + 1;
     let time2 = time1 + 1;
@@ -956,7 +1109,7 @@
     // Hour5
     let iconHour5 = data.hourly[5].weather[0].icon;
     let iconFullyUrlHour5 = iconBaseUrl + iconHour5 + iconFormat;
-    document.getElementById("wrapper-icon-hour5"+device_id).src = iconFullyUrlHour5;
+    document.getElementById("wrapper-icon-hour5"+device_id).src = iconFullyUrlHour5;*/
 
     });
   }

@@ -120,3 +120,35 @@
 .fa-cog{
   color: #215732;
 }
+
+.mainweather {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+.weather-panel {
+  background-image: url("/assets/img/backgrounds/weatherbg.jpg");
+  background-size: cover;
+  border-radius: 20px;
+  box-shadow: 25px 25px 40px 0px rgba(0,0,0,0.33);
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+  
+  small {
+    color: inherit;
+    font-size: 50%;
+  }
+  ul.forecast > li {
+    border-top: 1px solid #fff;
+  }
+  .temperature {
+    & > span {
+        font-size: 2em;
+    }
+  }
+}
+
+.weather_head{
+  padding-left: 25px;
+  padding-top: 25px;
+}
