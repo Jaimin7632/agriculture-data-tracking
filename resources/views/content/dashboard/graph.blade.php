@@ -239,7 +239,7 @@
                           <!-- <h2>Lucerne<br><small>May 24, 2016</small></h2>
                           <p class="h3"><i class="mi mi-fw mi-lg mi-rain-heavy"></i> Rainy</p> -->
                           <h4 class="text-white" id="timezone<?php echo $value; ?>">Lucerne</h4><br><h2><small class="text-white" id="daynow<?php echo $value; ?>">May 24, 2016</small><h2>
-                          <p class="h3 text-white" id="wrapper-description"><i class="mi mi-fw mi-lg mi-rain-heavy" id="cloud<?php echo $value; ?>"></i> Rainy</p>
+                          <p class="h3 text-white" id="wrapper-description"><i class="mi mi-fw mi-lg mi-rain-heavy" id="cloud<?php echo $value; ?>"></i></p>
                         </div>
                         <div class="col-xs-6 text-center">
                           <div class="h1 text-white">
