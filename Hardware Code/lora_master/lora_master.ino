@@ -59,7 +59,7 @@ void setup() {
     }
 
     Wire.begin(); // Inicializar I2C
-    Wire.onReceive(receiveEvent)
+    Wire.onReceive(receiveEvent);
 
     RadioEvents.RxDone = OnRxDone;
     Radio.Init(&RadioEvents);
@@ -150,8 +150,7 @@ void sendTimeToSlave(unsigned long time) {
     Radio.Sleep();
     Radio.Send((uint8_t *)jsonBuffer, strlen(jsonBuffer));
     lora_idle = false;
-    waitingForResponse = true;
-    responseStartTime = millis();
+
 }
 
 
