@@ -45,12 +45,16 @@ void requestEvent() {
   int numChunks = jsonString.length() / CHUNK_SIZE;
   int remainder = jsonString.length() % CHUNK_SIZE;
 
-  Wire.write(numChunks);   // send the number of chunks
-  Wire.write(remainder);   // send the remainder
+  Wire.write((uint8_t)numChunks);   // send the number of chunks
+  Wire.write((uint8_t)remainder);   // send the remainder
   for (int i = 0; i < numChunks; i++) {
-    Wire.write(jsonString.substring(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE).c_str(), CHUNK_SIZE);
+    for (int j = 0; j < CHUNK_SIZE; j++) {
+      Wire.write((uint8_t)jsonString[i * CHUNK_SIZE + j]);
+    }
   }
   if (remainder > 0) {
-    Wire.write(jsonString.substring(numChunks * CHUNK_SIZE).c_str(), remainder);
+    for (int i = 0; i < remainder; i++) {
+      Wire.write((uint8_t)jsonString[numChunks * CHUNK_SIZE + i]);
+    }
   }
 }
