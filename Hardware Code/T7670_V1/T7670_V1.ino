@@ -404,3 +404,31 @@ void loop() {
     // 15 min Delay before sending next data
     delay(60 * 1000 * 15);
 }
+
+
+
+
+// void sendJsonOverI2C() {
+// // Create a JSON document
+//   StaticJsonDocument<200> doc;
+//   doc["name"] = "Arduino";
+//   doc["value"] = 123;
+//
+//   // Serialize JSON document to a string
+//   char jsonBuffer[200];
+//   size_t length = serializeJson(doc, jsonBuffer);
+//   size_t offset = 0;
+//
+//   while (offset < length) {
+//     size_t remaining = length - offset;
+//     size_t currentChunkSize = (remaining > chunkSize) ? chunkSize : remaining;
+//
+//     Wire.beginTransmission(slaveAddress);
+//     Wire.write((const uint8_t*)jsonBuffer + offset, currentChunkSize);
+//     Wire.endTransmission();
+//
+//     offset += currentChunkSize;
+//
+//     delay(10); // Small delay between chunks to ensure the slave processes the data
+//   }
+// }

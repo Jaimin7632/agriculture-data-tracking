@@ -2,6 +2,7 @@
 #include "Arduino.h"
 #include <Wire.h>
 #include <set>
+#include <ArduinoJson.h>
 
 // heltec_wireless_stick_lite_v3
 // static const uint8_t SDA = 2;
@@ -58,6 +59,7 @@ void setup() {
     }
 
     Wire.begin(); // Inicializar I2C
+    Wire.onReceive(receiveEvent)
 
     RadioEvents.RxDone = OnRxDone;
     Radio.Init(&RadioEvents);
@@ -75,6 +77,27 @@ void loop() {
         Radio.Rx(0);
     }
     Radio.IrqProcess();
+}
+
+void receiveEvent(int numBytes) {
+  // Reiniciar el buffer y el índice
+  memset(rxBuffer, 0, BUFFER_SIZE);
+  rxIndex = 0;
+
+  // Leer los datos recibidos por I2C y almacenarlos en el buffer
+  while (Wire.available() > 0 && rxIndex < BUFFER_SIZE) {
+    char c = Wire.read(); // Leer un byte del bus I2C
+    rxBuffer[rxIndex++] = c; // Almacenar el byte en el buffer
+  }
+  DeserializationError error = deserializeJson(jsonDoc, rxBuffer);
+  if (error) {
+        Serial.println("Error al parsear el JSON recibido");
+  } else {
+    // Obtener el ID del JSON recibido
+    //const char* id = jsonDoc["id"];
+     serializeJsonPretty(jsonDoc, Serial);
+   }
+
 }
 
 void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr) {
@@ -130,3 +153,6 @@ void sendTimeToSlave(unsigned long time) {
     waitingForResponse = true;
     responseStartTime = millis();
 }
+
+
+
