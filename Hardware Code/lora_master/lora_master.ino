@@ -23,6 +23,9 @@
 
 #define NUM_SLAVES 2  // Número total de esclavos admitidos
 const char* MASTER_ID = "Master1";
+DynamicJsonDocument jsonDoc(400); // Crear un documento JSON dinámico
+char rxBuffer[400]; // Buffer para almacenar los datos recibidos por I2C
+int rxIndex = 0;
 // Definir los ID únicos de los esclavos admitidos aquí
 const char* slaveIDs[NUM_SLAVES] = {"Slave1", "Slave2"};
 
