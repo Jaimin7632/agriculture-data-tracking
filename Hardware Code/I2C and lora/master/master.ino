@@ -19,6 +19,7 @@ void loop() {
 // function that executes whenever data is received from master
 void receiveEvent(int howMany) {
   if (howMany > 0) {
+    String jsonString = "{\"device\":\"sensor\",\"value\":30}";
     int numChunks = Wire.read();  // read the number of chunks
     int remainder = Wire.read();  // read the remainder
     jsonString = "";
@@ -41,12 +42,8 @@ void receiveEvent(int howMany) {
 
 // function that executes whenever data is requested by master
 void requestEvent() {
+  String jsonString = "{\"device\":\"sensor\",\"value\":30}#";
   // Send JSON string in chunks
-  int numChunks = jsonString.length() / CHUNK_SIZE;
-  int remainder = jsonString.length() % CHUNK_SIZE;
-
-  Wire.write((uint8_t)numChunks);   // send the number of chunks
-  Wire.write((uint8_t)remainder);   // send the remainder
   for (int i = 0; i < numChunks; i++) {
     for (int j = 0; j < CHUNK_SIZE; j++) {
       Wire.write((uint8_t)jsonString[i * CHUNK_SIZE + j]);
@@ -57,4 +54,5 @@ void requestEvent() {
       Wire.write((uint8_t)jsonString[numChunks * CHUNK_SIZE + i]);
     }
   }
+  Wire.write('\0');
 }

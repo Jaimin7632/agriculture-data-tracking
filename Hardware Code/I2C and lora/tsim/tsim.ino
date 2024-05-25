@@ -8,6 +8,22 @@ void setup() {
   Serial.begin(9600);
 }
 
+String receiveJsonString() {
+  String jsonResponse = "";
+  Wire.requestFrom(8, 500); // Request more than necessary
+  bool endReached = false;
+
+  while (Wire.available() && !endReached) {
+    char c = Wire.read();
+    if (c == '\0') {
+      endReached = true; // Termination character received
+    } elif (c != '') { // Exclude null characters
+        jsonResponse += c;
+    }
+  }
+  return jsonResponse;
+}
+
 void loop() {
   // Create a JSON object and populate it
   StaticJsonDocument<200> jsonDocument;
@@ -37,34 +53,9 @@ void loop() {
   }
   Wire.endTransmission();   // stop transmitting
 
+  // reading part
   delay(500);
-
-  // Request the size of the incoming JSON string from the slave
-  Wire.requestFrom(8, 1);
-  int responseNumChunks = Wire.read(); // read the number of chunks
-  int responseRemainder = Wire.read(); // read the remainder
-
-  // Request the actual JSON string chunks based on the received information
-  String jsonResponse;
-  for (int i = 0; i < responseNumChunks; i++) {
-    Wire.requestFrom(8, CHUNK_SIZE);
-    while (Wire.available()) {
-      char c = Wire.read();
-      if (c != '\0') { // Exclude null characters
-        jsonResponse += c;
-      }
-    }
-  }
-  if (responseRemainder > 0) {
-    Wire.requestFrom(8, responseRemainder);
-    while (Wire.available()) {
-      char c = Wire.read();
-      if (c != '\0') { // Exclude null characters
-        jsonResponse += c;
-      }
-    }
-  }
-
+  String jsonResponse = receiveJsonString();
   Serial.println("Received JSON: " + jsonResponse);
   delay(1000); // wait for a second
 }
