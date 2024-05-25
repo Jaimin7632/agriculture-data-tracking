@@ -49,13 +49,19 @@ void loop() {
   for (int i = 0; i < responseNumChunks; i++) {
     Wire.requestFrom(8, CHUNK_SIZE);
     while (Wire.available()) {
-      jsonResponse += (char)Wire.read();
+      char c = Wire.read();
+      if (c != '\0') { // Exclude null characters
+        jsonResponse += c;
+      }
     }
   }
   if (responseRemainder > 0) {
     Wire.requestFrom(8, responseRemainder);
     while (Wire.available()) {
-      jsonResponse += (char)Wire.read();
+      char c = Wire.read();
+      if (c != '\0') { // Exclude null characters
+        jsonResponse += c;
+      }
     }
   }
 
