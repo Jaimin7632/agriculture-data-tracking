@@ -11,6 +11,13 @@ void setup() {
 String receiveJsonString() {
   String jsonResponse = "";
   Wire.requestFrom(8, 500); // Request more than necessary
+  for (int attempts = 0; attempts < MAX_ATTEMPTS; attempts++) {
+    if (Wire.available() >= 2) {
+      break;
+    }
+    Wire.requestFrom(8, 500);
+    delay(500);
+  }
   bool endReached = false;
 
   while (Wire.available() && !endReached) {
