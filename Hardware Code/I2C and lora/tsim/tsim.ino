@@ -9,27 +9,45 @@ void setup() {
 }
 
 String receiveJsonString() {
-  String jsonResponse = "";
-  Wire.requestFrom(8, 500); // Request more than necessary
-  for (int attempts = 0; attempts < 3; attempts++) {
-    if (Wire.available() >= 2) {
-      break;
-    }
-    Wire.requestFrom(8, 500);
-    delay(500);
-  }
-  bool endReached = false;
+  const int slaveAddress = 8;
+  const int requestBytes = 50;
+  const int maxRetries = 5;
+  const int delayTime = 500;
+  const size_t jsonBufferSize = 1024; // Adjust based on your expected JSON size
 
-  while (Wire.available() && !endReached) {
-    char c = Wire.read();
-    if (c == '\0') {
-      endReached = true; // Termination character received
-    } else if (c != '') { // Exclude null characters
+  for (int attempts = 0; attempts < maxRetries; attempts++) {
+    String jsonResponse = "";
+    bool endReached = false;
+
+    // Request 50 bytes from the I2C slave
+    Wire.requestFrom(slaveAddress, requestBytes);
+
+    while (Wire.available() && !endReached) {
+      char c = Wire.read();
+      if (c == '\0') {
+        endReached = true; // Termination character received
+      } else if (c != '') { // Exclude unwanted characters
         jsonResponse += c;
+      }
     }
+
+    // Check if the received string is a valid JSON
+    StaticJsonDocument<jsonBufferSize> jsonDoc;
+    DeserializationError error = deserializeJson(jsonDoc, jsonResponse);
+
+    if (!error) {
+      // Valid JSON received
+      return jsonResponse;
+    }
+
+    // Invalid JSON, retry after delay
+    delay(delayTime);
   }
-  return jsonResponse;
+
+  // If no valid JSON received after retries, return an empty string or handle error
+  return "";
 }
+
 
 void loop() {
   // Create a JSON object and populate it

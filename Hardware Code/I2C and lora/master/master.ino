@@ -19,6 +19,7 @@ void loop() {
 // function that executes whenever data is received from master
 void receiveEvent(int howMany) {
   if (howMany > 0) {
+    String jsonString = "{\"device\":\"sensor\",\"value\":30}";
     int numChunks = Wire.read();  // read the number of chunks
     int remainder = Wire.read();  // read the remainder
     jsonString = "";
