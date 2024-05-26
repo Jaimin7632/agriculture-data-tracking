@@ -10,7 +10,7 @@ void setup() {
 
 String receiveJsonString() {
   const int slaveAddress = 8;
-  const int requestBytes = 50;
+  const int requestBytes = 200;
   const int maxRetries = 5;
   const int delayTime = 500;
   const size_t jsonBufferSize = 1024; // Adjust based on your expected JSON size
