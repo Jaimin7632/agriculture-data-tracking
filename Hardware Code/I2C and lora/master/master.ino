@@ -43,6 +43,9 @@ void receiveEvent(int howMany) {
 // function that executes whenever data is requested by master
 void requestEvent() {
   String jsonString = "{\"device\":\"sensor\",\"value\":30}#";
+  int jsonLength = jsonString.length();
+  int numChunks = jsonLength / CHUNK_SIZE;
+  int remainder = jsonLength % CHUNK_SIZE;
   // Send JSON string in chunks
   for (int i = 0; i < numChunks; i++) {
     for (int j = 0; j < CHUNK_SIZE; j++) {

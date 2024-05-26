@@ -17,7 +17,7 @@ String receiveJsonString() {
     char c = Wire.read();
     if (c == '\0') {
       endReached = true; // Termination character received
-    } elif (c != '') { // Exclude null characters
+    } else if (c != '') { // Exclude null characters
         jsonResponse += c;
     }
   }
