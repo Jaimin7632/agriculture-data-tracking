@@ -103,7 +103,10 @@ void receiveEvent(int numBytes) {
   // Leer los datos recibidos por I2C y almacenarlos en el buffer
   while (Wire.available() > 0 && rxIndex < BUFFER_SIZE) {
     char c = Wire.read(); // Leer un byte del bus I2C
-    rxBuffer[rxIndex++] = c; // Almacenar el byte en el buffer
+    if (c != '') { // Exclude unwanted characters
+       rxBuffer[rxIndex++] = c; // Almacenar el byte en el buffer
+    }
+
   }
 
 

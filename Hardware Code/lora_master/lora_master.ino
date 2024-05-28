@@ -18,7 +18,7 @@
 #define RX_TIMEOUT_VALUE           0 // Continuous listening
 #define RESPONSE_TIMEOUT           5000 // Timeout for response from slave in milliseconds
 #define BUFFER_SIZE                400 // Define the payload size here
-
+const int CHUNK_SIZE = 32;
 #define I2C_SLAVE_ADDR             8 // Dirección del dispositivo Master en el bus I2C
 #define NUM_SLAVES                 20 // Número total de esclavos admitidos
 
@@ -116,6 +116,8 @@ void loop() {
     }
 
     Radio.IrqProcess(); // Procesa las interrupciones de la radio
+    //todo
+    delay(5);
 }
 
 void sendRequest() {
@@ -143,11 +145,11 @@ void sendToMain() {
     }
 
     char jsonString[BUFFER_SIZE];
-    size_t jsonLength = serializeJson(doc, jsonString, sizeof(jsonBuffer));
+    size_t jsonLength = serializeJson(doc, jsonString, sizeof(jsonString));
 
     // Send JSON string in chunks
-    int numChunks = jsonString.length() / CHUNK_SIZE;
-    int remainder = jsonString.length() % CHUNK_SIZE;
+    int numChunks = BUFFER_SIZE / CHUNK_SIZE;
+    int remainder = BUFFER_SIZE % CHUNK_SIZE;
 
     Wire.beginTransmission(8);  // transmit to device #8
     Wire.write((uint8_t)numChunks);      // send the number of chunks
