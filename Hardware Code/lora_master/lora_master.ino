@@ -138,14 +138,20 @@ void sendRequest() {
 void sendToMain() {
     StaticJsonDocument<BUFFER_SIZE> doc;
 
-    // Iterar a través de los datos de cada esclavo
+    JsonArray array = doc.to<JsonArray>();
+
+    // Iterate through the data of each slave
     for (const auto& slave : slaveData) {
         const StaticJsonDocument<BUFFER_SIZE>& lastData = slave.second;
-        doc[slave.first] = lastData;
+        // Create a temporary JsonDocument to store lastData for each slave
+        StaticJsonDocument<BUFFER_SIZE> tempDoc;
+        tempDoc.set(lastData);
+        // Add the temporary document to the array
+        array.add(tempDoc);
     }
 
     char jsonString[BUFFER_SIZE];
-    size_t jsonLength = serializeJson(doc, jsonString, sizeof(jsonString));
+    size_t jsonLength = serializeJson(array, jsonString, sizeof(jsonString));
 
     // Send JSON string in chunks
     int numChunks = BUFFER_SIZE / CHUNK_SIZE;
@@ -212,7 +218,7 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr) {
         // Corregir la forma en que se almacenan los datos
         StaticJsonDocument<BUFFER_SIZE> receivedDoc;
         receivedDoc.set(doc.as<JsonObjectConst>()); // Almacenar el objeto JSON recibido
-        slaveData[String(senderID)] = doc; // Almacenar el documento JSON en el mapa
+        slaveData[String(senderID)] = receivedDoc; // Almacenar el documento JSON en el mapa
         dataChanged = true; // Establecer la bandera de cambio de datos
 //         String jsonString;
 //         serializeJson(jsonDocument, jsonString);
