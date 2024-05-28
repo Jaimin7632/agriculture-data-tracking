@@ -138,20 +138,14 @@ void sendRequest() {
 void sendToMain() {
     StaticJsonDocument<BUFFER_SIZE> doc;
 
-    JsonArray array = doc.to<JsonArray>();
-
-    // Iterate through the data of each slave
+    // Iterar a través de los datos de cada esclavo
     for (const auto& slave : slaveData) {
         const StaticJsonDocument<BUFFER_SIZE>& lastData = slave.second;
-        // Create a temporary JsonDocument to store lastData for each slave
-        StaticJsonDocument<BUFFER_SIZE> tempDoc;
-        tempDoc.set(lastData);
-        // Add the temporary document to the array
-        array.add(tempDoc);
+        doc[slave.first] = lastData;
     }
 
     char jsonString[BUFFER_SIZE];
-    size_t jsonLength = serializeJson(array, jsonString, sizeof(jsonString));
+    size_t jsonLength = serializeJson(doc, jsonString, sizeof(jsonString));
 
     // Send JSON string in chunks
     int numChunks = BUFFER_SIZE / CHUNK_SIZE;
