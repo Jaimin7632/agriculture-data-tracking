@@ -212,7 +212,7 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr) {
         // Corregir la forma en que se almacenan los datos
         StaticJsonDocument<BUFFER_SIZE> receivedDoc;
         receivedDoc.set(doc.as<JsonObjectConst>()); // Almacenar el objeto JSON recibido
-        slaveData[String(senderID)] = receivedDoc; // Almacenar el documento JSON en el mapa
+        slaveData[String(senderID)] = doc; // Almacenar el documento JSON en el mapa
         dataChanged = true; // Establecer la bandera de cambio de datos
 //         String jsonString;
 //         serializeJson(jsonDocument, jsonString);
