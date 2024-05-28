@@ -47,6 +47,16 @@ StaticJsonDocument<BUFFER_SIZE> lastReceivedDoc;
 std::map<String, StaticJsonDocument<BUFFER_SIZE>> slaveData; // Mapa para almacenar datos de cada esclavo
 bool dataChanged = false; // Flag to track if data has changed
 
+bool isAnyDataToSend() {
+    for (auto& pair : slaveData) {
+        if (!pair.second.isNull()) {
+            // The document has data, clear it
+            return true;  // Return true as soon as we find and clear a document with data
+        }
+    }
+    return false;  // No documents with data were found
+}
+
 bool isChannelFree() {
     if (deviceState == DEVICE_STATE_SEND || deviceState == DEVICE_STATE_CYCLE) {
         return false;
@@ -68,10 +78,11 @@ void setup() {
     for (int i = 0; i < NUM_SLAVES; ++i) {
         allowedSlaveIDs.insert(String(slaveIDs[i]));
     }
+    //edit
+    Wire.begin(); // join I2C bus as master
 
-    Wire.begin(I2C_SLAVE_ADDR); // Inicializar I2C como esclavo con dirección I2C_SLAVE_ADDR
-    Wire.onReceive(receiveEvent);
-    Wire.onRequest(requestEvent);
+//     Wire.onReceive(receiveEvent);
+//     Wire.onRequest(requestEvent);
 
     RadioEvents.RxDone = OnRxDone;
     RadioEvents.TxDone = OnTxDone; // Handle Tx Done
@@ -99,6 +110,9 @@ void loop() {
         waitingForResponse = false;
         lora_idle = true;
         Radio.Rx(RX_TIMEOUT_VALUE); // Volver a modo de escucha después del timeout
+    }
+    if(isAnyDataToSend(){
+      sendToMain();
     }
 
     Radio.IrqProcess(); // Procesa las interrupciones de la radio
@@ -128,27 +142,29 @@ void sendToMain() {
         doc[slave.first] = lastData;
     }
 
-    char jsonBuffer[BUFFER_SIZE];
-    size_t jsonLength = serializeJson(doc, jsonBuffer, sizeof(jsonBuffer));
+    char jsonString[BUFFER_SIZE];
+    size_t jsonLength = serializeJson(doc, jsonString, sizeof(jsonBuffer));
 
-    Serial.print("Master: JSON buffer size: ");
-    Serial.println(jsonLength);
+    // Send JSON string in chunks
+    int numChunks = jsonString.length() / CHUNK_SIZE;
+    int remainder = jsonString.length() % CHUNK_SIZE;
 
-    if (jsonLength > 0 && jsonLength < sizeof(jsonBuffer)) {
-        Serial.print("Master: Sending data to Main via I2C: ");
-        Serial.println(jsonBuffer);
-
-        size_t offset = 0;
-        while (offset < jsonLength) {
-            size_t fragmentSize = min((size_t)30, jsonLength - offset);
-            Wire.write((uint8_t*)jsonBuffer + offset, fragmentSize);
-            offset += fragmentSize;
-            delay(10); // Pequeño retraso para asegurar la transmisión
-        }
-        Serial.println("Master: Sent data to Main via I2C");
-    } else {
-        Serial.println("Master: Failed to serialize JSON or buffer overflow");
+    Wire.beginTransmission(8);  // transmit to device #8
+    Wire.write((uint8_t)numChunks);      // send the number of chunks
+    Wire.write((uint8_t)remainder);      // send the remainder
+    for (int i = 0; i < numChunks; i++) {
+      for (int j = 0; j < CHUNK_SIZE; j++) {
+        Wire.write((uint8_t)jsonString[i * CHUNK_SIZE + j]);
+      }
     }
+    if (remainder > 0) {
+      for (int i = 0; i < remainder; i++) {
+        Wire.write((uint8_t)jsonString[numChunks * CHUNK_SIZE + i]);
+      }
+    }
+    Wire.endTransmission();   // stop transmitting
+    Serial.println("Master: Sent data to Main via I2C");
+
 }
 
 void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr) {
@@ -195,6 +211,9 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr) {
         receivedDoc.set(doc.as<JsonObjectConst>()); // Almacenar el objeto JSON recibido
         slaveData[String(senderID)] = receivedDoc; // Almacenar el documento JSON en el mapa
         dataChanged = true; // Establecer la bandera de cambio de datos
+//         String jsonString;
+//         serializeJson(jsonDocument, jsonString);
+//         sendToMain(jsonString);
 
         // Copiar los datos al JSON principal para enviar por I2C
         for (const auto& slave : slaveData) {
@@ -247,13 +266,6 @@ void receiveEvent(int howMany) {
             receivingData = false;
         }
     }
-}
-
-void requestEvent() {
-    sendToMain(); // Llamar a sendToMain para enviar los datos recopilados
-
-    //añadir pequeño retraso para que main se ponga en modo escucha
-    delay(50);
 }
 
 void sendTimeToSlave(unsigned long time) {
