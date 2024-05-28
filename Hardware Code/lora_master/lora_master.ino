@@ -152,8 +152,8 @@ void sendToMain() {
     int remainder = BUFFER_SIZE % CHUNK_SIZE;
 
     Wire.beginTransmission(8);  // transmit to device #8
-    Wire.write((uint8_t)numChunks);      // send the number of chunks
-    Wire.write((uint8_t)remainder);      // send the remainder
+//     Wire.write((uint8_t)numChunks);      // send the number of chunks
+//     Wire.write((uint8_t)remainder);      // send the remainder
     for (int i = 0; i < numChunks; i++) {
       for (int j = 0; j < CHUNK_SIZE; j++) {
         Wire.write((uint8_t)jsonString[i * CHUNK_SIZE + j]);
@@ -164,6 +164,7 @@ void sendToMain() {
         Wire.write((uint8_t)jsonString[numChunks * CHUNK_SIZE + i]);
       }
     }
+    Wire.write('\0');
     Wire.endTransmission();   // stop transmitting
     Serial.println("Master: Sent data to Main via I2C");
 
