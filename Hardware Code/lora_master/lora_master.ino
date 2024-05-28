@@ -117,7 +117,7 @@ void loop() {
 
     Radio.IrqProcess(); // Procesa las interrupciones de la radio
     //todo
-    delay(5);
+    delay(5000);
 }
 
 void sendRequest() {
