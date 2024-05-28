@@ -111,7 +111,7 @@ void loop() {
         lora_idle = true;
         Radio.Rx(RX_TIMEOUT_VALUE); // Volver a modo de escucha después del timeout
     }
-    if(isAnyDataToSend(){
+    if(isAnyDataToSend()){
       sendToMain();
     }
 
