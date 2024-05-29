@@ -125,35 +125,48 @@ void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
         Serial.println("Error al parsear el JSON recibido");
       } else {
         // Obtener el ID del JSON recibido
-        const char* id = jsonDoc["id"];
-         serializeJsonPretty(jsonDoc, Serial);
+             deserializeJson(jsonDoc, jsonString);
 
-        // Create a new JSON object for the sensor data under the ID key
-        JsonObject sensorDataNode = jsonDocument["sensor_data"];
-        if(sensorDataNode.isNull()){
-          sensorDataNode = jsonDocument.createNestedObject("sensor_data");
-        }
-        // Iterate over each sensor in the sensor data
-        for (JsonPair sensorEntry : jsonDoc.as<JsonObject>()) {
-            // Skip the entry if its key is "id"
-            if (strcmp(sensorEntry.key().c_str(), "id") == 0) {
-                continue;
+            // Iterate over the top-level keys (IDs)
+            for (JsonPair idEntry : jsonDoc.as<JsonObject>()) {
+              const char* idKey = idEntry.key().c_str();
+              JsonObject idObject = idEntry.value().as<JsonObject>();
+
+              char* id = idObject["id"];
+              serializeJsonPretty(idObject, Serial);
+
+              // Create a new JSON object for the sensor data under the ID key
+              JsonObject sensorDataNode = idObject["sensor_data"];
+              if(sensorDataNode.isNull()){
+                sensorDataNode = idObject.createNestedObject("sensor_data");
+              }
+
+              // Iterate over each sensor in the sensor data
+              for (JsonPair sensorEntry : idObject) {
+                // Skip the entry if its key is "id"
+                if (strcmp(sensorEntry.key().c_str(), "id") == 0 || strcmp(sensorEntry.key().c_str(), "sensor_data") == 0) {
+                  continue;
+                }
+
+                // Extract sensor name, value, and unit from sensor data
+                const char* sensorName = sensorEntry.key().c_str();
+                String finalSensorName = String(id) + sensorName;
+                JsonObject sensor = sensorEntry.value().as<JsonObject>();
+                float value = sensor["value"];
+                const char* unit = sensor["unit"];
+
+                // Create a new JSON object for the sensor
+                JsonObject sensorNode = sensorDataNode.createNestedObject(finalSensorName);
+                sensorNode["value"] = value;
+                sensorNode["unit"] = unit;
+              }
+
+              // Update receivedData with the modified JSON document (if you have such a structure)
+              receivedData[id] = idObject;
+
+              // Print the JSON received
+              serializeJsonPretty(jsonDoc, Serial);
             }
-
-            // Extract sensor name, value, and unit from sensor data
-            const char* sensorName = sensorEntry.key().c_str();
-            String finalSensorName = String(id) + sensorName;
-            JsonObject sensor = sensorEntry.value().as<JsonObject>();
-            float value = sensor["value"];
-            const char* unit = sensor["unit"];
-
-            // Create a new JSON object for the sensor
-            JsonObject sensorNode = sensorDataNode.createNestedObject(finalSensorName);
-            sensorDataNode["value"] = value;
-            sensorDataNode["unit"] = unit;
-        }
-        receivedData[id] = jsonDoc;
-        // Imprimir el JSON recibido
       }
     }
 
