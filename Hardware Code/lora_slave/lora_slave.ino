@@ -14,7 +14,7 @@
 #define RX_TIMEOUT_VALUE            0 // No timeout, continuous listening
 #define BUFFER_SIZE                 100 // Define the payload size here
 #define DEFAULT_SLEEP_TIME          10 // Default sleep time in seconds
-#define SLAVE_ID                    "Slave7" // Unique ID of the slave
+#define SLAVE_ID                    "Slave0" // Unique ID of the slave
 #define RESPONSE_TIMEOUT            5000 // Timeout for response from master in milliseconds
 
 const char* MASTER_ID = "Master1"; // Define the master ID
@@ -26,6 +26,7 @@ static RadioEvents_t RadioEvents;
 unsigned long sleepTime = DEFAULT_SLEEP_TIME * 1000000; // Convert to microseconds for deep sleep
 unsigned long responseStartTime = 0;
 bool waitingForResponse = false;
+int backoffAttempts = 0;
 
 bool isChannelFree() {
     // Verificamos si el estado del dispositivo LoRaWAN es compatible con la función
@@ -37,8 +38,9 @@ bool isChannelFree() {
 
 void performBackoff() {
     // Retraso aleatorio antes de volver a intentar la transmisión
-    unsigned long backoffTime = random(0, 100); // Ajustar los límites según sea necesario
+    unsigned long backoffTime = random(0, 500); // Ajustar los límites a 500 ms
     delay(backoffTime);
+    backoffAttempts++;
 }
 
 void setup() {
@@ -70,7 +72,7 @@ void loop() {
     if (waitingForResponse && millis() - responseStartTime >= RESPONSE_TIMEOUT) {
         Serial.println("Slave: Response timeout, performing backoff...");
         performBackoff();
-        enterDeepSleep();
+        sendResponse();
     }
 }
 
@@ -78,7 +80,9 @@ void sendResponse() {
     if (!isChannelFree()) {
         Serial.println("Slave: Channel not clear, performing backoff...");
         performBackoff();
+        return; // Intentar más tarde
     }
+
     int pressureValue = analogRead(A0);
 
     DynamicJsonDocument jsonDoc(2048);
@@ -104,11 +108,13 @@ void enterDeepSleep() {
 void OnTxDone(void) {
     Serial.println("Slave: TX done...");
     Radio.Rx(RX_TIMEOUT_VALUE); // Entramos en modo de escucha después de la transmisión para recibir el nuevo parámetro "time"
+    backoffAttempts = 0; // Reset backoff attempts
 }
 
 void OnTxTimeout(void) {
     Serial.println("Slave: TX Timeout...");
-    enterDeepSleep(); // Entramos en modo de reposo profundo después de que se agote el tiempo de transmisión
+    performBackoff();
+    sendResponse(); // Reattempt sending the response
 }
 
 void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr) {

@@ -27,6 +27,7 @@ const char endpoint[] = "http://16.171.60.141:8000/api/sensordatastore";
 DynamicJsonDocument jsonDoc(BUFFER_SIZE); // Crear un documento JSON dinámico
 char rxBuffer[BUFFER_SIZE]; // Buffer para almacenar los datos recibidos por I2C
 int rxIndex = 0; // Índice para realizar un seguimiento del tamaño actual del buffer
+String i2cJsonString = "";
 // end lora code with i2c
 
 #include <ArduinoHttpClient.h>
@@ -97,21 +98,20 @@ void addSensorDataToJson(DynamicJsonDocument& jsonDocument) {
 // lora code with i2c
 void receiveEvent(int numBytes) {
   // Reiniciar el buffer y el índice
-  memset(rxBuffer, 0, BUFFER_SIZE);
+  if (numBytes > 0) {
+    while (Wire.available()) {
+      char c = Wire.read();
+      if (c=='\0')
+      {
+          Serial.print("Received JSON: ");
+          Serial.println(i2cJsonString);
+          i2cJsonString = "";
+          break;
+      }
+      i2cJsonString += c;  // receive the actual JSON string chunk
+      }
 
-
-  // Leer los datos recibidos por I2C y almacenarlos en el buffer
-  while (Wire.available() > 0 && rxIndex < BUFFER_SIZE) {
-    if (c == '\0') { // Exclude unwanted characters
-       rxIndex = 0;
-       break;
-    }
-    char c = Wire.read(); // Leer un byte del bus I2C
-    if (c != '') { // Exclude unwanted characters
-       rxBuffer[rxIndex++] = c; // Almacenar el byte en el buffer
-    }
   }
-  Serial.println(rxBuffer);
 }
 
 
@@ -120,7 +120,7 @@ void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
     JsonObject receivedData;
     if (rxIndex > 0) {
       // Deserializar el JSON almacenado en el buffer
-      DeserializationError error = deserializeJson(jsonDoc, rxBuffer);
+      DeserializationError error = deserializeJson(jsonDoc, i2cJsonString);
       Serial.println(rxBuffer);
       // Verificar si se pudo deserializar correctamente
       if (error) {
