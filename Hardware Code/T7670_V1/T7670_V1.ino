@@ -22,7 +22,7 @@ float sensorValues[numSensors] = {0};
 const char endpoint[] = "http://16.171.60.141:8000/api/sensordatastore";
 
 // lora code with i2c
-#define BUFFER_SIZE 400 // Tamaño máximo del buffer para almacenar el paquete JSON
+#define BUFFER_SIZE 3000 // Tamaño máximo del buffer para almacenar el paquete JSON
 
 DynamicJsonDocument jsonDoc(BUFFER_SIZE); // Crear un documento JSON dinámico
 char rxBuffer[BUFFER_SIZE]; // Buffer para almacenar los datos recibidos por I2C
@@ -118,7 +118,7 @@ void receiveEvent(int numBytes) {
 void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
      // Deserializar el JSON solo si se recibieron datos
     JsonObject receivedData;
-    if (rxIndex > 0) {
+    if (true) {
       // Deserializar el JSON almacenado en el buffer
       DeserializationError error = deserializeJson(jsonDoc, i2cJsonString);
       Serial.println(rxBuffer);
@@ -342,13 +342,6 @@ void setup() {
           Serial.print("Network IP:"); Serial.println(ipAddress);
     // end sim part
     #endif
-
-
-    if (!aht.begin()) {
-       Serial.println("Could not find AHT? Check wiring");
-    }else{
-      Serial.println("AHT10 or AHT20 found");
-    }
 
 
 }
