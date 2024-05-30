@@ -98,18 +98,20 @@ void addSensorDataToJson(DynamicJsonDocument& jsonDocument) {
 void receiveEvent(int numBytes) {
   // Reiniciar el buffer y el índice
   memset(rxBuffer, 0, BUFFER_SIZE);
-  rxIndex = 0;
+
 
   // Leer los datos recibidos por I2C y almacenarlos en el buffer
   while (Wire.available() > 0 && rxIndex < BUFFER_SIZE) {
+    if (c == '\0') { // Exclude unwanted characters
+       rxIndex = 0;
+       break;
+    }
     char c = Wire.read(); // Leer un byte del bus I2C
     if (c != '') { // Exclude unwanted characters
        rxBuffer[rxIndex++] = c; // Almacenar el byte en el buffer
     }
-
   }
-
-
+  Serial.println(rxBuffer);
 }
 
 
@@ -415,7 +417,8 @@ void loop() {
       sendJsonData(endpoint, jsonDocument);
     #endif
     // 15 min Delay before sending next data
-    delay(60 * 1000 * 15);
+//     delay(60 * 1000 * 15);
+    delay(10000);
 }
 
 

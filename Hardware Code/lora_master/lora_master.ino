@@ -148,24 +148,30 @@ void sendToMain() {
     size_t jsonLength = serializeJson(doc, jsonString, sizeof(jsonString));
 
     // Send JSON string in chunks
-    int numChunks = BUFFER_SIZE / CHUNK_SIZE;
-    int remainder = BUFFER_SIZE % CHUNK_SIZE;
+    int numChunks = jsonLength / CHUNK_SIZE;
+    int remainder = jsonLength % CHUNK_SIZE;
 
-    Wire.beginTransmission(8);  // transmit to device #8
+      // transmit to device #8
 //     Wire.write((uint8_t)numChunks);      // send the number of chunks
 //     Wire.write((uint8_t)remainder);      // send the remainder
     for (int i = 0; i < numChunks; i++) {
+      Wire.beginTransmission(8);
       for (int j = 0; j < CHUNK_SIZE; j++) {
         Wire.write((uint8_t)jsonString[i * CHUNK_SIZE + j]);
       }
+      Wire.endTransmission();
     }
     if (remainder > 0) {
+      Wire.beginTransmission(8);
       for (int i = 0; i < remainder; i++) {
         Wire.write((uint8_t)jsonString[numChunks * CHUNK_SIZE + i]);
       }
+      Wire.endTransmission();
     }
+    Wire.beginTransmission(8);
     Wire.write('\0');
-    Wire.endTransmission();   // stop transmitting
+    Wire.endTransmission();
+       // stop transmitting
     Serial.println("Master: Sent data to Main via I2C");
 
 }
