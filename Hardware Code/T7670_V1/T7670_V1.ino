@@ -125,26 +125,23 @@ void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
         Serial.println("Error al parsear el JSON recibido");
       } else {
         // Obtener el ID del JSON recibido
-             deserializeJson(jsonDoc, jsonString);
-
             // Iterate over the top-level keys (IDs)
             for (JsonPair idEntry : jsonDoc.as<JsonObject>()) {
-              const char* idKey = idEntry.key().c_str();
               JsonObject idObject = idEntry.value().as<JsonObject>();
 
-              char* id = idObject["id"];
+              const char* id = idObject["id"];
               serializeJsonPretty(idObject, Serial);
 
               // Create a new JSON object for the sensor data under the ID key
-              JsonObject sensorDataNode = idObject["sensor_data"];
+              JsonObject sensorDataNode = jsonDocument["sensor_data"];
               if(sensorDataNode.isNull()){
-                sensorDataNode = idObject.createNestedObject("sensor_data");
+                sensorDataNode = jsonDocument.createNestedObject("sensor_data");
               }
 
               // Iterate over each sensor in the sensor data
               for (JsonPair sensorEntry : idObject) {
                 // Skip the entry if its key is "id"
-                if (strcmp(sensorEntry.key().c_str(), "id") == 0 || strcmp(sensorEntry.key().c_str(), "sensor_data") == 0) {
+                if (strcmp(sensorEntry.key().c_str(), "id") == 0) {
                   continue;
                 }
 
