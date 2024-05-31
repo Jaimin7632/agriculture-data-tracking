@@ -44,6 +44,7 @@ unsigned long receivedTime = 10; // Variable global para almacenar el tiempo rec
 
 std::set<String> allowedSlaveIDs;
 StaticJsonDocument<BUFFER_SIZE> lastReceivedDoc;
+StaticJsonDocument<BUFFER_SIZE> serverJson;
 std::map<String, StaticJsonDocument<BUFFER_SIZE>> slaveData; // Mapa para almacenar datos de cada esclavo
 bool dataChanged = false; // Flag to track if data has changed
 
@@ -114,6 +115,8 @@ void loop() {
     if(isAnyDataToSend()){
       sendToMain();
     }
+    String jsonResponse = receiveJsonString();
+    Serial.println("Received JSON: " + jsonResponse);
 
     Radio.IrqProcess(); // Procesa las interrupciones de la radio
     //todo
@@ -286,12 +289,8 @@ void receiveEvent(int howMany) {
 }
 
 void sendTimeToSlave(unsigned long time) {
-    StaticJsonDocument<BUFFER_SIZE> doc;
-    doc["id"] = MASTER_ID;
-    doc["time"] = time;
-
     char jsonBuffer[BUFFER_SIZE];
-    serializeJson(doc, jsonBuffer);
+    serializeJson(serverJson, jsonBuffer);
     Serial.print("Master: Sending new time to Slave: ");
     Serial.println(jsonBuffer);
 
@@ -301,3 +300,45 @@ void sendTimeToSlave(unsigned long time) {
     waitingForResponse = true;
     responseStartTime = millis();
 }
+
+
+String receiveJsonString() {
+  const int slaveAddress = 8;
+  const int requestBytes = 300;
+  const int maxRetries = 5;
+  const int delayTime = 500;
+  const size_t jsonBufferSize = 1024; // Adjust based on your expected JSON size
+
+  for (int attempts = 0; attempts < maxRetries; attempts++) {
+    String jsonResponse = "";
+    bool endReached = false;
+
+    // Request 50 bytes from the I2C slave
+    Wire.requestFrom(slaveAddress, requestBytes);
+
+    while (Wire.available() && !endReached) {
+      char c = Wire.read();
+      if (c == '\0') {
+        endReached = true; // Termination character received
+      } else if (c != '') { // Exclude unwanted characters
+        jsonResponse += c;
+      }
+    }
+
+    // Check if the received string is a valid JSON
+    
+    DeserializationError error = deserializeJson(serverJson, jsonResponse);
+
+    if (!error) {
+      // Valid JSON received
+      return jsonResponse;
+    }
+
+    // Invalid JSON, retry after delay
+    delay(delayTime);
+  }
+
+  // If no valid JSON received after retries, return an empty string or handle error
+  return "";
+}
+
