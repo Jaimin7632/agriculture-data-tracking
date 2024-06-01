@@ -509,12 +509,24 @@ class Analytics extends Controller
     $device_id = $post_data['device_id'];
     if (!empty($device_id)) {
       // $sensor_data = SensorData::where('device_id', $device_id)->get()->toArray();
-      $sensor_data[] = SensorData::where('device_id', $device_id)->latest('created_at')->first()->toArray();
+      $latestSensorData = SensorData::where('device_id', $device_id)->latest('created_at')->first();
+
+      if ($latestSensorData !== null) {
+          $sensor_data[] = $latestSensorData->toArray();
+      } else {
+          // Handle the case where no data is found
+          $sensor_data = [];
+      }
       
       $outputArray = [];
       $sensorValues = [];
       $sensorColors = [];
-      foreach ($sensor_data as $item) {
+      // echo "<pre>"; print_r($sensor_data); die();
+      if (empty($sensor_data)) {
+        $responseData = ['success' => 'success', 'error' => '', 'html' => ""];
+        return response()->json($responseData);
+      }
+      foreach (array_reverse($sensor_data) as $item) {
           $formattedDateTime = $item['created_at'];
           $dateTime = new \DateTime($formattedDateTime);
           $createdAt = $dateTime->format('Y-m-d H:i:s');
@@ -533,6 +545,57 @@ class Analytics extends Controller
             $sensorValues[$sensorName]['spname'] = $sensorName;
             $sensorValues[$sensorName]['unit'] = $sensorDetails['unit'];
 
+            if (strpos($sensorName, "AirTemperature") !== false) {
+                // Store the air pressure value in a variable
+                // $temperatureValues[] = $sensorDetails['value'];
+                $temperatureValues[] = ['value' => $sensorDetails['value'], 'type' => $sensorValueType];
+                // $temperatureValues['type'] = $sensorValueType;
+            }
+            
+            // Check if sensor name contains "humidity"
+            if (strpos($sensorName, "Humidity") !== false) {
+                // Store the humidity value in the array
+                // $humidityValues[] = $sensorDetails['value'];
+                $humidityValues[] = ['value' => $sensorDetails['value'], 'type' => $sensorValueType];
+                // $humidityValues['type'] = $sensorValueType;
+            }
+
+          }
+
+          foreach ($temperatureValues as $key => $temperatureCelsius) {
+              // Check if the corresponding humidity value exists
+              if (isset($humidityValues[$key])) {
+
+                $temperatureCelsiusval = $temperatureCelsius['value'];
+                $temperatureType = $temperatureCelsius['type'];
+
+                // Get the humidity value and its type
+                $humidityValue = $humidityValues[$key]['value'];
+                $humidityType = $humidityValues[$key]['type'];
+
+                if ($temperatureCelsiusval != '' && $humidityValue != '') {
+                  // Calculate the DPV for the current set of temperature and humidity values
+                  $dewPoint = $this->calculateDewPoint($temperatureCelsiusval, $humidityValue);
+                  if ($dewPoint == '') {
+                    $dewPoint = 10;
+                  }
+                  // Create a new sensor name for DPV and store its value
+                  $dewPointSensorName = 'DewPoint_' . ($key + 1);
+                  if (!isset($sensorValues[$dewPointSensorName])) {
+                      $sensorValues[$dewPointSensorName] = [
+                          'type' => 'multi',
+                          'data' => [],
+                          'spname' => $dewPointSensorName,
+                          'unit' => 'MA',
+                          'color' => '#FF33C7',
+                          'icon' => '<svg viewBox="0 0 24 24" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 4H20M15 8H20M17 12H20M8 15.9998C7.44772 15.9998 7 16.4475 7 16.9998C7 17.5521 7.44772 17.9998 8 17.9998C8.55228 17.9998 9 17.5521 9 16.9998C9 16.4475 8.55228 15.9998 8 15.9998ZM8 15.9998V9M8 16.9998L8.00707 17.0069M12 16.9998C12 19.209 10.2091 20.9998 8 20.9998C5.79086 20.9998 4 19.209 4 16.9998C4 15.9854 4.37764 15.0591 5 14.354L5 6C5 4.34315 6.34315 3 8 3C9.65685 3 11 4.34315 11 6V14.354C11.6224 15.0591 12 15.9854 12 16.9998Z" stroke="#FF33C7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>',
+                          // You can add more properties here if needed
+                      ];
+                  }
+                  $sensorValues[$dewPointSensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $dewPoint];
+                }
+                  
+              }
           }
       }
 
@@ -611,15 +674,9 @@ class Analytics extends Controller
             $sensorValue = $sensorData['data'][0]['y'];
             $sensorDate = $sensorData['data'][0]['x'];
         }
-        // if (count($sensorData['data']) > 3) {
-        //   $sensorValue = $sensorData['data'][0]['y'];
-        //   $sensorDate = $sensorData['data'][0]['x'];
-        // }else{
-        //   $sensorValue = $sensorData['data']['y'];
-        //   $sensorDate = $sensorData['data']['x'];
-        // }
-          
-          $unit = $sensorData['unit'];
+        
+
+        $unit = $sensorData['unit'];
 
           $html .= '<tr style="text-align:center;">';
           $html .= '<td>' . $sensorName . '</td>';

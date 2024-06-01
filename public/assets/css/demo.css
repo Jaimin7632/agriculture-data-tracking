@@ -152,3 +152,7 @@
   padding-left: 25px;
   padding-top: 25px;
 }
+
+.accordion-button{
+  width: 0% !important;
+}
