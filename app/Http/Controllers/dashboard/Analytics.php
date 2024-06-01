@@ -530,7 +530,8 @@ class Analytics extends Controller
           $formattedDateTime = $item['created_at'];
           $dateTime = new \DateTime($formattedDateTime);
           $createdAt = $dateTime->format('Y-m-d H:i:s');
-
+          $temperatureValues = [];
+          $humidityValues = [];
           $changedateBycountry =  Country::changedateBytimezone($dateTime, $authuser->timezone)->format('Y-m-d H:i:s');
           // Initialize an array to store sensor values dynamically
           foreach ($item['sensor_data'] as $sensorName => $sensorDetails) {
