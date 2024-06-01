@@ -9,6 +9,7 @@ $('.graphDiv').on('click', function() {
     var device_id = $(this).attr('device-id');
     $('.append_graph_blank').html("");
     $('.append_graph_single').html("");
+    $("#show_alarm_history").html('');
     $('#spinner'+device_id).show();
     var from_date = $(".from_date").val();
     var to_date = $(".to_date").val();
