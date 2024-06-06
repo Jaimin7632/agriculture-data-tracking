@@ -9,6 +9,7 @@ $('.graphDiv').on('click', function() {
     var device_id = $(this).attr('device-id');
     $('.append_graph_blank').html("");
     $('.append_graph_single').html("");
+    $("#show_alarm_history").html('');
     $('#spinner'+device_id).show();
     var from_date = $(".from_date").val();
     var to_date = $(".to_date").val();
@@ -130,18 +131,18 @@ $('.changegraphtime').on('click', function() {
                     chartColors = config.colors.chartColors;
                     labelColor  = config.colors.labelColor;
 
-                    var divElement = $('<div>', {
+                    var container = $('<div>', {
                         id: 'lineChart'+sensorName+response.devide_id,
                         class: 'px-2 col-12',
                         style: 'margin: 40px 0px;'
                     });
 
-                    var divElement = $('<div>', {
+                    var container = $('<div>', {
                         id: 'lineChart'+sensorName+response.devide_id,
                         class: 'px-2 col-12'
                     });
                     // Create a container div for centering
-                    var container = $('<div>', {
+                    var divElement = $('<div>', {
                       style: 'text-align: center; margin-top: 20px;'  // Adjust margin as needed
                     });
 
@@ -152,11 +153,6 @@ $('.changegraphtime').on('click', function() {
                         style: 'color: ' + sensorValues.color + '; font-size: 20px; margin-bottom: 10px;'
                     });
 
-
-                    // console.log(sensorValues.data);
-                    // console.log(sensorValues.data[-1]);
-                    // console.log(sensorValues.data.length);
-                    // console.log(sensorValues.data[0]);
                     // Last Y Value
                     var lastYValue = $('<h3>', {
                       text: Math.round(sensorValues.data[sensorValues.data.length - 1].y * 100)/100 + ' ' + sensorValues.unit,
@@ -164,8 +160,8 @@ $('.changegraphtime').on('click', function() {
                     });
 
                     // Append elements to the container
-                    container.append(chartTitle);
-                    container.append(lastYValue);
+                    divElement.append(chartTitle);
+                    divElement.append(lastYValue);
 
                     // Append the container to the 'divElement'
                     divElement.append(container);
@@ -178,86 +174,86 @@ $('.changegraphtime').on('click', function() {
                         sensoryvalue.push(value.y);
                     });
 
-                        if (response.data != "") {
+                    if (response.data != "") {
 
-                          console.log(sensorxvalue);
-                          console.log(sensoryvalue);
+                      console.log(sensorxvalue);
+                      console.log(sensoryvalue);
 
-                          const lineChartEl = document.querySelector('#lineChart'+sensorName+response.devide_id),
-                          lineChartConfig = {
-                            chart: {
-                              height: 400,
-                              type: 'line',
-                              parentHeightOffset: 0,
-                              zoom: {
-                                enabled: false
-                              },
-                              toolbar: {
-                                show: false
-                              }
-                            },
-                            series: [
-                              {
-                                name: readableSensorName,
-                                data: sensoryvalue
-                              }
-                            ],
-                            title: {
-                              enabled: false
-                            },
-                            dataLabels: {
-                              enabled: true
-                            },
-                            stroke: {
-                              curve: 'smooth'
-                            },
-                            legend: {
-                              show: true,
-                              position: 'top',
-                              horizontalAlign: 'start',
-                              labels: {
-                                colors: legendColor,
-                                useSeriesColors: false
-                              }
-                            },
-                            colors: [sensorValues.color],
-                            grid: {
-                              borderColor: borderColor,
-                              xaxis: {
-                                lines: {
-                                  show: true
-                                }
-                              }
-                            },
-                            tooltip: {
-                              shared: false
-                            },
-                            xaxis: {
-                              //type: 'datetime',
-                              categories: sensorxvalue,
-                              labels: {
-                                style: {
-                                  colors: labelColor,
-                                  fontSize: '13px'
-                                }
-                              }
-                            },
-                            yaxis: {
-                              //type: 'datetime',
-                              labels: {
-                                style: {
-                                  colors: labelColor,
-                                  fontSize: '13px'
-                                }
-                              }
-                            }
-                          };
-                          if (typeof lineChartEl !== undefined && lineChartEl !== null) {
-                            const lineChart = new ApexCharts(lineChartEl, lineChartConfig);
-                            lineChart.render();
+                      const lineChartEl = document.querySelector('#lineChart'+sensorName+response.devide_id),
+                      lineChartConfig = {
+                        chart: {
+                          height: 400,
+                          type: 'line',
+                          parentHeightOffset: 0,
+                          zoom: {
+                            enabled: false
+                          },
+                          toolbar: {
+                            show: false
                           }
-
+                        },
+                        series: [
+                          {
+                            name: readableSensorName,
+                            data: sensoryvalue
+                          }
+                        ],
+                        title: {
+                          enabled: false
+                        },
+                        dataLabels: {
+                          enabled: true
+                        },
+                        stroke: {
+                          curve: 'smooth'
+                        },
+                        legend: {
+                          show: true,
+                          position: 'top',
+                          horizontalAlign: 'start',
+                          labels: {
+                            colors: legendColor,
+                            useSeriesColors: false
+                          }
+                        },
+                        colors: [sensorValues.color],
+                        grid: {
+                          borderColor: borderColor,
+                          xaxis: {
+                            lines: {
+                              show: true
+                            }
+                          }
+                        },
+                        tooltip: {
+                          shared: false
+                        },
+                        xaxis: {
+                          //type: 'datetime',
+                          categories: sensorxvalue,
+                          labels: {
+                            style: {
+                              colors: labelColor,
+                              fontSize: '13px'
+                            }
+                          }
+                        },
+                        yaxis: {
+                          //type: 'datetime',
+                          labels: {
+                            style: {
+                              colors: labelColor,
+                              fontSize: '13px'
+                            }
+                          }
                         }
+                      };
+                      if (typeof lineChartEl !== undefined && lineChartEl !== null) {
+                        const lineChart = new ApexCharts(lineChartEl, lineChartConfig);
+                        lineChart.render();
+                      }
+
+                    }
                   
                 });
 

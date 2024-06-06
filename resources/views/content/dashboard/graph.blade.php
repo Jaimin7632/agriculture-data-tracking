@@ -68,7 +68,7 @@
           <!-- <div class="demo-inline-spacing"> -->
             <div class="row" style="padding: 15px 10px 15px 10px;">
               <div class="col-md-5 col-sm-6">
-                  <div class="btn-group graphDiv align-items-center" device-id="<?php echo $value; ?>" onclick="show_summary('<?php echo $value; ?>')" style="cursor: pointer; color: #215732;">
+                  <div class="btn-group  align-items-center" device-id="<?php echo $value; ?>"  style="cursor: pointer; color: #215732;">
                       <?php
                       $device_name = $value;
 
@@ -79,10 +79,13 @@
                       }
                       ?>
                       <span class="device_name_text">Dispositivo - <?php echo $device_name; ?></span>
-                      <span class="no_data_found">
+                      <!-- <span class="no_data_found">
                           <h6 class="card-header m-0 me-2 pb-3 no_data_found<?php echo $value; ?>" style="display: none;"></h6>
-                      </span>
+                      </span> -->
+
+                      <span class="graphDiv opengraph<?php echo $value; ?> accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionTwo<?php echo $value; ?>" aria-expanded="false" aria-controls="accordionTwo" device-id="<?php echo $value; ?>" onclick="show_summary('<?php echo $value; ?>')"></span> 
                   </div>
+
 
               </div>
               <div class="col-md-1 col-sm-6">
@@ -102,9 +105,9 @@
 
                   <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#exportdata<?php echo $value; ?>">Exportar</button></li>
 
-                  <?php if ($authuser->role == 'user') { ?>
+                  
                   <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-toggle="modal" data-bs-target="#changeNameModal<?php echo $value; ?>">Personalizar</button></li>
-                  <?php } ?>
+                  
 
                   <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#graphtimechange<?php echo $value; ?>">Graph Change</button></li>
 
@@ -115,192 +118,83 @@
 
               </br>
 
-              <!-- <span class="weather_wiedget<?php echo $value; ?> weather_hd" style="display: none;">
-                <section class="">
-                  <div class="container py-5">
+              <div id="accordionTwo<?php echo $value; ?>" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                  <span class="show_alarm_history<?php echo $value; ?>" id="show_alarm_history"></span>
+
+                  <div class="mainweather container weather_wiedget<?php echo $value; ?> weather_hd" style="display: none;">
+                    <button class="btn"  type="button" data-bs-toggle="modal" data-bs-toggle="modal" data-bs-target="#mapedit<?php echo $value; ?>"><i class="fas fa-edit"></i></button>
+                    <div class="row">
+                      <div class="col-xs-12">
+                        <!-- <div class="col-xs-12 col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4 weather-panel"> -->
+                        <div class="col-xs-12 weather-panel">
+                          <div class="col-xs-6 weather_head">
+                            <!-- <h2>Lucerne<br><small>May 24, 2016</small></h2>
+                            <p class="h3"><i class="mi mi-fw mi-lg mi-rain-heavy"></i> Rainy</p> -->
+                            <h4 class="text-white" id="timezone<?php echo $value; ?>">Lucerne</h4><br><h2><small class="text-white" id="daynow<?php echo $value; ?>">May 24, 2016</small><h2>
+                            <p class="h3 text-white" id="wrapper-description"><i class="mi mi-fw mi-lg mi-rain-heavy" id="cloud<?php echo $value; ?>"></i></p>
+                          </div>
+                          <div class="col-xs-6 text-center">
+                            <div class="h1 text-white">
+                              <span id="temperature<?php echo $value; ?>">12°</span>
+                              <br>
+                              <small id="pressure<?php echo $value; ?>">Pressure: 8°</small>
+                              <small id="humidity<?php echo $value; ?>">Humidity: 13°</small>
+                              <small id="windspeed<?php echo $value; ?>">Wind Speed: 13°</small>
+                              <small id="winddirection<?php echo $value; ?>">Wind Direction: 13°</small>
+                            </div>
+                          </div>
+                          <div class="col-xs-12">
+                            <ul class="list-inline row forecast">
+                              <li class="col-xs-4 col-sm-2 text-center">
+                                <h3 class="h5 text-white" id="day1<?php echo $value; ?>">Wed</h3>
+                                <!-- <p><i class="mi mi-fw mi-2x mi-cloud-sun"></i><br>9°/18°</p> -->
+                                <p id="day1ph<?php echo $value; ?>">9°/18°</p>
+                                <p id="day1ww<?php echo $value; ?>">9°/18°</p>
+                              </li>
+                              <li class="col-xs-4 col-sm-2 text-center">
+                                <h3 class="h5 text-white" id="day2<?php echo $value; ?>">Thu</h3>
+                                <!-- <p><i class="mi mi-fw mi-2x mi-sun"></i><br>12°/23°</p> -->
+                                <p id="day2ph<?php echo $value; ?>">9°/18°</p>
+                                <p id="day2ww<?php echo $value; ?>">9°/18°</p>
+                              </li>
+                              <li class="col-xs-4 col-sm-2 text-center">
+                                <h3 class="h5 text-white" id="day3<?php echo $value; ?>">Fri</h3>
+                                <!-- <p><i class="mi mi-fw mi-2x mi-cloud-sun"></i><br>14°/24°</p> -->
+                                <p id="day3ph<?php echo $value; ?>">9°/18°</p>
+                                <p id="day3ww<?php echo $value; ?>">9°/18°</p>
+                              </li>
+                              <li class="col-xs-4 col-sm-2 text-center">
+                                <h3 class="h5 text-white" id="day4<?php echo $value; ?>">Sat</h3>
+                                <!-- <p><i class="mi mi-fw mi-2x mi-rain"></i><br>15°/23°</p> -->
+                                <p id="day4ph<?php echo $value; ?>">9°/18°</p>
+                                <p id="day4ww<?php echo $value; ?>">9°/18°</p>
+                              </li>
+                              <li class="col-xs-4 col-sm-2 text-center">
+                                <h3 class="h5 text-white" id="day5<?php echo $value; ?>">Sun</h3>
+                                <!-- <p><i class="mi mi-fw mi-2x mi-rain-heavy"></i><br>15°/22°</p> -->
+                                <p id="day5ph<?php echo $value; ?>">9°/18°</p>
+                                <p id="day5ww<?php echo $value; ?>">9°/18°</p>
+                              </li>
+                              <li class="col-xs-4 col-sm-2 text-center">
+                                <h3 class="h5 text-white" id="day6<?php echo $value; ?>">Mon</h3>
+                                <!-- <p><i class="mi mi-fw mi-2x mi-clouds"></i><br>12°/17°</p> -->
+                                <p id="day6ph<?php echo $value; ?>">9°/18°</p>
+                                <p id="day6ww<?php echo $value; ?>">9°/18°</p>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- </span> -->
+                  <span class="append_graph_blank" id="append_graph<?php echo $value; ?>"></span>
                   
-                  <button class="btn"  type="button" data-bs-toggle="modal" data-bs-toggle="modal" data-bs-target="#mapedit<?php echo $value; ?>"><i class="fas fa-edit"></i></button>
-                    <div id="wrapper-bg" class="row d-flex justify-content-center align-items-center h-100" style="background-color: #eeefed">
-                      <div class="col-sm-3">
-                        <div class="card-header p-4 border-0">
-                          <div class="text-center mb-3">
-                            <p class="h2 mb-1" id="wrapper-name<?php echo $value; ?>"></p>
-                            <p class="mb-1" id="wrapper-description<?php echo $value; ?>"></p>
-                            <p class="display-1 mb-1" id="wrapper-temp<?php echo $value; ?>"></p>
-                            <span class="">Pressure: <span id="wrapper-pressure<?php echo $value; ?>"></span></span>
-                            <span class="mx-2">|</span>
-                            <span class="">Humidity: <span id="wrapper-humidity<?php echo $value; ?>"></span></span>
-                            <span class="mx-2">|</span>
-                            <span class="">Wind Speed: <span id="wrapper-windspeed<?php echo $value; ?>"></span></span>
-                            <span class="mx-2">|</span>
-                            <span class="">Wind Direction: <span id="wrapper-winddirection<?php echo $value; ?>"></span></span>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm-5">
-                          <div class="card-body p-4 border-top border-bottom mb-2">
-                            <div class="row text-center">
-                              <div class="col-2">
-                                <strong class="d-block mb-2">Now</strong>
-                                <img id="wrapper-icon-hour-now<?php echo $value; ?>" src="" class="" alt="" />
-                                <strong class="d-block" id="wrapper-hour-now<?php echo $value; ?>"></strong>
-                              </div>
+                  <span class="append_graph_single" id="append_graph_single<?php echo $value; ?>"></span>
 
-                              <div class="col-2">
-                                <strong class="d-block mb-2" id="wrapper-time1<?php echo $value; ?>"></strong>
-                                <img id="wrapper-icon-hour1<?php echo $value; ?>" src="" class="" alt="" />
-                                <strong class="d-block" id="wrapper-hour1<?php echo $value; ?>"></strong>
-                              </div>
-
-                              <div class="col-2">
-                                <strong class="d-block mb-2" id="wrapper-time2<?php echo $value; ?>"></strong>
-                                <img id="wrapper-icon-hour2<?php echo $value; ?>" src="" class="" alt="" />
-                                <strong class="d-block" id="wrapper-hour2<?php echo $value; ?>"></strong>
-                              </div>
-
-                              <div class="col-2">
-                                <strong class="d-block mb-2" id="wrapper-time3<?php echo $value; ?>"></strong>
-                                <img id="wrapper-icon-hour3<?php echo $value; ?>" src="" class="" alt="" />
-                                <strong class="d-block" id="wrapper-hour3<?php echo $value; ?>"></strong>
-                              </div>
-
-                              <div class="col-2">
-                                <strong class="d-block mb-2" id="wrapper-time4<?php echo $value; ?>"></strong>
-                                <img id="wrapper-icon-hour4<?php echo $value; ?>" src="" class="" alt="" />
-                                <strong class="d-block" id="wrapper-hour4<?php echo $value; ?>"></strong>
-                              </div>
-
-                              <div class="col-2">
-                                <strong class="d-block mb-2" id="wrapper-time5<?php echo $value; ?>"></strong>
-                                <img id="wrapper-icon-hour5<?php echo $value; ?>" src="" class="" alt="" />
-                                <strong class="d-block" id="wrapper-hour5<?php echo $value; ?>"></strong>
-                              </div>
-                            </div>
-                          </div>
-                      </div>
-                      <div class="col-sm-4">
-                        <div class="card-body px-5">
-                            <div class="row align-items-center">
-                              <div class="col-lg-6">
-                                <strong>Today</strong>
-                              </div>
-
-                              <div class="col-lg-2 text-center">
-                                <img id="wrapper-icon-today<?php echo $value; ?>" src="" class="w-100" alt="" />
-                              </div>
-
-                              <div class="col-lg-4 text-end">
-                                <span id="wrapper-forecast-temp-today<?php echo $value; ?>"></span>
-                              </div>
-                            </div>
-
-                            <div class="row align-items-center">
-                              <div class="col-lg-6">
-                                <strong>Tomorrow</strong>
-                              </div>
-
-                              <div class="col-lg-2 text-center">
-                                <img id="wrapper-icon-tomorrow<?php echo $value; ?>" src="" class="w-100" alt="" />
-                              </div>
-
-                              <div class="col-lg-4 text-end">
-                                <span id="wrapper-forecast-temp-tomorrow<?php echo $value; ?>">28</span>
-                              </div>
-                            </div>
-
-                            <div class="row align-items-center">
-                              <div class="col-lg-6">
-                                <strong>Day after tomorrow</strong>
-                              </div>
-
-                              <div class="col-lg-2 text-center">
-                                <img id="wrapper-icon-dAT<?php echo $value; ?>" src="" class="w-100" alt="" />
-                              </div>
-
-                              <div class="col-lg-4 text-end">
-                                <span id="wrapper-forecast-temp-dAT<?php echo $value; ?>">28</span>
-                              </div>
-                            </div>
-                          </div>
-                      </div>
-
-                    </div>
-
-                  </div>
-                </section> -->
-
-                <div class="mainweather container weather_wiedget<?php echo $value; ?> weather_hd" style="display: none;">
-                  <button class="btn"  type="button" data-bs-toggle="modal" data-bs-toggle="modal" data-bs-target="#mapedit<?php echo $value; ?>"><i class="fas fa-edit"></i></button>
-                  <div class="row">
-                    <div class="col-xs-12">
-                      <!-- <div class="col-xs-12 col-sm-6 col-sm-offset-3 col-lg-4 col-lg-offset-4 weather-panel"> -->
-                      <div class="col-xs-12 weather-panel">
-                        <div class="col-xs-6 weather_head">
-                          <!-- <h2>Lucerne<br><small>May 24, 2016</small></h2>
-                          <p class="h3"><i class="mi mi-fw mi-lg mi-rain-heavy"></i> Rainy</p> -->
-                          <h4 class="text-white" id="timezone<?php echo $value; ?>">Lucerne</h4><br><h2><small class="text-white" id="daynow<?php echo $value; ?>">May 24, 2016</small><h2>
-                          <p class="h3 text-white" id="wrapper-description"><i class="mi mi-fw mi-lg mi-rain-heavy" id="cloud<?php echo $value; ?>"></i></p>
-                        </div>
-                        <div class="col-xs-6 text-center">
-                          <div class="h1 text-white">
-                            <span id="temperature<?php echo $value; ?>">12°</span>
-                            <br>
-                            <small id="pressure<?php echo $value; ?>">Pressure: 8°</small>
-                            <small id="humidity<?php echo $value; ?>">Humidity: 13°</small>
-                            <small id="windspeed<?php echo $value; ?>">Wind Speed: 13°</small>
-                            <small id="winddirection<?php echo $value; ?>">Wind Direction: 13°</small>
-                          </div>
-                        </div>
-                        <div class="col-xs-12">
-                          <ul class="list-inline row forecast">
-                            <li class="col-xs-4 col-sm-2 text-center">
-                              <h3 class="h5 text-white" id="day1<?php echo $value; ?>">Wed</h3>
-                              <!-- <p><i class="mi mi-fw mi-2x mi-cloud-sun"></i><br>9°/18°</p> -->
-                              <p id="day1ph<?php echo $value; ?>">9°/18°</p>
-                              <p id="day1ww<?php echo $value; ?>">9°/18°</p>
-                            </li>
-                            <li class="col-xs-4 col-sm-2 text-center">
-                              <h3 class="h5 text-white" id="day2<?php echo $value; ?>">Thu</h3>
-                              <!-- <p><i class="mi mi-fw mi-2x mi-sun"></i><br>12°/23°</p> -->
-                              <p id="day2ph<?php echo $value; ?>">9°/18°</p>
-                              <p id="day2ww<?php echo $value; ?>">9°/18°</p>
-                            </li>
-                            <li class="col-xs-4 col-sm-2 text-center">
-                              <h3 class="h5 text-white" id="day3<?php echo $value; ?>">Fri</h3>
-                              <!-- <p><i class="mi mi-fw mi-2x mi-cloud-sun"></i><br>14°/24°</p> -->
-                              <p id="day3ph<?php echo $value; ?>">9°/18°</p>
-                              <p id="day3ww<?php echo $value; ?>">9°/18°</p>
-                            </li>
-                            <li class="col-xs-4 col-sm-2 text-center">
-                              <h3 class="h5 text-white" id="day4<?php echo $value; ?>">Sat</h3>
-                              <!-- <p><i class="mi mi-fw mi-2x mi-rain"></i><br>15°/23°</p> -->
-                              <p id="day4ph<?php echo $value; ?>">9°/18°</p>
-                              <p id="day4ww<?php echo $value; ?>">9°/18°</p>
-                            </li>
-                            <li class="col-xs-4 col-sm-2 text-center">
-                              <h3 class="h5 text-white" id="day5<?php echo $value; ?>">Sun</h3>
-                              <!-- <p><i class="mi mi-fw mi-2x mi-rain-heavy"></i><br>15°/22°</p> -->
-                              <p id="day5ph<?php echo $value; ?>">9°/18°</p>
-                              <p id="day5ww<?php echo $value; ?>">9°/18°</p>
-                            </li>
-                            <li class="col-xs-4 col-sm-2 text-center">
-                              <h3 class="h5 text-white" id="day6<?php echo $value; ?>">Mon</h3>
-                              <!-- <p><i class="mi mi-fw mi-2x mi-clouds"></i><br>12°/17°</p> -->
-                              <p id="day6ph<?php echo $value; ?>">9°/18°</p>
-                              <p id="day6ww<?php echo $value; ?>">9°/18°</p>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
-              <!-- </span> -->
-
-              <span class="show_alarm_history<?php echo $value; ?>" id="show_alarm_history"></span>
-              <span class="append_graph_blank" id="append_graph<?php echo $value; ?>"></span>
-              <span class="append_graph_single" id="append_graph_single<?php echo $value; ?>"></span>
-
+              </div>
             </div>
 
             <!-- <div class="row row-bordered g-0 show_alarm_history<?php echo $value; ?>" >
@@ -349,7 +243,7 @@
                   </div>
                   <div class="modal-footer">
                       <button type="button" device-id="<?php echo $value; ?>" class="btn btn-primary changegraphtime">Entregar</button>
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                   </div>
               </div>
           </div>
@@ -385,7 +279,7 @@
                       </div>
                   </div>
                   <div class="modal-footer">
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                       <button class="btn btn-primary" data-bs-dismiss="modal" id="saveSettings" onclick="saveSettings('<?php echo $value; ?>')">Guardar ajustes</button>
                   </div>
               </div>
@@ -404,7 +298,7 @@
                       </div>
                   </div>
                   <div class="modal-footer">
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                   </div>
               </div>
           </div>
@@ -421,7 +315,7 @@
                     <input type="text" name="LAT" class="LAT<?php echo $value; ?>" readonly>
                     <input type="text" name="LON" class="LON<?php echo $value; ?>" readonly>
                       <button type="button" device-id="<?php echo $value; ?>" class="btn btn-primary maplatlong">Entregar</button>
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                   </div>
               </div>
           </div>
@@ -481,7 +375,7 @@
                   </div>
                   <div class="modal-footer">
                       <button type="button" device-id="<?php echo $value; ?>" class="btn btn-primary datefilter">Entregar</button>
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                   </div>
               </div>
           </div>
@@ -511,14 +405,14 @@
                   </div>
                   <div class="modal-footer">
                       <button type="button" class="btn btn-primary" onclick="datefilterexport('<?php echo $value; ?>')">Exportar</button>
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                   </div>
               </div>
           </div>
       </div>
 
 
-      <?php if ($authuser->role == 'user') { ?>
+      
 
           <!-- Modal Change Username-->
           <div class="modal fade" id="changeNameModal<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
@@ -535,13 +429,13 @@
                       </div>
                       <div class="modal-footer">
                           <button type="button" class="btn btn-primary" onclick="changedevicename('<?php echo $value; ?>')">Cambiar</button>
-                          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerca</button>
+                          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                       </div>
                   </div>
               </div>
           </div>
 
-      <?php } ?>
+      
     <?php }
   }
 ?>
@@ -550,6 +444,16 @@
 
 
 <script type="text/javascript">
+
+  const dayNameMap = {
+      Sun: 'Sunday',
+      Mon: 'Monday',
+      Tue: 'Tuesday',
+      Wed: 'Wednesday',
+      Thu: 'Thursday',
+      Fri: 'Friday',
+      Sat: 'Saturday'
+  };
 
   var baseUrl = "{{ url('/') }}";
 
@@ -715,6 +619,7 @@
     });
 
   }
+
 
   function show_alarmhistory(device_id) {
     getUserLocation(device_id);
@@ -922,9 +827,9 @@
         const date = new Date(dayTimestamp * 1000);
         const options = { weekday: 'short' };
         const dayName = date.toLocaleDateString('en-US', options);
-        dayNames.push(dayName);
+        dayNames.push(getFullDayName(dayName));
         const daydate = date.toDateString();
-        daydates.push(daydate);
+        daydates.push(convertDateString(daydate));
         const windspeed = data.daily[i].wind_speed;
         windspeeds.push(windspeed);
         const winddirection = data.daily[i].wind_deg;
@@ -952,32 +857,38 @@
     let humidity = data.current.humidity;
     let name = data.timezone;
     let windspeed = data.current.wind_speed;
-    let winddirection = data.current.wind_deg;
+    let winddirection = getWindDirection(data.current.wind_deg);
 
     $("#cloud"+device_id).text(description);
     $("#temperature"+device_id).text(temp + "°C");
     $("#pressure"+device_id).text("Pressure:" + pressure +' |');
     $("#humidity"+device_id).text("Humidity:" + humidity + "%" +' |');
-    $("#windspeed"+device_id).text("Wind Speed:" + windspeed + "(m/s)" +' |');
-    $("#winddirection"+device_id).text("Wind Direction:" + winddirection + "°");
+    $("#windspeed"+device_id).text("Wind Speed:" + parseFloat((windspeed * 3.6).toFixed(2)) + "(km/h)" +' |');
+    $("#winddirection"+device_id).text("Wind Direction:" + winddirection);
 
     let day1ph = pressures[1]+'/'+humiditys[1]+'%';
-    let day1ww = windspeeds[1]+'(m/s) /'+winddirections[1]+'°';
+    var winddirections1 = getWindDirection(winddirections[1]);
+    let day1ww = parseFloat((windspeeds[1] * 3.6).toFixed(2))+'(km/h) /'+winddirections1;
 
     let day2ph = pressures[2]+'/'+humiditys[2]+'%';
-    let day2ww = windspeeds[2]+'(m/s) /'+winddirections[2]+'°';
+    var winddirections2 = getWindDirection(winddirections[2]);
+    let day2ww = parseFloat((windspeeds[2] * 3.6).toFixed(2))+'(km/h) /'+winddirections2;
 
     let day3ph = pressures[3]+'/'+humiditys[3]+'%';
-    let day3ww = windspeeds[3]+'(m/s) /'+winddirections[3]+'°';
+    var winddirections3 = getWindDirection(winddirections[3]);
+    let day3ww = parseFloat((windspeeds[3] * 3.6).toFixed(2))+'(km/h) /'+winddirections3;
 
     let day4ph = pressures[4]+'/'+humiditys[4]+'%';
-    let day4ww = windspeeds[4]+'(m/s) /'+winddirections[4]+'°';
+    var winddirections4 = getWindDirection(winddirections[4]);
+    let day4ww = parseFloat((windspeeds[4] * 3.6).toFixed(2))+'(km/h) /'+winddirections4;
 
     let day5ph = pressures[5]+'/'+humiditys[5]+'%';
-    let day5ww = windspeeds[5]+'(m/s) /'+winddirections[5]+'°';
+    var winddirections5 = getWindDirection(winddirections[5]);
+    let day5ww = parseFloat((windspeeds[5] * 3.6).toFixed(2))+'(km/h) /'+winddirections5;
 
     let day6ph = pressures[6]+'/'+humiditys[6]+'%';
-    let day6ww = windspeeds[6]+'(m/s) /'+winddirections[6]+'°';
+    var winddirections6 = getWindDirection(winddirections[6]);
+    let day6ww = parseFloat((windspeeds[6] * 3.6).toFixed(2))+'(km/h) /'+winddirections6;
 
     $("#day1ph"+device_id).text(day1ph);
     $("#day1ww"+device_id).text(day1ww);
@@ -1112,6 +1023,45 @@
     document.getElementById("wrapper-icon-hour5"+device_id).src = iconFullyUrlHour5;*/
 
     });
+  }
+
+  // Function to convert a date string to the full day name format
+  function convertDateString(dateString) {
+      // Parse the date string into a Date object
+      const date = new Date(dateString);
+      
+      // Options for toLocaleDateString to get the full day name
+      const options = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+      
+      // Generate the formatted date string
+      const formattedDate = date.toLocaleDateString('en-US', options);
+      
+      return formattedDate;
+  }
+
+  // Function to convert abbreviated day name to full day name
+  function getFullDayName(abbreviatedName) {
+      return dayNameMap[abbreviatedName] || 'Invalid day name';
+  }
+
+  function getWindDirection(deg) {
+      if (deg >= 348.75 || deg < 11.25) return deg+"° N";
+      if (deg >= 11.25 && deg < 33.75) return deg+"° NNE";
+      if (deg >= 33.75 && deg < 56.25) return deg+"° NE";
+      if (deg >= 56.25 && deg < 78.75) return deg+"° ENE";
+      if (deg >= 78.75 && deg < 101.25) return deg+"° E";
+      if (deg >= 101.25 && deg < 123.75) return deg+"° ESE";
+      if (deg >= 123.75 && deg < 146.25) return deg+"° SE";
+      if (deg >= 146.25 && deg < 168.75) return deg+"° SSE";
+      if (deg >= 168.75 && deg < 191.25) return deg+"° S";
+      if (deg >= 191.25 && deg < 213.75) return deg+"° SSW";
+      if (deg >= 213.75 && deg < 236.25) return deg+"° SW";
+      if (deg >= 236.25 && deg < 258.75) return deg+"° WSW";
+      if (deg >= 258.75 && deg < 281.25) return deg+"° W";
+      if (deg >= 281.25 && deg < 303.75) return deg+"° WNW";
+      if (deg >= 303.75 && deg < 326.25) return deg+"° NW";
+      if (deg >= 326.25 && deg < 348.75) return deg+"° NNW";
+      return "Invalid"; // In case the degree value is out of range
   }
 
   function getUserLocation(deviceid) {
