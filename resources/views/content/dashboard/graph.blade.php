@@ -224,7 +224,7 @@
       <div class="modal fade" id="setattribute<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document" style="max-width: 57rem">
               <div class="modal-content">
-                  <form class="dynamic-form" method="post">
+                  <form class="dynamic-form<?php echo $value; ?>" method="post">
                     <input type="hidden" id="attrdeviceid" value="<?php echo $value; ?>">
                     <div class="card-body">
                       <?php foreach ($attributedata as $key => $attributevalue) { ?>
@@ -520,20 +520,24 @@ $(document).ready(function() {
   });
 
   // Handle form submission
-  $(document).on('submit', '.dynamic-form', function(event) {
+  $(document).on('submit', '[class^="dynamic-form"]', function(event) {
     event.preventDefault(); // Prevent the default form submission
 
-    let keys = $("input[name='attrkey[]']").map(function(){ return $(this).val(); }).get();
-    let values = $("input[name='attrval[]']").map(function(){ return $(this).val(); }).get();
+    let keys = $(this).find("input[name='attrkey[]']").map(function() {
+          return $(this).val();
+    }).get();
+    let values = $(this).find("input[name='attrval[]']").map(function() {
+      return $(this).val();
+    }).get();
 
     let attributes = [];
-    for(let i = 0; i < keys.length; i++) {
+    for (let i = 0; i < keys.length; i++) {
       attributes.push({ key: keys[i], value: values[i] });
     }
 
     console.log(attributes);
-    var user_id = $("#User_Id").val();
-    var device_id = $("#attrdeviceid").val();
+    let user_id = $("#User_Id").val();
+    let device_id = $(this).find("#attrdeviceid").val();
 
     $.ajax({
         type: 'POST',
@@ -541,8 +545,44 @@ $(document).ready(function() {
         data: {attributes:attributes,device_id:device_id,user_id:user_id,_token:"{{ csrf_token() }}"},
         success: function (response) {
           console.log(response);
-            
-            // $('.loader').fadeOut();
+          if (response.success == 'success') {
+            $("#setattribute"+device_id).modal('hide');
+            Swal.fire({
+                // title: 'You Dial Number!',
+                title: response.msg,
+                icon: 'success',
+                allowOutsideClick: false,
+                confirmButtonText: 'Ok',
+                customClass: {
+                    confirmButton: 'btn btn-danger ml-1'
+                },
+                buttonsStyling: true
+            }).then(function(result) {
+              if (result.isConfirmed) {
+                  location.reload(true);
+              } else {
+                  location.reload(true);
+              }
+            });
+          }else{
+            Swal.fire({
+                // title: 'You Dial Number!',
+                title: response.msg,
+                icon: 'failure',
+                allowOutsideClick: false,
+                confirmButtonText: 'Ok',
+                customClass: {
+                    confirmButton: 'btn btn-danger ml-1'
+                },
+                buttonsStyling: true
+            }).then(function(result) {
+              if (result.isConfirmed) {
+                  location.reload(true);
+              } else {
+                  location.reload(true);
+              }
+            });
+          }
         }
     });
 
