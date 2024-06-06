@@ -19,7 +19,7 @@ float sensorValues[numSensors] = {0};
 // Server details
 // const char server[] = "16.171.60.141";
 // const int port = 8000;
-const char endpoint[] = "http://16.171.60.141:8000/api/sensordatastore";
+const char endpoint[] = "https://portal.agromolinainnova.com/login/api/sensordatastore";
 
 // lora code with i2c
 #define BUFFER_SIZE 6000 // Tamaño máximo del buffer para almacenar el paquete JSON
@@ -28,6 +28,7 @@ DynamicJsonDocument jsonDoc(BUFFER_SIZE); // Crear un documento JSON dinámico
 char rxBuffer[BUFFER_SIZE]; // Buffer para almacenar los datos recibidos por I2C
 int rxIndex = 0; // Índice para realizar un seguimiento del tamaño actual del buffer
 String i2cJsonString = "";
+String serverJsonString = "";
 // end lora code with i2c
 
 #include <ArduinoHttpClient.h>
@@ -98,12 +99,12 @@ void addSensorDataToJson(DynamicJsonDocument& jsonDocument) {
 // lora code with i2c
 void receiveEvent(int numBytes) {
   // Reiniciar el buffer y el índice
-  
+
   if (numBytes > 0) {
     while (Wire.available()) {
       char c = Wire.read();
       if (c=='\0')
-      {   
+      {
           rxIndex = 0;
           Serial.print("Received JSON: ");
           DeserializationError error = deserializeJson(jsonDoc, rxBuffer);
@@ -113,7 +114,7 @@ void receiveEvent(int numBytes) {
           if (error) {
             Serial.println("Error al parsear el JSON recibido");
             Serial.println(error.f_str());
-          } 
+          }
           break;
       }
       rxBuffer[rxIndex++] = c;
@@ -123,19 +124,19 @@ void receiveEvent(int numBytes) {
   }
 }
 void requestEvent() {
-  String jsonString = "{\"time\":15000}";
-  int jsonLength = jsonString.length();
+//   String jsonString = "{\"time\":15000}";
+  int jsonLength = serverJsonString.length();
   int numChunks = jsonLength / CHUNK_SIZE;
   int remainder = jsonLength % CHUNK_SIZE;
   // Send JSON string in chunks
   for (int i = 0; i < numChunks; i++) {
     for (int j = 0; j < CHUNK_SIZE; j++) {
-      Wire.write((uint8_t)jsonString[i * CHUNK_SIZE + j]);
+      Wire.write((uint8_t)serverJsonString[i * CHUNK_SIZE + j]);
     }
   }
   if (remainder > 0) {
     for (int i = 0; i < remainder; i++) {
-      Wire.write((uint8_t)jsonString[numChunks * CHUNK_SIZE + i]);
+      Wire.write((uint8_t)serverJsonString[numChunks * CHUNK_SIZE + i]);
     }
   }
   Wire.write('\0');
@@ -157,7 +158,7 @@ void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
               JsonObject idObject = idEntry.value().as<JsonObject>();
 
               const char* id = idObject["id"];
-              
+
               // Create a new JSON object for the sensor data under the ID key
               jsonDocument["device_id"] = device_id;
               JsonObject sensorDataNode = jsonDocument["sensor_data"];
@@ -228,18 +229,21 @@ void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
         Serial.print("HTTP post failed ! error code = ");
         Serial.println(httpCode);
         return;
+    }else{
+      // Get HTTPS header information
+      String header = modem.https_header();
+      Serial.print("HTTP Header : ");
+      Serial.println(header);
+
+      // Get HTTPS response
+      String body = modem.https_body();
+      if (body != ""){
+        serverJsonString = body;
+      }
+      Serial.print("HTTP body : ");
+      Serial.println(body);
+      Serial.println("Server disconnected");
     }
-
-    // Get HTTPS header information
-    String header = modem.https_header();
-    Serial.print("HTTP Header : ");
-    Serial.println(header);
-
-    // Get HTTPS response
-    String body = modem.https_body();
-    Serial.print("HTTP body : ");
-    Serial.println(body);
-    Serial.println("Server disconnected");
 
 }
 
@@ -376,8 +380,8 @@ void loop() {
 
     // Read sensor values
     Serial.println("sensor value read done ");
-    
-    
+
+
     // Create JSON object
     DynamicJsonDocument jsonDocument(1024);
     //addSensorDataToJson(jsonDocument);
@@ -390,47 +394,6 @@ void loop() {
     Serial.print("Sending JSON data: ");
     Serial.println(jsonString);
 
-//     int err = http.post(endpoint, "application/json", jsonString);
-//     if (err != 0) {
-//         Serial.println(F("failed to connect"));
-//         delay(10000);
-//         return;
-//     }
-//
-//     int status = http.responseStatusCode();
-//     Serial.print(F("Response status code: "));
-//     Serial.println(status);
-//     if (!status) {
-//         delay(10000);
-//         return;
-//     }
-//
-//     Serial.println(F("Response Headers:"));
-//     while (http.headerAvailable()) {
-//         String headerName  = http.readHeaderName();
-//         String headerValue = http.readHeaderValue();
-//         Serial.println("    " + headerName + " : " + headerValue);
-//     }
-//
-//     int length = http.contentLength();
-//     if (length >= 0) {
-//         Serial.print(F("Content length is: "));
-//         Serial.println(length);
-//     }
-//     if (http.isResponseChunked()) {
-//         Serial.println(F("The response is chunked"));
-//     }
-//
-//     String body = http.responseBody();
-//     Serial.println(F("Response:"));
-//     Serial.println(body);
-//
-//     Serial.print(F("Body length is: "));
-//     Serial.println(body.length());
-//
-//     // Shutdown
-//
-//     http.stop();
     #if TINY_GSM_USE_GPRS
       sendJsonModem(endpoint, jsonDocument);
     #else
