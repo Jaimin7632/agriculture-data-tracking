@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use App\Models\User;
 use App\Models\Timezones;
+use App\Models\Attributes;
 
 class UserManagementController extends Controller
 {
@@ -99,7 +100,7 @@ class UserManagementController extends Controller
 
   protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'status' => $data['status'],
@@ -109,6 +110,36 @@ class UserManagementController extends Controller
             'device_id' => $data['device_id'],
             'password' => Hash::make($data['password']),
         ]);
+
+        // Convert device IDs to an array
+        $deviceIds = explode(',', $data['device_id']);
+
+        // Insert data into the attributes table
+        $attributeValue = ['time' => (1000 * 60 * 15)];
+
+        foreach ($deviceIds as $deviceId) {
+            $deviceId = trim($deviceId); // Trim any extra whitespace
+            
+            // Prepare the attribute data
+            $attributeData = [
+                'user_id' => $user->id,
+                'device_id' => $deviceId,
+                'attributes' => json_encode($attributeValue), // Assuming 'attribute' in $data is an array or object
+            ];
+            
+            // Check if the attribute record already exists
+            $existingAttribute = Attributes::where('user_id', $user->id)->where('device_id', $deviceId)->first();
+            
+            if ($existingAttribute) {
+                // Update the existing record
+                $existingAttribute->update($attributeData);
+            } else {
+                // Create a new record
+                Attributes::create($attributeData);
+            }
+        }
+
+        return $user;
     }
 
     public function edit($id)
@@ -168,6 +199,34 @@ class UserManagementController extends Controller
             'timezone' => $timezone,
             'device_id' => $device_id,
           ]);
+
+        $deviceIds = explode(',', $device_id);
+        
+        // Insert data into the attributes table
+        $attributeValue = ['time' => (1000 * 60 * 15)];
+
+        foreach ($deviceIds as $deviceId) {
+            $deviceId = trim($deviceId); // Trim any extra whitespace
+            
+            // Prepare the attribute data
+            $attributeData = [
+                'user_id' => $user_id,
+                'device_id' => $deviceId,
+                'attributes' => json_encode($attributeValue), // Assuming 'attribute' in $data is an array or object
+            ];
+            
+            // Check if the attribute record already exists
+            $existingAttribute = Attributes::where('user_id', $user_id)->where('device_id', $deviceId)->first();
+            
+            if ($existingAttribute) {
+                // Update the existing record
+                $existingAttribute->update($attributeData);
+            } else {
+                // Create a new record
+                Attributes::create($attributeData);
+            }
+        }
+
       } catch (Exception $ex) {
           $message = $ex->getMessage();
       }

@@ -46,9 +46,17 @@
     <?php foreach ($targetdevice_id as $value) { 
       $userlatlong = \App\Models\SetLatLong::where('user_id', $user->id)->where('device_id', $value)->get()->first();
       $alarms = \App\Models\Setalarm::where('user_id', $user->id)->where('device_id', $value)->get()->first();
+      
       $alarmdata = [];
       if (!empty($alarms)) {
         $alarmdata = json_decode($alarms->alarmdata);
+      }
+
+      $attribute = \App\Models\Attributes::where('user_id', $user->id)->where('device_id', $value)->get()->first();
+
+      $attributedata = [];
+      if (!empty($attribute)) {
+        $attributedata = json_decode($attribute->attributes);
       }
       
       ?>
@@ -111,6 +119,7 @@
 
                   <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#graphtimechange<?php echo $value; ?>">Graph Change</button></li>
 
+                  <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#setattribute<?php echo $value; ?>">Set Attribute</button></li>
                   <!-- <li><button class="dropdown-item btn btn-outline-secondary"  type="button" data-bs-toggle="modal" data-bs-target="#setalarm<?php echo $value; ?>">Ajustar alarma</button></li> -->
 
                 </ul>
@@ -190,7 +199,7 @@
                   </div>
                   <!-- </span> -->
                   <span class="append_graph_blank" id="append_graph<?php echo $value; ?>"></span>
-                  
+
                   <span class="append_graph_single" id="append_graph_single<?php echo $value; ?>"></span>
 
                 </div>
@@ -208,6 +217,46 @@
 
           <!-- </div> -->
         <!-- </div> -->
+      </div>
+
+
+      <!-- Modal Set Attribute-->
+      <div class="modal fade" id="setattribute<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document" style="max-width: 57rem">
+              <div class="modal-content">
+                  <form class="dynamic-form" method="post">
+                    <input type="hidden" id="attrdeviceid" value="<?php echo $value; ?>">
+                    <div class="card-body">
+                      <?php foreach ($attributedata as $key => $attributevalue) { ?>
+                          <div class="row mb-3">
+                            <div class="col-sm-2">
+                              <input type="text" name="attrkey[]" class="form-control" id="basic-default-name" value="<?= $key; ?>">
+                            </div>
+                            <div class="col-sm-10">
+                              <input type="text" name="attrval[]" class="form-control" id="basic-default-name" value="<?= $attributevalue; ?>">
+                            </div>
+                          </div>
+                      <?php }  ?>
+                      
+                      <div id="input-container<?php echo $value; ?>">
+                        <!-- Initial input fields can be placed here -->
+                      </div>
+
+                      <div class="row justify-content-end">
+                        <div class="col-sm-10">
+                          <button type="button" device-attr-id="<?php echo $value; ?>" class="add-input" class="btn btn-primary"><i class='bx bx-plus' ></i></button>
+                          <button type="button" device-remove-id="<?php echo $value; ?>" class="remove-input" class="btn btn-primary"><i class='bx bx-minus' ></i></button>
+                        </div>
+                      </div>
+                    
+                  </div>
+                  <div class="modal-footer">
+                      <button type="submit" device-id="<?php echo $value; ?>" class="btn btn-primary setattributeadd">Entregar</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                  </div>
+                  </form>
+              </div>
+          </div>
       </div>
 
       <!-- Modal Graph Time Change-->
@@ -381,7 +430,6 @@
           </div>
       </div>
 
-
       <!-- Modal Export Data-->
       <div class="modal fade" id="exportdata<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document" style="max-width: 57rem">
@@ -411,29 +459,26 @@
           </div>
       </div>
 
-
-      
-
-          <!-- Modal Change Username-->
-          <div class="modal fade" id="changeNameModal<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
-              <div class="modal-dialog" role="document">
-                  <div class="modal-content">
-                      <div class="modal-header">
-                          <h5 class="modal-title" id="changeNameModalLabel">Personalizar nombre</h5>
-                          <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                          </button> -->
-                      </div>
-                      <div class="modal-body">
-                          <input type="text" name="change_name" id="name_textbox<?php echo $value; ?>" class="form-control" placeholder="Enter new name">
-                      </div>
-                      <div class="modal-footer">
-                          <button type="button" class="btn btn-primary" onclick="changedevicename('<?php echo $value; ?>')">Cambiar</button>
-                          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
-                      </div>
+      <!-- Modal Change Username-->
+      <div class="modal fade" id="changeNameModal<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="changeNameModalLabel">Personalizar nombre</h5>
+                      <!-- <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button> -->
+                  </div>
+                  <div class="modal-body">
+                      <input type="text" name="change_name" id="name_textbox<?php echo $value; ?>" class="form-control" placeholder="Enter new name">
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-primary" onclick="changedevicename('<?php echo $value; ?>')">Cambiar</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                   </div>
               </div>
           </div>
+      </div>
 
       
     <?php }
@@ -444,6 +489,66 @@
 
 
 <script type="text/javascript">
+
+$(document).ready(function() {
+  
+  $('.add-input').click(function() {
+    var device_id = $(this).attr('device-attr-id');
+    // console.log(device_id);
+    $('#input-container'+device_id).append(`
+      <div id="attrdiv${device_id}" class="row mb-3">
+        <div class="col-sm-2">
+          <input type="text" name="attrkey[]" class="form-control" id="basic-default-name" value="">
+        </div>
+        <div class="col-sm-10">
+          <input type="text" name="attrval[]" class="form-control" id="basic-default-name" value="">
+        </div>
+      </div>
+    `);
+  });
+
+  // Remove the last added input fields
+  // $('.remove-input').click(function() {
+  //   var device_id = $(this).attr('device-remove-id');
+  //   $('#input-container+device_id .row.mb-3').last().remove();
+  // });
+
+  $(document).on('click', '.remove-input', function() {
+    var device_id = $(this).attr('device-remove-id');
+    console.log(device_id);
+    $('#attrdiv'+device_id).remove();
+  });
+
+  // Handle form submission
+  $(document).on('submit', '.dynamic-form', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    let keys = $("input[name='attrkey[]']").map(function(){ return $(this).val(); }).get();
+    let values = $("input[name='attrval[]']").map(function(){ return $(this).val(); }).get();
+
+    let attributes = [];
+    for(let i = 0; i < keys.length; i++) {
+      attributes.push({ key: keys[i], value: values[i] });
+    }
+
+    console.log(attributes);
+    var user_id = $("#User_Id").val();
+    var device_id = $("#attrdeviceid").val();
+
+    $.ajax({
+        type: 'POST',
+        url: '{{ route("set-attribute-key-value") }}',
+        data: {attributes:attributes,device_id:device_id,user_id:user_id,_token:"{{ csrf_token() }}"},
+        success: function (response) {
+          console.log(response);
+            
+            // $('.loader').fadeOut();
+        }
+    });
+
+  });
+
+});
 
   const dayNameMap = {
       Sun: 'Sunday',

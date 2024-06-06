@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\SensorData;
 use App\Models\Setalarm;
 use App\Models\AlarmHistory;
+use App\Models\Attributes;
 use App\Jobs\SendEmailJob;
 use DB;
 
@@ -95,7 +96,8 @@ class SensorDataInsertApi extends Controller
         try {
             $data = $request->all();
             $data['created_at'] = $data['updated_at'] = date('Y-m-d H:i:s');
-
+            $attributes = "";
+            $extraparam = "";
             if(isset($data['device_id'])) {
                 // Bulk insert data into MongoDB
                 $insertData = DB::collection('sensor_data')->insert([$data]);
@@ -103,6 +105,7 @@ class SensorDataInsertApi extends Controller
                 $device_id = $data['device_id'];
                 $data['device_id'] = (string) $device_id;
                 $userdata = User::where('device_id', 'like', "%$device_id%")->get();
+                $attributes = Attributes::where('device_id', 'like', "%$device_id%")->first();
 
                 foreach ($userdata as $user) {
                     $uid = $user['_id'];
@@ -138,7 +141,11 @@ class SensorDataInsertApi extends Controller
                     }
                 }
             }
-            $extraparam = array('time' => '10000');
+
+            if ($attributes) {
+                $extraparam = json_decode($attributes->attributes);
+            }
+            
             if($insertData){
                 return response()->json($extraparam, 200);
             } else {

@@ -51,6 +51,7 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::post('/usermanagement/update-user', [UserManagementController::class, 'update_user_via_admin'])->name('update-user');
 	Route::post('/usermanagement/delete-user-data', [UserManagementController::class, 'delete_user_data'])->name('delete-user-data');
 	Route::get('/usermanagement/{id}/dashboard', [UserManagementController::class, 'dashboard'])->name('users.dashboard');
+	Route::post('/set-attribute-key-value', [Analytics::class, 'saveattributes'])->name("set-attribute-key-value");
 	// User Management End
 
 	// Account Setting Start
@@ -132,4 +133,3 @@ Route::group(['middleware' => ['auth']], function () {
 });
 
 
-URL::forceScheme('https');

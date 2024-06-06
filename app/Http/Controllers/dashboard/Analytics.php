@@ -13,6 +13,7 @@ use App\Models\SetLatLong;
 use App\Models\Setalarm;
 use App\Models\AlarmHistory;
 use App\Models\Country;
+use App\Models\Attributes;
 use Carbon\Carbon;
 use DB;
 use GuzzleHttp\Client;
@@ -934,6 +935,49 @@ class Analytics extends Controller
     }
 
     return response()->json($responseData);
+
+  }
+
+  public function saveattributes(Request $request){
+
+    $post_data = $request->all();
+    // echo "<pre>"; print_r($post_data); die();
+
+    try {
+      
+      $attributeValue = [];
+      foreach ($post_data['attributes'] as $attribute) {
+          $attributeValue[$attribute['key']] = $attribute['value'];
+      }
+
+      $attributeData = [
+          'user_id' => $post_data['user_id'],
+          'device_id' => $post_data['device_id'],
+          'attributes' => json_encode($attributeValue), // Assuming 'attribute' in $data is an array or object
+      ];
+
+      $existingAttribute = Attributes::where('user_id', $post_data['user_id'])->where('device_id', $post_data['device_id'])->first();
+            
+      if ($existingAttribute) {
+          // Update the existing record
+          $existingAttribute->update($attributeData);
+          $message = "Attributes Updated Successfully!";
+      } else {
+          // Create a new record
+          Attributes::create($attributeData);
+          $message = "Attributes Added Successfully!";
+      }
+      
+      $responseData = ['success' => 'success', 'error' => '', 'msg' => $message];
+    } catch (Exception $ex) {
+      $message = $ex->getMessage();
+      $responseData = ['success' => 'failure', 'error' => '', 'msg' => $message];
+    }
+
+    return response()->json($responseData);
+
+
+    
 
   }
 
