@@ -123,10 +123,14 @@ class SensorDataInsertApi extends Controller
                                     
                                     if ($sensorData->min_value != '' && $sensorvalue < $sensorData->min_value) {
                                         $this->savealarmhistory($device_id, $uid, $sensorData->min_value, $sensorvalue, $data['created_at'], $sensor_name);
+                                        SendEmailJob::dispatch($user, $sensorData->sensor_name, $sensorData->min_value, $sensorData->max_value, $sensorvalue);
+                                        //SendEmailJob::dispatch($user['email'], "Min Value Alert - {$sensorData->sensor_name}", "Min value set is {$sensorData->min_value}");
                                     }
 
                                     if ($sensorData->max_value != '' && $sensorvalue > $sensorData->max_value) {
                                         $this->savealarmhistory($device_id, $uid, $sensorData->max_value, $sensorvalue, $data['created_at'], $sensor_name);
+                                        SendEmailJob::dispatch($user, $sensorData->sensor_name, $sensorData->min_value, $sensorData->max_value, $sensorvalue);
+                                        //SendEmailJob::dispatch($user['email'], "Max Value Alert - {$sensorData->sensor_name}", "Max value set is {$sensorData->max_value}");
                                     }
                                 }
                             }
