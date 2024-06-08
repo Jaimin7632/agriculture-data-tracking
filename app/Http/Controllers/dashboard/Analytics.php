@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Jenssegers\Mongodb\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ChangeDeviceName;
+use App\Models\ChangeGraphName;
 use App\Models\User;
 use App\Models\SensorData;
 use App\Models\SetLatLong;
@@ -68,7 +69,7 @@ class Analytics extends Controller
     $humiditySensorValues = [];
     $temperatureSensorValues = [];
     $post_data = $request->all();
-
+    $User_Id = $post_data['User_Id'];
     $device_id = $post_data['device_id'];
     $fromDate = $post_data['from_date'];
     $toDate = $post_data['to_date'];
@@ -122,7 +123,7 @@ class Analytics extends Controller
               ->get()
               ->toArray();
       }
-      
+      // echo "<pre>"; print_r($sensor_data); die();
       $outputArray = [];
       $sensorConfig = config('global');
       $sensorValues = [];
@@ -131,13 +132,19 @@ class Analytics extends Controller
           $formattedDateTime = $item['created_at'];
           $dateTime = new \DateTime($formattedDateTime);
           $createdAt = $dateTime->format('Y-m-d H:i:s');
-          // echo "<pre>"; print_r($item['sensor_data']); die;
+          
           $changedateBycountry =  Country::changedateBytimezone($dateTime, $authuser->timezone)->format('Y-m-d H:i:s');
           $temperatureValues = [];
           $humidityValues = [];
           // Initialize an array to store sensor values dynamically
           foreach ($item['sensor_data'] as $sensorName => $sensorDetails) {
              
+              // $graphname = ChangeGraphName::where('original_name', 'like', '%' . $sensorName . '%')->where('device_id', $device_id)->where('user_id', $User_Id)->first();
+              // $sensorValues[$sensorName]['changename'] = $sensorName;
+              // if (!empty($graphname)) {
+              //   $sensorValues[$sensorName]['changename'] = $graphname->change_name;
+              // }
+
               $sensorValueKey = $sensorName;
               $sensorValueType = isset($sensor_data[0]['sensor_data'][$sensorValueKey]['type']) ? $sensor_data[0]['sensor_data'][$sensorValueKey]['type'] : "graph" ;
               $sensorValueColor = $sensorDetails['unit'];
@@ -148,7 +155,7 @@ class Analytics extends Controller
               $sensorValues[$sensorName]['spname'] = $sensorName;
               $sensorValues[$sensorName]['unit'] = $sensorDetails['unit'];
               
-              if (strpos($sensorName, "AirPressure") !== false) {
+              if (strpos($sensorName, "pressure") !== false) {
                 $sensorValues[$sensorName]['color'] = '#33FF57';
                 $sensorValues[$sensorName]['icon'] = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#33FF57" width="50"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M14,19V17.73a8,8,0,1,0-4,0V19H2v3H22V19ZM6.12,11.17A5.9,5.9,0,0,1,6.46,7.7a6,6,0,1,1,7.84,7.84,5.9,5.9,0,0,1-3.47.34,6,6,0,0,1-4.71-4.71ZM11,14.05A1.41,1.41,0,0,1,10.5,13c.17-1.9,1.5-7.5,1.5-7.5s1.33,5.6,1.5,7.5a1.39,1.39,0,0,1-.45,1.05h0l0,0A1.45,1.45,0,0,1,11,14.05ZM7,10H8v1H7Zm9,0h1v1H16Zm0-2H15V7h1ZM8,7H9V8H8Zm3-1H10V5h1Zm3,0H13V5h1Z"></path><rect width="24" height="24" fill="none"></rect></g></svg>';
               } else if (strpos($sensorName, "SoilWetness") !== false){
@@ -259,6 +266,11 @@ class Analytics extends Controller
       
       foreach ($sensorValues as $sensorName => $sensorData) {
         $sensorValueType = $sensorData['type'];
+        $graphname = ChangeGraphName::where('original_name', 'like', '%' . $sensorName . '%')->where('device_id', $device_id)->where('user_id', $User_Id)->first();
+        $sensorValues[$sensorName]['changename'] = $sensorName;
+        if (!empty($graphname)) {
+          $sensorValues[$sensorName]['changename'] = $graphname->change_name;
+        }
         //echo $sensorValueType;
         if ($sensorValueType == 'lastvalue') {
           $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][0];
@@ -288,7 +300,7 @@ class Analytics extends Controller
 
         }
       }  
-      //echo "<pre>";print_r($sensorValues);exit;
+      // echo "<pre>";print_r($sensorValues);exit;
 
       // Check if 'location' key exists
       /*if (isset($sensorValues['location'])) {
@@ -357,6 +369,41 @@ class Analytics extends Controller
       }else{
         $updateData = ['change_name'=>$change_text, "updated_at" => date('Y-m-d H:i:s')];
         ChangeDeviceName::where("user_id", $user_id)->where("device_id", $device_id)->update($updateData);
+      }
+
+      $message = "SUCCESS";
+      $responseData = ['success' => 'success', 'error' => '', 'msg' => $message];
+    } catch (Exception $ex) {
+      $message = $ex->getMessage();
+      $responseData = ['success' => 'failure', 'error' => '', 'msg' => $message];
+    }
+
+    return response()->json($responseData);
+
+  }
+
+  public function change_graph_name(Request $request){
+
+    $post_data = $request->all();
+    //echo "<pre>"; print_r($post_data); exit();
+    $user_id = $post_data['user_id'];
+    $change_text = $post_data['change_text'];
+    $device_id = $post_data['device_id'];
+    $original_name = $post_data['original_name'];
+
+    try {
+      $change_text_data = ChangeGraphName::where('user_id', $user_id)->where('device_id', $device_id)->where('original_name', $original_name)->first();
+      //echo "<pre>"; print_r($change_text_data); die();
+      if (empty($change_text_data)) {
+        ChangeGraphName::create([
+            'user_id' => $user_id,
+            'device_id' => $device_id,
+            'original_name' => $original_name,
+            'change_name' => $change_text,
+        ]);
+      }else{
+        $updateData = ['change_name'=>$change_text, "updated_at" => date('Y-m-d H:i:s')];
+        ChangeGraphName::where("user_id", $user_id)->where("device_id", $device_id)->where("original_name", $original_name)->update($updateData);
       }
 
       $message = "SUCCESS";

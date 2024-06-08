@@ -69,6 +69,7 @@ Route::group(['middleware' => ['auth']], function () {
 	Route::post('/savelatlong', [Analytics::class, 'savelatlong'])->name("savelatlong");
 
 	Route::post('/get-alarm-data-by-sensorname', [Analytics::class, 'get_alarm_data_by_sensorname'])->name("get-alarm-data-by-sensorname");
+	Route::post('/change-graph-name', [Analytics::class, 'change_graph_name'])->name("change-graph-name");
 	// Graph Data End
 
 	// layout

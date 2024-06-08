@@ -335,6 +335,25 @@
           </div>
       </div>
 
+      <!-- Modal Set Graph Name-->
+      <div class="modal fade" id="setgraphname<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="changeNameModalLabel">Change Graph Name</h5>
+                  </div>
+                  <div class="modal-body">
+                      <input type="text" name="change_graph_name" id="graph_name_textbox<?php echo $value; ?>" class="form-control" placeholder="Enter new name">
+                      <input type="hidden" name="original_graph_name" id="original_graph_name_textbox<?php echo $value; ?>" class="form-control" placeholder="Enter new name">
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-primary" onclick="changegraphname('<?php echo $value; ?>')">Cambiar</button>
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+
       <!-- Modal Summary-->
       <div class="modal fade" id="summury<?php echo $value; ?>" tabindex="-1" role="dialog" aria-labelledby="changeNameModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document" style="max-width: 57rem">
@@ -731,6 +750,71 @@ $(document).ready(function() {
     });
   }
 
+  function changegraphname(device_id) {
+    
+    var device_id = device_id;
+    var user_id = $("#User_Id").val();
+    var change_text = $("#graph_name_textbox"+device_id).val();
+    var original_name = $("#original_graph_name_textbox"+device_id).val();
+    // console.log(device_id);
+    // console.log(user_id);
+    // console.log(change_text);
+    if (change_text =="") {
+        return false;
+    }
+    $.ajax({
+        type: 'POST',
+        url: '{{ route("change-graph-name") }}',
+        data: {device_id:device_id,user_id:user_id,change_text:change_text,original_name:original_name,_token:"{{ csrf_token() }}"},
+        // dataType: 'json',
+        success: function (response) {
+          $("#setgraphname"+device_id).modal('hide');
+            //console.log(response);
+            //return false;
+            if (response.success == 'success') {
+
+                Swal.fire({
+                    // title: 'You Dial Number!',
+                    title: 'Graph Name Update Successfully!',
+                    icon: 'success',
+                    allowOutsideClick: false,
+                    confirmButtonText: 'Ok',
+                    customClass: {
+                        confirmButton: 'btn btn-danger ml-1'
+                    },
+                    buttonsStyling: true
+                }).then(function(result) {
+                  if (result.isConfirmed) {
+                      location.reload(true);
+                  } else {
+                      location.reload(true);
+                  }
+                });
+
+            }else{
+                Swal.fire({
+                    // title: 'You Dial Number!',
+                    title: 'Graph Name Does Not Update Successfully!',
+                    icon: 'failure',
+                    allowOutsideClick: false,
+                    confirmButtonText: 'Ok',
+                    customClass: {
+                        confirmButton: 'btn btn-danger ml-1'
+                    },
+                    buttonsStyling: true
+                }).then(function(result) {
+                  if (result.isConfirmed) {
+                      location.reload(true);
+                  } else {
+                      location.reload(true);
+                  }
+                });
+            }
+            // $('.loader').fadeOut();
+        }
+    });
+  }
+
   function show_summary(device_id) {
     $("#changeNameModal"+device_id).modal('hide');
     getUserLocation(device_id);
@@ -877,6 +961,10 @@ $(document).ready(function() {
         }
     });
 
+  }
+
+  function get_graph_name(sensorName,device_id) {
+    $("#original_graph_name_textbox"+device_id).val(sensorName);
   }
 
   function saveSettings(device_id) {

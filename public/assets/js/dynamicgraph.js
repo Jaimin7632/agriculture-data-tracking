@@ -7,6 +7,7 @@ var intervalID = null; // Initialize the interval ID variable
 
 $('.graphDiv').on('click', function() {
     var device_id = $(this).attr('device-id');
+    var User_Id = $('#User_Id').val();
     $('.append_graph_blank').html("");
     $('.append_graph_single').html("");
     $("#show_alarm_history").html('');
@@ -16,20 +17,21 @@ $('.graphDiv').on('click', function() {
     console.log(device_id);
     
     // Call the function
-    graphdata(device_id, from_date, to_date);
+    graphdata(device_id, User_Id, from_date, to_date);
     
     // Clear previous interval, if any
     clearInterval(intervalID);
     
     // Start a new interval
     intervalID = setInterval(function() {
-        graphdata(device_id, from_date, to_date);
+        graphdata(device_id, User_Id, from_date, to_date);
     }, 50000);
 });
 
 
 $('.datefilter').on('click', function() {
     var device_id = $(this).attr('device-id');
+    var User_Id = $('#User_Id').val();
     $('.append_graph_blank').html("");
     $('.append_graph_single').html("");
     $('#spinner'+device_id).show();
@@ -39,19 +41,20 @@ $('.datefilter').on('click', function() {
     console.log(device_id);
     
     // Call the function
-    graphdata(device_id, from_date, to_date);
+    graphdata(device_id, User_Id, from_date, to_date);
     
     // Clear previous interval, if any
     clearInterval(intervalID);
     
     // Start a new interval
     intervalID = setInterval(function() {
-        graphdata(device_id, from_date, to_date);
+        graphdata(device_id, User_Id, from_date, to_date);
     }, 50000);
 });
 
 $('.changegraphtime').on('click', function() {
     var device_id = $(this).attr('device-id');
+    var User_Id = $('#User_Id').val();
     $('.append_graph_blank').html("");
     $('.append_graph_single').html("");
     $('#spinner'+device_id).show();
@@ -65,23 +68,23 @@ $('.changegraphtime').on('click', function() {
     console.log(device_id);
     
     // Call the function
-    graphdata(device_id, '','',selectedValuechangetime, selectedValuechangematrix);
+    graphdata(device_id,User_Id, '','',selectedValuechangetime, selectedValuechangematrix);
     
     // Clear previous interval, if any
     clearInterval(intervalID);
     
     // Start a new interval
     intervalID = setInterval(function() {
-        graphdata(device_id, '','',selectedValuechangetime, selectedValuechangematrix);
+        graphdata(device_id,User_Id, '','',selectedValuechangetime, selectedValuechangematrix);
     }, 50000);
 });
 
 // });
-  function graphdata(device_id,from_date,to_date,changetime = null, changematrix = null) {
+  function graphdata(device_id,User_Id,from_date,to_date,changetime = null, changematrix = null) {
     $.ajax({
         type: 'post',
         url: getGraphDataRoute,
-        data: {device_id:device_id,from_date:from_date,to_date:to_date,changetime:changetime,changematrix:changematrix,_token:csrfToken},
+        data: {device_id:device_id,User_Id:User_Id,from_date:from_date,to_date:to_date,changetime:changetime,changematrix:changematrix,_token:csrfToken},
         dataType: 'json',
         success: function (response) {
           //console.log('resp');
@@ -109,13 +112,19 @@ $('.changegraphtime').on('click', function() {
                       return true;
                     }
                     //console.log(sensorValues);
+
+                    var sensoricon = sensorValues.icon ?? '';
+                    var sensorcolor = sensorValues.color ?? '';
                     
-                    var readableSensorName = convertSensorName(sensorValues.spname);
-                    if (readableSensorName == 'HUMIDITY SENSOR') {
-                      readableSensorName = 'AIR '+readableSensorName;
-                    }else if(readableSensorName == 'TEMPERATURE SENSOR'){
-                      readableSensorName = 'AIR '+readableSensorName;
-                    }
+                    // var readableSensorName = convertSensorName(sensorValues.spname);
+                    // if (readableSensorName == 'HUMIDITY SENSOR') {
+                    //   readableSensorName = 'AIR '+readableSensorName;
+                    // }else if(readableSensorName == 'TEMPERATURE SENSOR'){
+                    //   readableSensorName = 'AIR '+readableSensorName;
+                    // }
+
+                    var readableSensorName = sensorValues.changename;
+
 
                     var sensorxvalue = [];
                     var sensoryvalue = [];
@@ -146,11 +155,29 @@ $('.changegraphtime').on('click', function() {
                       style: 'text-align: center; margin-top: 20px;'  // Adjust margin as needed
                     });
 
-                    var imageUrl = baseUrl +'/'+ sensorValues.icon;
+                    var imageUrl = baseUrl +'/'+ sensoricon;
                     
                     var chartTitle = $('<h3>', {
-                        html: '<button class="btn" data-bs-toggle="modal" type="button" onclick="get_sensor_alarm(\'' + sensorName + '\', \'' + devide_id + '\')" data-bs-target="#setalarm' + devide_id + '"><i class="fa fa-cog"></i></button> ' + sensorValues.icon + readableSensorName,
-                        style: 'color: ' + sensorValues.color + '; font-size: 20px; margin-bottom: 10px;'
+                        // html: '<button class="btn" data-bs-toggle="modal" type="button" onclick="get_sensor_alarm(\'' + sensorName + '\', \'' + devide_id + '\')" data-bs-target="#setalarm' + devide_id + '"><i class="fa fa-cog"></i></button> ' + sensorValues.icon + readableSensorName,
+                        // style: 'color: ' + sensorValues.color + '; font-size: 20px; margin-bottom: 10px;'
+                        html: `
+                          <div class="btn-group">
+                              <i class="fas fa-cog" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+                              <ul class="dropdown-menu">
+                                  <li>
+                                      <button class="dropdown-item" type="button" onclick="get_sensor_alarm('${sensorName}', '${devide_id}')" data-bs-toggle="modal" data-bs-target="#setalarm${devide_id}">
+                                          Set Alarm
+                                      </button>
+                                  </li>
+                                  <li>
+                                      <button class="dropdown-item" type="button" onclick="get_graph_name('${sensorName}', '${devide_id}')" data-bs-toggle="modal" data-bs-target="#setgraphname${devide_id}">
+                                          Set Graph Name
+                                      </button>
+                                  </li>
+                              </ul>
+                          </div>
+                          ${sensoricon}${readableSensorName}
+                      `
                     });
 
                     // Last Y Value
@@ -216,7 +243,7 @@ $('.changegraphtime').on('click', function() {
                             useSeriesColors: false
                           }
                         },
-                        colors: [sensorValues.color],
+                        colors: [sensorcolor],
                         grid: {
                           borderColor: borderColor,
                           xaxis: {
