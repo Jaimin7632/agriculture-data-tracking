@@ -150,7 +150,7 @@ class Analytics extends Controller
               $sensorValueColor = $sensorDetails['unit'];
                 // Add sensor values to the dynamically generated array
               $sensorValues[$sensorName]['type'] = $sensorValueType;
-              $sensorValues[$sensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $sensorDetails['value']];
+              $sensorValues[$sensorName]['data'][] = ['x' => $changedateBycountry, 'y' => number_format($sensorDetails['value'],2)];
                 
               $sensorValues[$sensorName]['spname'] = $sensorName;
               $sensorValues[$sensorName]['unit'] = $sensorDetails['unit'];
@@ -255,7 +255,7 @@ class Analytics extends Controller
                           // You can add more properties here if needed
                       ];
                   }
-                  $sensorValues[$dewPointSensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $dewPoint];
+                  $sensorValues[$dewPointSensorName]['data'][] = ['x' => $changedateBycountry, 'y' => number_format($dewPoint)];
                 }
                   
               }
@@ -555,6 +555,7 @@ class Analytics extends Controller
     $message = "Failure";
     $post_data = $request->all();
     $device_id = $post_data['device_id'];
+    $user_id = $post_data['user_id'];
     if (!empty($device_id)) {
       // $sensor_data = SensorData::where('device_id', $device_id)->get()->toArray();
       $latestSensorData = SensorData::where('device_id', $device_id)->latest('created_at')->first();
@@ -650,6 +651,7 @@ class Analytics extends Controller
 
       foreach ($sensorValues as $sensorName => $sensorData) {
         $sensorValueType = $sensorData['type'];
+
         //echo $sensorValueType;
         if ($sensorValueType == 'lastvalue') {
           $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][0];
@@ -723,13 +725,19 @@ class Analytics extends Controller
             $sensorValue = $sensorData['data'][0]['y'];
             $sensorDate = $sensorData['data'][0]['x'];
         }
+
+        $graphname = ChangeGraphName::where('original_name', 'like', '%' . $sensorName . '%')->where('device_id', $device_id)->where('user_id', $user_id)->first();
+        $graph_name = $sensorName;
+        if (!empty($graphname)) {
+          $graph_name = $graphname->change_name;
+        }
         
 
         $unit = $sensorData['unit'];
 
           $html .= '<tr style="text-align:center;">';
-          $html .= '<td>' . $sensorName . '</td>';
-          $html .= '<td>' . $sensorValue .' '. $unit . '</td>';
+          $html .= '<td>' . $graph_name . '</td>';
+          $html .= '<td>' . number_format($sensorValue,2) .' '. $unit . '</td>';
           $html .= '<td>' . $sensorDate . '</td>';
           $html .= '</tr>';
       }
