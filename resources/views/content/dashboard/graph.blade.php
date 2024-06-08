@@ -91,7 +91,8 @@
                           <h6 class="card-header m-0 me-2 pb-3 no_data_found<?php echo $value; ?>" style="display: none;"></h6>
                       </span> -->
 
-                      <span class="graphDiv opengraph<?php echo $value; ?> accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionTwo<?php echo $value; ?>" aria-expanded="false" aria-controls="accordionTwo" device-id="<?php echo $value; ?>" onclick="show_summary('<?php echo $value; ?>')"></span> 
+                      <!-- <span class="graphDiv opengraph<?php echo $value; ?> accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionTwo<?php echo $value; ?>" aria-expanded="false" aria-controls="accordionTwo" device-id="<?php echo $value; ?>" onclick="show_summary('<?php echo $value; ?>')"></span>  -->
+                      <span class="graphDiv opengraph<?php echo $value; ?> accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#accordionTwo<?php echo $value; ?>" aria-expanded="false" aria-controls="accordionTwo" device-id="<?php echo $value; ?>" data-loaded<?php echo $value; ?>="false"></span> 
                   </div>
 
 
@@ -815,7 +816,7 @@ $(document).ready(function() {
     });
   }
 
-  function show_summary(device_id) {
+/*  function show_summary(device_id) {
     $("#changeNameModal"+device_id).modal('hide');
     getUserLocation(device_id);
     $("#show_alarm_history").html('');
@@ -838,7 +839,7 @@ $(document).ready(function() {
             if (response.success == 'success') {
               showweather(device_id,latitude,longitude);
                 // location.reload(true);
-              $('.show_alarm_history'+device_id).html(response.html);
+              // $('.show_alarm_history'+device_id).html(response.html);
 
             }else{
                showweather(device_id,latitude,longitude); 
@@ -847,7 +848,7 @@ $(document).ready(function() {
         }
     });
 
-  }
+  }*/
 
 
   function show_alarmhistory(device_id) {

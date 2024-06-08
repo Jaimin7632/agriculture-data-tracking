@@ -7,25 +7,32 @@ var intervalID = null; // Initialize the interval ID variable
 
 $('.graphDiv').on('click', function() {
     var device_id = $(this).attr('device-id');
-    var User_Id = $('#User_Id').val();
-    $('.append_graph_blank').html("");
-    $('.append_graph_single').html("");
-    $("#show_alarm_history").html('');
-    $('#spinner'+device_id).show();
-    var from_date = $(".from_date").val();
-    var to_date = $(".to_date").val();
-    console.log(device_id);
-    
-    // Call the function
-    graphdata(device_id, User_Id, from_date, to_date);
-    
-    // Clear previous interval, if any
-    clearInterval(intervalID);
-    
-    // Start a new interval
-    intervalID = setInterval(function() {
-        graphdata(device_id, User_Id, from_date, to_date);
-    }, 50000);
+    // var $this = $(this).attr('data-loaded'+device_id)
+    // if ($this == 'false') {
+
+      var User_Id = $('#User_Id').val();
+      $('.append_graph_blank').html("");
+      $('.append_graph_single').html("");
+      $("#show_alarm_history").html('');
+      $('#spinner'+device_id).show();
+      var from_date = $(".from_date").val();
+      var to_date = $(".to_date").val();
+      console.log(device_id);
+      
+      // Call the function
+      graphdata(device_id, User_Id, from_date, to_date);
+      // $(this).attr('data-loaded'+device_id, 'true');
+      // Clear previous interval, if any
+      clearInterval(intervalID);
+      
+      // Start a new interval
+      intervalID = setInterval(function() {
+          graphdata(device_id, User_Id, from_date, to_date);
+      }, 50000);
+
+    // }else {
+    //     console.log('AJAX call skipped for device ID:');
+    // }
 });
 
 
@@ -81,6 +88,9 @@ $('.changegraphtime').on('click', function() {
 
 // });
   function graphdata(device_id,User_Id,from_date,to_date,changetime = null, changematrix = null) {
+    $("#show_alarm_history").html('');
+    $(".weather_hd").hide();
+    getUserLocation(device_id);
     $.ajax({
         type: 'post',
         url: getGraphDataRoute,
@@ -89,10 +99,16 @@ $('.changegraphtime').on('click', function() {
         success: function (response) {
           //console.log('resp');
             //console.log(response);
-              $('#spinner'+device_id).hide();
+            $('#spinner'+device_id).hide();
               // localStorage.screenname = "callcenter";
               // setCurrentScreen(localStorage.screenname);
-              if(response.status == "success"){
+            if(response.status == "success"){
+                $('.show_alarm_history'+device_id).html(response.html);
+                var latitude = $('#onloadlatitude'+device_id).val();
+                var longitude = $('#onloadlongitude'+device_id).val();
+                showweather(device_id,latitude,longitude);
+                
+
                 $('.no_data_found').hide();
                 $('.no_data_found'+response.devide_id).hide();
                 var sensorData = response.data.sensordata;
@@ -379,6 +395,7 @@ $('.changegraphtime').on('click', function() {
                     
                 });
 
+                
             }
 
         }
