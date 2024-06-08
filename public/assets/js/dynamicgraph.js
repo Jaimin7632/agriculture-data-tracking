@@ -177,18 +177,22 @@ $('.changegraphtime').on('click', function() {
                               </ul>
                           </div>
                           ${sensoricon}${readableSensorName}
-                      `
+                          <span style="color: #4c4e4f; font-size: 28px;">
+                              ${Math.round(sensorValues.data[sensorValues.data.length - 1].y * 100) / 100} ${sensorValues.unit}
+                          </span>
+                      `,
+                      style: 'color: #4c4e4f; font-size: 20px; margin-bottom: 10px;'
                     });
 
                     // Last Y Value
-                    var lastYValue = $('<h3>', {
-                      text: Math.round(sensorValues.data[sensorValues.data.length - 1].y * 100)/100 + ' ' + sensorValues.unit,
-                      style: 'color: #4c4e4f; font-size: 28px;'  // Adjust font-size as needed
-                    });
+                    // var lastYValue = $('<h3>', {
+                    //   text: Math.round(sensorValues.data[sensorValues.data.length - 1].y * 100)/100 + ' ' + sensorValues.unit,
+                    //   style: 'color: #4c4e4f; font-size: 28px;'  // Adjust font-size as needed
+                    // });
 
                     // Append elements to the container
                     divElement.append(chartTitle);
-                    divElement.append(lastYValue);
+                    // divElement.append(lastYValue);
 
                     // Append the container to the 'divElement'
                     divElement.append(container);
