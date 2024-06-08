@@ -19,7 +19,7 @@ float sensorValues[numSensors] = {0};
 // Server details
 // const char server[] = "16.171.60.141";
 // const int port = 8000;
-const char endpoint[] = "https://portal.agromolinainnova.com/login/api/sensordatastore";
+const char endpoint[] = "https://portal.agromolinainnova.com/api/sensordatastore";
 
 // lora code with i2c
 #define BUFFER_SIZE 6000 // Tamaño máximo del buffer para almacenar el paquete JSON
@@ -112,8 +112,8 @@ void receiveEvent(int numBytes) {
           memset(rxBuffer, 0, BUFFER_SIZE);
           // Verificar si se pudo deserializar correctamente
           if (error) {
-            Serial.println("Error al parsear el JSON recibido");
-            Serial.println(error.f_str());
+//             Serial.println("Error al parsear el JSON recibido");
+//             Serial.println(error.f_str());
           }
           break;
       }
@@ -149,7 +149,7 @@ void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
     if (true) {
       // Deserializar el JSON almacenado en el buffer
       Serial.println("checkpoint before string to json of i2c");
-      serializeJsonPretty(jsonDoc, Serial);
+//       serializeJsonPretty(jsonDoc, Serial);
       // Verificar si se pudo deserializar correctamente
       if (1) {
         // Obtener el ID del JSON recibido
@@ -232,8 +232,8 @@ void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
     }else{
       // Get HTTPS header information
       String header = modem.https_header();
-      Serial.print("HTTP Header : ");
-      Serial.println(header);
+//       Serial.print("HTTP Header : ");
+//       Serial.println(header);
 
       // Get HTTPS response
       String body = modem.https_body();
