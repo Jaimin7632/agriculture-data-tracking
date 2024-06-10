@@ -284,9 +284,9 @@ class Analytics extends Controller
         if ($sensorValueType == 'lastvalue') {
           $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][0];
           $sensorValues[$sensorName]['type'] = 'single';
-
-          $sensorValuetbl = $sensorData['data']['y'];
-          $sensorDatetbl = $sensorData['data']['x'];
+          
+          $sensorValuetbl = $sensorData['data'][0]['y'];
+          $sensorDatetbl = $sensorData['data'][0]['x'];
 
         }else if($sensorValueType == 'location'){
           $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][0];
