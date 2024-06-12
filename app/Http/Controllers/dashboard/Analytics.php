@@ -150,7 +150,7 @@ class Analytics extends Controller
               $sensorValueColor = $sensorDetails['unit'];
                 // Add sensor values to the dynamically generated array
               $sensorValues[$sensorName]['type'] = $sensorValueType;
-              $sensorValues[$sensorName]['data'][] = ['x' => $changedateBycountry, 'y' => number_format($sensorDetails['value'],2)];
+              $sensorValues[$sensorName]['data'][] = ['x' => $changedateBycountry, 'y' => round($sensorDetails['value'],2)];
                 
               $sensorValues[$sensorName]['spname'] = $sensorName;
               $sensorValues[$sensorName]['unit'] = $sensorDetails['unit'];
@@ -750,7 +750,7 @@ class Analytics extends Controller
           ->whereBetween('created_at', [$fromDate, $toDate])
           ->get()
           ->toArray();
-
+      // echo "<pre>"; print_r($exportdata); die();    
       // Check if data is empty
       if (empty($exportdata)) {
           return response()->json(['status' => 'failure', 'message' => 'No data found']);
@@ -763,12 +763,20 @@ class Analytics extends Controller
       $response = new StreamedResponse(function () use ($exportdata) {
           $handle = fopen('php://output', 'w');
 
+          // Get the keys for the header from the first flattened row
+          $headerWritten = false;
           // Write CSV header
-          fputcsv($handle, array_keys($exportdata[0]));
-
-          // Write CSV data
           foreach ($exportdata as $row) {
-              fputcsv($handle, $row);
+              $flattened_row = $this->flatten_array($row);
+
+              // Write the header if not written yet
+              if (!$headerWritten) {
+                  fputcsv($handle, array_keys($flattened_row));
+                  $headerWritten = true;
+              }
+
+              // Write the data row
+              fputcsv($handle, $flattened_row);
           }
 
           fclose($handle);
@@ -780,6 +788,18 @@ class Analytics extends Controller
 
       // Return success response
       return $response;
+  }
+
+  public function flatten_array($array, $prefix = '') {
+      $result = [];
+      foreach ($array as $key => $value) {
+          if (is_array($value)) {
+              $result = array_merge($result, $this->flatten_array($value, $prefix . $key . '_'));
+          } else {
+              $result[$prefix . $key] = $value;
+          }
+      }
+      return $result;
   }
 
   function cleanData(&$str)
