@@ -190,7 +190,7 @@ void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
               receivedData[id] = idObject;
 
               // Print the JSON received
-              serializeJsonPretty(jsonDoc, Serial);
+//               serializeJsonPretty(jsonDoc, Serial);
             }
       }
     }

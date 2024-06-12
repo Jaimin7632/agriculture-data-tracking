@@ -13,7 +13,7 @@ const float pressureMaxRange = 0.2; // set pressure sensor range in MPa
 
 float sensorValues[numSensors] = {0};
 // Server details
-const char server[] = "16.171.60.141";
+const char server[] = "portal.agromolinainnova.com";
 const int port = 8000;
 const char endpoint[] = "/api/sensordatastore";
 
@@ -23,11 +23,13 @@ const char endpoint[] = "/api/sensordatastore";
 #include <Adafruit_AHTX0.h>
 
 // lora code with i2c
-#define BUFFER_SIZE 400 // Tamaño máximo del buffer para almacenar el paquete JSON
-
+#define BUFFER_SIZE 6000 // Tamaño máximo del buffer para almacenar el paquete JSON
+int CHUNK_SIZE  = 32;
 DynamicJsonDocument jsonDoc(BUFFER_SIZE); // Crear un documento JSON dinámico
 char rxBuffer[BUFFER_SIZE]; // Buffer para almacenar los datos recibidos por I2C
 int rxIndex = 0; // Índice para realizar un seguimiento del tamaño actual del buffer
+String i2cJsonString = "";
+String serverJsonString = "";
 // end lora code with i2c
 
 WiFiClient client;
@@ -83,60 +85,99 @@ void addSensorDataToJson(DynamicJsonDocument& jsonDocument) {
 // lora code with i2c
 void receiveEvent(int numBytes) {
   // Reiniciar el buffer y el índice
-  memset(rxBuffer, 0, BUFFER_SIZE);
-  rxIndex = 0;
 
-  // Leer los datos recibidos por I2C y almacenarlos en el buffer
-  while (Wire.available() > 0 && rxIndex < BUFFER_SIZE) {
-    char c = Wire.read(); // Leer un byte del bus I2C
-    rxBuffer[rxIndex++] = c; // Almacenar el byte en el buffer
+  if (numBytes > 0) {
+    while (Wire.available()) {
+      char c = Wire.read();
+      if (c=='\0')
+      {
+          rxIndex = 0;
+          Serial.print("Received JSON: ");
+          DeserializationError error = deserializeJson(jsonDoc, rxBuffer);
+          Serial.println(rxBuffer);
+          memset(rxBuffer, 0, BUFFER_SIZE);
+          // Verificar si se pudo deserializar correctamente
+          if (error) {
+//             Serial.println("Error al parsear el JSON recibido");
+//             Serial.println(error.f_str());
+          }
+          break;
+      }
+      rxBuffer[rxIndex++] = c;
+      //i2cJsonString += c;  // receive the actual JSON string chunk
+      }
+
   }
-
-
+}
+void requestEvent() {
+//   String jsonString = "{\"time\":15000}";
+  int jsonLength = serverJsonString.length();
+  int numChunks = jsonLength / CHUNK_SIZE;
+  int remainder = jsonLength % CHUNK_SIZE;
+  // Send JSON string in chunks
+  for (int i = 0; i < numChunks; i++) {
+    for (int j = 0; j < CHUNK_SIZE; j++) {
+      Wire.write((uint8_t)serverJsonString[i * CHUNK_SIZE + j]);
+    }
+  }
+  if (remainder > 0) {
+    for (int i = 0; i < remainder; i++) {
+      Wire.write((uint8_t)serverJsonString[numChunks * CHUNK_SIZE + i]);
+    }
+  }
+  Wire.write('\0');
 }
 
 
 void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
      // Deserializar el JSON solo si se recibieron datos
     JsonObject receivedData;
-    if (rxIndex > 0) {
+    if (true) {
       // Deserializar el JSON almacenado en el buffer
-      DeserializationError error = deserializeJson(jsonDoc, rxBuffer);
-      Serial.println(rxBuffer);
+      Serial.println("checkpoint before string to json of i2c");
+//       serializeJsonPretty(jsonDoc, Serial);
       // Verificar si se pudo deserializar correctamente
-      if (error) {
-        Serial.println("Error al parsear el JSON recibido");
-      } else {
+      if (1) {
         // Obtener el ID del JSON recibido
-        const char* id = jsonDoc["id"];
-         serializeJsonPretty(jsonDoc, Serial);
+            // Iterate over the top-level keys (IDs)
+            for (JsonPair idEntry : jsonDoc.as<JsonObject>()) {
+              JsonObject idObject = idEntry.value().as<JsonObject>();
 
-        // Create a new JSON object for the sensor data under the ID key
-        JsonObject sensorDataNode = jsonDocument["sensor_data"];
-        if(sensorDataNode.isNull()){
-          sensorDataNode = jsonDocument.createNestedObject("sensor_data");
-        }
-        // Iterate over each sensor in the sensor data
-        for (JsonPair sensorEntry : jsonDoc.as<JsonObject>()) {
-            // Skip the entry if its key is "id"
-            if (strcmp(sensorEntry.key().c_str(), "id") == 0) {
-                continue;
+              const char* id = idObject["id"];
+
+              // Create a new JSON object for the sensor data under the ID key
+              jsonDocument["device_id"] = device_id;
+              JsonObject sensorDataNode = jsonDocument["sensor_data"];
+              if(sensorDataNode.isNull()){
+                sensorDataNode = jsonDocument.createNestedObject("sensor_data");
+              }
+
+              // Iterate over each sensor in the sensor data
+              for (JsonPair sensorEntry : idObject) {
+                // Skip the entry if its key is "id"
+                if (strcmp(sensorEntry.key().c_str(), "id") == 0) {
+                  continue;
+                }
+
+                // Extract sensor name, value, and unit from sensor data
+                const char* sensorName = sensorEntry.key().c_str();
+                String finalSensorName = String(id) + sensorName;
+                JsonObject sensor = sensorEntry.value().as<JsonObject>();
+                float value = sensor["value"];
+                const char* unit = sensor["unit"];
+
+                // Create a new JSON object for the sensor
+                JsonObject sensorNode = sensorDataNode.createNestedObject(finalSensorName);
+                sensorNode["value"] = value;
+                sensorNode["unit"] = unit;
+              }
+
+              // Update receivedData with the modified JSON document (if you have such a structure)
+              receivedData[id] = idObject;
+
+              // Print the JSON received
+//               serializeJsonPretty(jsonDoc, Serial);
             }
-
-            // Extract sensor name, value, and unit from sensor data
-            const char* sensorName = sensorEntry.key().c_str();
-            String finalSensorName = String(id) + sensorName;
-            JsonObject sensor = sensorEntry.value().as<JsonObject>();
-            float value = sensor["value"];
-            const char* unit = sensor["unit"];
-
-            // Create a new JSON object for the sensor
-            JsonObject sensorNode = sensorDataNode.createNestedObject(finalSensorName);
-            sensorDataNode["value"] = value;
-            sensorDataNode["unit"] = unit;
-        }
-        receivedData[id] = jsonDoc;
-        // Imprimir el JSON recibido
       }
     }
 
@@ -148,6 +189,7 @@ void setup() {
     // start lora code with i2c
     Wire.begin(8); // Inicializar el dispositivo I2C con dirección 8
     Wire.onReceive(receiveEvent); // Configurar el evento de recepción de datos por I2C
+    Wire.onRequest(requestEvent); // register event
     // end lora code with i2c
     Serial.println("Connecting to WiFi...");
 
@@ -159,21 +201,13 @@ void setup() {
     }
     Serial.println("\nConnected to WiFi");
 
-    if (!aht.begin()) {
-        Serial.println("Could not find AHT? Check wiring");
-        while (1) delay(10);
-    }
-    Serial.println("AHT10 or AHT20 found");
 
 }
 
 void loop() {
-    // Read sensor values
-    readSensors();
 
     // Create JSON object
     DynamicJsonDocument jsonDocument(256);
-    addSensorDataToJson(jsonDocument);
     updateJsonDocument(jsonDocument);
 
     // Serialize JSON document
@@ -197,10 +231,11 @@ void loop() {
             String body = payload.substring(bodyIndex + 4); // Add 4 to skip "\r\n\r\n"
             Serial.println("Body:");
             Serial.println(body);
-            DynamicJsonDocument responseData(512); // Adjust buffer size according to your JSON payload size
-            DeserializationError error = deserializeJson(responseData, body);
-            const char* wifi_id = responseData["data"]["wifi_id"];
-            const char* wifi_password = responseData["data"]["wifi_password"];
+            serverJsonString = body;
+//             DynamicJsonDocument responseData(512); // Adjust buffer size according to your JSON payload size
+//             DeserializationError error = deserializeJson(responseData, body);
+//             const char* wifi_id = responseData["data"]["wifi_id"];
+//             const char* wifi_password = responseData["data"]["wifi_password"];
 
 
         } else {
@@ -216,5 +251,5 @@ void loop() {
     // Delay or other code here
 
     // Delay before sending next data
-    delay(60 * 5000);
+    delay(20 * 1000);
 }
