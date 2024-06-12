@@ -176,7 +176,7 @@ void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
               receivedData[id] = idObject;
 
               // Print the JSON received
-              serializeJsonPretty(jsonDoc, Serial);
+//               serializeJsonPretty(jsonDoc, Serial);
             }
       }
     }
@@ -201,11 +201,6 @@ void setup() {
     }
     Serial.println("\nConnected to WiFi");
 
-    if (!aht.begin()) {
-        Serial.println("Could not find AHT? Check wiring");
-        while (1) delay(10);
-    }
-    Serial.println("AHT10 or AHT20 found");
 
 }
 
@@ -236,7 +231,7 @@ void loop() {
             String body = payload.substring(bodyIndex + 4); // Add 4 to skip "\r\n\r\n"
             Serial.println("Body:");
             Serial.println(body);
-            serverJsonString = body
+            serverJsonString = body;
 //             DynamicJsonDocument responseData(512); // Adjust buffer size according to your JSON payload size
 //             DeserializationError error = deserializeJson(responseData, body);
 //             const char* wifi_id = responseData["data"]["wifi_id"];
@@ -256,5 +251,5 @@ void loop() {
     // Delay or other code here
 
     // Delay before sending next data
-    delay(60 * 5000);
+    delay(20 * 1000);
 }
