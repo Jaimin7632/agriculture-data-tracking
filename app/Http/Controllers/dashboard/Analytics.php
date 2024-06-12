@@ -256,18 +256,38 @@ class Analytics extends Controller
       }
 
       // echo "<pre>";print_r($sensorValues);exit;
+
+      $html = '<div class="table-responsive">';
+      $html .= '<table class="table table-bordered">';
+      $html .= '<thead>';
+      $html .= '<tr style="text-align:center; font-family:math">';
+      $html .= '<th colspan="3">Summary</th>'; // Spanning all columns for the title
+      $html .= '</tr>';
+      $html .= '<tr style="text-align:center; font-family:math">';
+      $html .= '<th>Sensor Name</th>';
+      $html .= '<th>Value</th>';
+      $html .= '<th>Date</th>';
+      $html .= '</tr>';
+      $html .= '</thead>';
+      $html .= '<tbody>';
       
       foreach ($sensorValues as $sensorName => $sensorData) {
         $sensorValueType = $sensorData['type'];
         $graphname = ChangeGraphName::where('original_name', 'like', '%' . $sensorName . '%')->where('device_id', $device_id)->where('user_id', $User_Id)->first();
         $sensorValues[$sensorName]['changename'] = $sensorName;
+        $graph_name = $sensorName;
         if (!empty($graphname)) {
           $sensorValues[$sensorName]['changename'] = $graphname->change_name;
+          $graph_name = $graphname->change_name;
         }
         //echo $sensorValueType;
         if ($sensorValueType == 'lastvalue') {
           $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][0];
           $sensorValues[$sensorName]['type'] = 'single';
+          
+          $sensorValuetbl = $sensorData['data'][0]['y'];
+          $sensorDatetbl = $sensorData['data'][0]['x'];
+
         }else if($sensorValueType == 'location'){
           $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][0];
           $sensorValues[$sensorName]['type'] = 'location';
@@ -286,13 +306,32 @@ class Analytics extends Controller
           $LocationAddress = $address->original['address'];
           $sensorValues[$sensorName]['data'] = ['x' => $xValue, 'y' => $latLongStr, 'address' => $LocationAddress,'Latitude' => $latitude, 'Longitude' => $longitude];
 
+          $sensorValuetbl = $yValue;
+          $sensorDatetbl = $xValue;
           //print_r($sensorData['data']);
         }else{
           
-           $sensorValues[$sensorName]['type'] = 'multi';
+          $sensorValues[$sensorName]['type'] = 'multi';
+
+          $lastDataPoint = end($sensorData['data']);
+
+          $sensorValuetbl = $lastDataPoint['y'];
+          $sensorDatetbl = $lastDataPoint['x'];
 
         }
-      }  
+        $sensorValuetbl = (float) $sensorValuetbl;
+        $unit = $sensorData['unit'];
+        $html .= '<tr style="text-align:center;">';
+        $html .= '<td>' . $graph_name . '</td>';
+        $html .= '<td>' . number_format($sensorValuetbl,2) .' '. $unit . '</td>';
+        $html .= '<td>' . $sensorDatetbl . '</td>';
+        $html .= '</tr>';
+
+      }
+
+      $html .= '</tbody>';
+      $html .= '</table>';
+      $html .= '</div>';  
       // echo "<pre>";print_r($sensorValues);exit;
 
       // Check if 'location' key exists
@@ -319,7 +358,7 @@ class Analytics extends Controller
         $data = ['sensordata' => $sensorValues];
     }
 
-     $responseData = ['status' => $success, 'msg' => $message, 'data' => $data, 'devide_id' => $device_id, 'sensorconfig' => $sensorConfig];
+     $responseData = ['status' => $success, 'msg' => $message, 'data' => $data, 'devide_id' => $device_id, 'sensorconfig' => $sensorConfig, 'html' => $html];
      
     //return view('content/dashboard/graph', compact('soialSensorValues'));
     return response()->json($responseData);
@@ -541,7 +580,7 @@ class Analytics extends Controller
 
   }
 
-  public function get_show_summary(Request $request){
+  /*public function get_show_summary(Request $request){
 
     $authuser = Auth::user();
 
@@ -598,41 +637,6 @@ class Analytics extends Controller
 
           }
 
-          // foreach ($temperatureValues as $key => $temperatureCelsius) {
-          //     // Check if the corresponding humidity value exists
-          //     if (isset($humidityValues[$key])) {
-
-          //       $temperatureCelsiusval = $temperatureCelsius['value'];
-          //       $temperatureType = $temperatureCelsius['type'];
-
-          //       // Get the humidity value and its type
-          //       $humidityValue = $humidityValues[$key]['value'];
-          //       $humidityType = $humidityValues[$key]['type'];
-
-          //       if ($temperatureCelsiusval != '' && $humidityValue != '') {
-          //         // Calculate the DPV for the current set of temperature and humidity values
-          //         $dewPoint = $this->calculateDewPoint($temperatureCelsiusval, $humidityValue);
-          //         if ($dewPoint == '') {
-          //           $dewPoint = 10;
-          //         }
-          //         // Create a new sensor name for DPV and store its value
-          //         $dewPointSensorName = 'DewPoint_' . ($key + 1);
-          //         if (!isset($sensorValues[$dewPointSensorName])) {
-          //             $sensorValues[$dewPointSensorName] = [
-          //                 'type' => 'multi',
-          //                 'data' => [],
-          //                 'spname' => $dewPointSensorName,
-          //                 'unit' => 'MA',
-          //                 'color' => '#FF33C7',
-          //                 'icon' => '<svg viewBox="0 0 24 24" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 4H20M15 8H20M17 12H20M8 15.9998C7.44772 15.9998 7 16.4475 7 16.9998C7 17.5521 7.44772 17.9998 8 17.9998C8.55228 17.9998 9 17.5521 9 16.9998C9 16.4475 8.55228 15.9998 8 15.9998ZM8 15.9998V9M8 16.9998L8.00707 17.0069M12 16.9998C12 19.209 10.2091 20.9998 8 20.9998C5.79086 20.9998 4 19.209 4 16.9998C4 15.9854 4.37764 15.0591 5 14.354L5 6C5 4.34315 6.34315 3 8 3C9.65685 3 11 4.34315 11 6V14.354C11.6224 15.0591 12 15.9854 12 16.9998Z" stroke="#FF33C7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>',
-          //                 // You can add more properties here if needed
-          //             ];
-          //         }
-          //         $sensorValues[$dewPointSensorName]['data'][] = ['x' => $changedateBycountry, 'y' => $dewPoint];
-          //       }
-                  
-          //     }
-          // }
       }
 
       foreach ($sensorValues as $sensorName => $sensorData) {
@@ -668,22 +672,6 @@ class Analytics extends Controller
         }
       }
 
-      // Check if 'location' key exists
-      /*if (isset($sensorValues['location'])) {
-          // Accessing 'location' data
-          $locationData = $sensorValues['location']['data'];
-          $xValue = $locationData['x'];
-          $yValue = $locationData['y'];
-
-          $coordinates = explode(',', $yValue);
-          $latitude = $coordinates[0];
-          $longitude = $coordinates[1];
-          $latLongStr = 'Latitude: '.$latitude.'° N'.', Longitude: '.$longitude.'° W';
-
-          $address = $this->getAddressFromCoordinates($latitude,$longitude);
-          $LocationAddress = $address->original['address'];
-          $sensorValues['location']['data'][0] = ['x' => $xValue, 'y' => $LocationAddress, 'address' => $LocationAddress];
-      }*/
       $html = '<div class="table-responsive">';
       $html .= '<table class="table table-bordered">';
       $html .= '<thead>';
@@ -737,7 +725,7 @@ class Analytics extends Controller
     
     $responseData = ['success' => 'success', 'error' => '', 'html' => $html];
     return response()->json($responseData);
-  }
+  }*/
 
   public function fileExport(Request $request)
   {
