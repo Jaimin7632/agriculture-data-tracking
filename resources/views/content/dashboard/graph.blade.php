@@ -472,6 +472,9 @@
                     </div>
                   </div>
                   <div class="modal-footer">
+                    <div class="spinner-border " id="exportcsv<?php echo $value; ?>" role="status" style="color: #215732; display: none;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
                       <button type="button" class="btn btn-primary" onclick="datefilterexport('<?php echo $value; ?>')">Exportar</button>
                       <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
                   </div>
@@ -884,6 +887,7 @@ $(document).ready(function() {
     var user_id = $("#User_Id").val();
     var from_date = $(".from_date_export"+device_id).val();
     var to_date = $(".to_date_export"+device_id).val();
+    $("#exportcsv"+device_id).show();
     //console.log(from_date);
     //console.log(to_date);
     // console.log(user_id);
@@ -893,6 +897,7 @@ $(document).ready(function() {
         url: '{{ route("file-export") }}',
         data: {device_id:device_id,user_id:user_id,from_date:from_date,to_date:to_date,_token:"{{ csrf_token() }}"},
         success: function (response) {
+          $("#exportcsv"+device_id).hide();
           $("#exportdata"+device_id).modal('hide');
             if (response.status === 'failure') {
                 // Show alert message if no data found
