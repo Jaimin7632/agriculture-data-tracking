@@ -807,7 +807,7 @@ class Analytics extends Controller
       // Retrieve data based on device ID and date range
       $exportdata = SensorData::where('device_id', $device_id)
           ->whereBetween('created_at', [$fromDate, $toDate])
-          ->orderBy('created_at', 'desc')
+          ->orderBy('_id', 'desc')
           ->get()
           ->toArray();
        // echo "<pre>"; print_r($exportdata); die();    
@@ -822,10 +822,23 @@ class Analytics extends Controller
       }
       $allHeaders = array_unique($allHeaders);
 
+      // Ensure 'created_at' and 'updated_at' are the last columns
+      if (($createdAtKey = array_search('created_at', $allHeaders)) !== false) {
+          unset($allHeaders[$createdAtKey]);
+          $allHeaders[] = 'created_at';
+      }
+      if (($updatedAtKey = array_search('updated_at', $allHeaders)) !== false) {
+          unset($allHeaders[$updatedAtKey]);
+          $allHeaders[] = 'updated_at';
+      }
+
       $filename = $device_id . "_data_" . date('YmdHis') . ".csv";
 
       $response = new StreamedResponse(function () use ($exportdata, $allHeaders) {
           $handle = fopen('php://output', 'w');
+
+          // Write BOM for UTF-8
+          fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
 
           fputcsv($handle, $allHeaders);
 
