@@ -727,6 +727,65 @@ class Analytics extends Controller
     return response()->json($responseData);
   }*/
 
+  public function fileExport_old(Request $request)
+  {
+      $post_data = $request->all();
+      $device_id = $post_data['device_id'];
+      $fromDate = $post_data['from_date'];
+      $toDate = $post_data['to_date'];
+
+      if ($fromDate == '' || $toDate == '') {
+          $fromDate = '1970-01-01 00:00:00';
+          $toDate = date('Y-m-d H:i:s');
+      } else {
+          $fromDate .= ' 00:00:00';
+          $toDate .= ' 23:59:59';
+      }
+
+      $exportdata = SensorData::where('device_id', $device_id)
+          ->whereBetween('created_at', [$fromDate, $toDate])
+          ->get()
+          ->toArray();
+
+      if (empty($exportdata)) {
+          return response()->json(['status' => 'failure', 'message' => 'No data found']);
+      }
+
+      $allHeaders = [];
+      foreach ($exportdata as $row) {
+          $flatRow = $this->flattenArray($row);
+          $allHeaders = array_merge($allHeaders, array_keys($flatRow));
+      }
+      $allHeaders = array_unique($allHeaders);
+
+      $filename = $device_id . "_data_" . date('YmdHis') . ".csv";
+
+      $response = new StreamedResponse(function () use ($exportdata, $allHeaders) {
+          $handle = fopen('php://output', 'w');
+
+          // Write BOM for UTF-8
+          fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+          fputcsv($handle, $allHeaders);
+
+          foreach ($exportdata as $row) {
+              $flattenedRow = $this->flattenArray($row);
+              $csvRow = [];
+              foreach ($allHeaders as $header) {
+                  $csvRow[] = $flattenedRow[$header] ?? '';
+              }
+              fputcsv($handle, $csvRow);
+          }
+
+          fclose($handle);
+      });
+
+      $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
+      $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+
+      return $response;
+  }
+
   public function fileExport(Request $request)
   {
       $post_data = $request->all();
@@ -750,53 +809,84 @@ class Analytics extends Controller
           ->whereBetween('created_at', [$fromDate, $toDate])
           ->get()
           ->toArray();
-      // echo "<pre>"; print_r($exportdata); die();    
+       // echo "<pre>"; print_r($exportdata); die();    
       // Check if data is empty
       if (empty($exportdata)) {
           return response()->json(['status' => 'failure', 'message' => 'No data found']);
       }
+      $allHeaders = [];
+      foreach ($exportdata as $row) {
+          $flatRow = $this->flattenArray($row);
+          $allHeaders = array_merge($allHeaders, array_keys($flatRow));
+      }
+      $allHeaders = array_unique($allHeaders);
 
-      // Set the filename for the CSV file
       $filename = $device_id . "_data_" . date('YmdHis') . ".csv";
 
-      // Create a StreamedResponse to output CSV data directly
-      $response = new StreamedResponse(function () use ($exportdata) {
+      $response = new StreamedResponse(function () use ($exportdata, $allHeaders) {
           $handle = fopen('php://output', 'w');
 
-          // Get the keys for the header from the first flattened row
-          $headerWritten = false;
-          // Write CSV header
+          fputcsv($handle, $allHeaders);
+
           foreach ($exportdata as $row) {
-              $flattened_row = $this->flatten_array($row);
-
-              // Write the header if not written yet
-              if (!$headerWritten) {
-                  fputcsv($handle, array_keys($flattened_row));
-                  $headerWritten = true;
+              $flattenedRow = $this->flattenArray($row);
+              $csvRow = [];
+              foreach ($allHeaders as $header) {
+                  $csvRow[] = $flattenedRow[$header] ?? '';
               }
-
-              // Write the data row
-              fputcsv($handle, $flattened_row);
+              fputcsv($handle, $csvRow);
           }
 
           fclose($handle);
       });
 
-      // Set response headers for file download
       $response->headers->set('Content-Type', 'text/csv');
       $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
 
-      // Return success response
       return $response;
+
+      // Set the filename for the CSV file
+      // $filename = $device_id . "_data_" . date('YmdHis') . ".csv";
+
+      // // Create a StreamedResponse to output CSV data directly
+      // $response = new StreamedResponse(function () use ($exportdata) {
+      //     $handle = fopen('php://output', 'w');
+
+      //     // Get the keys for the header from the first flattened row
+      //     $headerWritten = false;
+      //     // Write CSV header
+      //     foreach ($exportdata as $row) {
+      //         $flattened_row = $this->flatten_array($row);
+
+      //         // Write the header if not written yet
+      //         if (!$headerWritten) {
+      //             fputcsv($handle, array_keys($flattened_row));
+      //             $headerWritten = true;
+      //         }
+
+      //         // Write the data row
+      //         fputcsv($handle, $flattened_row);
+      //     }
+
+      //     fclose($handle);
+      // });
+
+      // // Set response headers for file download
+      // $response->headers->set('Content-Type', 'text/csv');
+      // $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+
+      // // Return success response
+      // return $response;
   }
 
-  public function flatten_array($array, $prefix = '') {
+  public function flattenArray($array, $prefix = '') {
       $result = [];
       foreach ($array as $key => $value) {
+          $newKey = $prefix === '' ? $key : $prefix . '_' . $key;
           if (is_array($value)) {
-              $result = array_merge($result, $this->flatten_array($value, $prefix . $key . '_'));
+              $result = array_merge($result, $this->flattenArray($value, $newKey));
           } else {
-              $result[$prefix . $key] = $value;
+              $result[$newKey] = $value;
           }
       }
       return $result;
