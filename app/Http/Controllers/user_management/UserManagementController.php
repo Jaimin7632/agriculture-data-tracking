@@ -115,7 +115,7 @@ class UserManagementController extends Controller
         $deviceIds = explode(',', $data['device_id']);
 
         // Insert data into the attributes table
-        $attributeValue = ['time' => (1000 * 60 * 15)];
+        $attributeValue = ['time' => 120];
 
         foreach ($deviceIds as $deviceId) {
             $deviceId = trim($deviceId); // Trim any extra whitespace
@@ -203,7 +203,7 @@ class UserManagementController extends Controller
         $deviceIds = explode(',', $device_id);
         
         // Insert data into the attributes table
-        $attributeValue = ['time' => (1000 * 60 * 15)];
+        $attributeValue = ['time' => 120];
 
         foreach ($deviceIds as $deviceId) {
             $deviceId = trim($deviceId); // Trim any extra whitespace
