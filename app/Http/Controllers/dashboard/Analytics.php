@@ -807,6 +807,7 @@ class Analytics extends Controller
       // Retrieve data based on device ID and date range
       $exportdata = SensorData::where('device_id', $device_id)
           ->whereBetween('created_at', [$fromDate, $toDate])
+          ->orderBy('created_at', 'desc')
           ->get()
           ->toArray();
        // echo "<pre>"; print_r($exportdata); die();    
