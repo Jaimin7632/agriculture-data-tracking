@@ -119,14 +119,6 @@ void receiveEvent(int numBytes) {
   }
 }
 
-void processDataAndSend() {
-  // Crear un nuevo documento JSON para enviar
-  DynamicJsonDocument jsonDocument(1024);
-  updateJsonDocument(jsonDocument);
-
-  // Enviar los datos al servidor
-  sendJsonModem(endpoint, jsonDocument);
-}
 
 void requestEvent() {
   int jsonLength = serverJsonString.length();
@@ -150,6 +142,9 @@ void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
   // Deserializar el JSON solo si se recibieron datos
   JsonObject receivedData;
   if (true) {
+    // Deserializar el JSON almacenado en el buffer
+    Serial.println("checkpoint before string to json of i2c");
+    serializeJsonPretty(jsonDoc, Serial);
     // Verificar si se pudo deserializar correctamente
     if (1) {
       // Obtener el ID del JSON recibido
@@ -190,14 +185,14 @@ void updateJsonDocument(DynamicJsonDocument& jsonDocument) {
         receivedData[id] = idObject;
 
         // Print the JSON received
-//         serializeJsonPretty(jsonDoc, Serial);
+        serializeJsonPretty(jsonDoc, Serial);
       }
     }
   }
 }
 // end lora code with i2c
 
-void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
+String sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument, String method="POST") {
   String jsonString;
   serializeJson(jsonDocument, jsonString);
 
@@ -211,7 +206,7 @@ void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
   // Set GET URT
   if (!modem.https_set_url(server_url)) {
     Serial.println("Failed to set the URL. Please check the validity of the URL!");
-    return;
+    return "";
   }
 
   modem.https_add_header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -221,17 +216,22 @@ void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
   modem.https_add_header("Content-Type", "application/json");
 
   String post_body = jsonString;
+  int httpCode = 0;
+  if(method == "POST"){
+    httpCode = modem.https_post(post_body);
+  }else{
+    httpCode = modem.https_get();
+  }
 
-  int httpCode = modem.https_post(post_body);
   if (httpCode != 200) {
     Serial.print("HTTP post failed ! error code = ");
     Serial.println(httpCode);
-    return;
+    return "";
   } else {
     // Get HTTPS header information
     String header = modem.https_header();
-//     Serial.print("HTTP Header : ");
-//     Serial.println(header);
+    //Serial.print("HTTP Header : ");
+    //Serial.println(header);
 
     // Get HTTPS response
     String body = modem.https_body();
@@ -241,7 +241,18 @@ void sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument) {
     Serial.print("HTTP body : ");
     Serial.println(body);
     Serial.println("Server disconnected");
+    return body;
   }
+}
+
+
+void processDataAndSend() {
+  // Crear un nuevo documento JSON para enviar
+  DynamicJsonDocument jsonDocument(1024);
+  updateJsonDocument(jsonDocument);
+
+  // Enviar los datos al servidor
+  sendJsonModem(endpoint, jsonDocument, "POST");
 }
 
 void setup() {
@@ -374,4 +385,18 @@ void setup() {
 
 void loop() {
   // Nada que hacer en el loop principal por ahora
+  char google_endpoint[] = "https://www.google.com";
+  int led_pin = 33;
+  DynamicJsonDocument dummy(128);
+  String response = sendJsonModem(google_endpoint, dummy, "GET");
+  if(response != ""){
+    Serial.println("## LED ON ##");
+    digitalWrite(led_pin, HIGH);
+  }else{
+    Serial.println("## LED OFF ##");
+    digitalWrite(led_pin, LOW);
+  }
+  Serial.println(response);
+  delay(5 * 1000);
+
 }
