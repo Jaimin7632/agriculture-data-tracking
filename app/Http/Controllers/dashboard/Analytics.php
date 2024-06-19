@@ -272,7 +272,7 @@ class Analytics extends Controller
       $html .= '</thead>';
       $html .= '<tbody>';
       
-
+      ksort($sensorValues);
       foreach ($sensorValues as $sensorName => $sensorData) {
         $sensorValueType = $sensorData['type'];
         $graphname = ChangeGraphName::where('original_name', 'like', '%' . $sensorName . '%')->where('device_id', $device_id)->where('user_id', $User_Id)->first();
