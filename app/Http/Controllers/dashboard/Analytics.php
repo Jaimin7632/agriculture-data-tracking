@@ -137,6 +137,7 @@ class Analytics extends Controller
           $temperatureValues = [];
           $humidityValues = [];
           // Initialize an array to store sensor values dynamically
+          ksort($item['sensor_data']);
           foreach ($item['sensor_data'] as $sensorName => $sensorDetails) {
              
               // $graphname = ChangeGraphName::where('original_name', 'like', '%' . $sensorName . '%')->where('device_id', $device_id)->where('user_id', $User_Id)->first();
@@ -271,6 +272,7 @@ class Analytics extends Controller
       $html .= '</thead>';
       $html .= '<tbody>';
       
+
       foreach ($sensorValues as $sensorName => $sensorData) {
         $sensorValueType = $sensorData['type'];
         $graphname = ChangeGraphName::where('original_name', 'like', '%' . $sensorName . '%')->where('device_id', $device_id)->where('user_id', $User_Id)->first();
