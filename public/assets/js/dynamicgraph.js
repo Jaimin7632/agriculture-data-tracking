@@ -173,32 +173,52 @@ $('.changegraphtime').on('click', function() {
 
                     var imageUrl = baseUrl +'/'+ sensoricon;
                     
-                    var chartTitle = $('<h3>', {
-                        // html: '<button class="btn" data-bs-toggle="modal" type="button" onclick="get_sensor_alarm(\'' + sensorName + '\', \'' + devide_id + '\')" data-bs-target="#setalarm' + devide_id + '"><i class="fa fa-cog"></i></button> ' + sensorValues.icon + readableSensorName,
-                        // style: 'color: ' + sensorValues.color + '; font-size: 20px; margin-bottom: 10px;'
-                        html: `
-                          <div class="btn-group">
-                              <i class="fas fa-cog" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
-                              <ul class="dropdown-menu">
-                                  <li>
-                                      <button class="dropdown-item" type="button" onclick="get_sensor_alarm('${sensorName}', '${devide_id}')" data-bs-toggle="modal" data-bs-target="#setalarm${devide_id}">
-                                          Set Alarm
-                                      </button>
-                                  </li>
-                                  <li>
-                                      <button class="dropdown-item" type="button" onclick="get_graph_name('${sensorName}', '${devide_id}')" data-bs-toggle="modal" data-bs-target="#setgraphname${devide_id}">
-                                          Set Graph Name
-                                      </button>
-                                  </li>
-                              </ul>
+                    var chartTitle = $('<div>', {
+                      class: 'accordion-header',
+                      html: `
+                          <div class="row align-items-center">
+                              <div class="col-9 text-start">
+                                  <div class="btn-group">
+                                      <i class="fas fa-cog" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+                                      <ul class="dropdown-menu">
+                                          <li>
+                                              <button class="dropdown-item" type="button" onclick="get_sensor_alarm('${sensorName}', '${devide_id}')" data-bs-toggle="modal" data-bs-target="#setalarm${response.devide_id}">
+                                                  Set Alarm
+                                              </button>
+                                          </li>
+                                          <li>
+                                              <button class="dropdown-item" type="button" onclick="get_graph_name('${sensorName}', '${devide_id}')" data-bs-toggle="modal" data-bs-target="#setgraphname${response.devide_id}">
+                                                  Set Graph Name
+                                              </button>
+                                          </li>
+                                      </ul>
+                                  </div>
+                                  <span style="color: #4c4e4f; font-size: 20px;">
+                                      ${sensoricon} ${readableSensorName}
+                                  </span>
+
+                                  <span style="color: #4c4e4f; font-size: 24px;">
+                                      ${Math.round(sensorValues.data[sensorValues.data.length - 1].y * 100) / 100} ${sensorValues.unit}
+                                  </span>
+
+                              </div>
+                              <div class="col-3 text-end">
+                                  <span class="accordion-button" 
+                                        data-bs-toggle="collapse" 
+                                        data-bs-target="#lineChart${sensorName}${response.devide_id}" 
+                                        aria-expanded="false" 
+                                        aria-controls="accordionTwo">
+                                  </span>
+                              </div>
                           </div>
-                          ${sensoricon}${readableSensorName}
-                          <span style="color: #4c4e4f; font-size: 28px;">
-                              ${Math.round(sensorValues.data[sensorValues.data.length - 1].y * 100) / 100} ${sensorValues.unit}
-                          </span>
-                      `,
-                      style: 'color: #4c4e4f; font-size: 20px; margin-bottom: 10px;'
-                    });
+                          <div class="collapse" id="lineChart${sensorName}${response.devide_id}">
+                              
+                              
+                          </div>
+                      `
+                  });
+
+
 
                     // Last Y Value
                     // var lastYValue = $('<h3>', {
