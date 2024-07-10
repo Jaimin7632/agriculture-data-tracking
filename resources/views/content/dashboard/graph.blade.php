@@ -515,7 +515,6 @@
 
 $(document).ready(function() {
   
-
   $('.add-input').click(function() {
     var device_id = $(this).attr('device-attr-id');
     // console.log(device_id);

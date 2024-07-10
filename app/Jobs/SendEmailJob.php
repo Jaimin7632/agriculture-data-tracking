@@ -9,7 +9,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use App\Notifications\SensorAlertEmail;
-use Illuminate\Support\Facades\Validator;
 
 class SendEmailJob implements ShouldQueue
 {
@@ -19,7 +18,6 @@ class SendEmailJob implements ShouldQueue
     protected $sensorName;
     protected $minValue;
     protected $maxValue;
-    protected $actualValue;
 
     /**
      * Create a new job instance.
@@ -28,13 +26,12 @@ class SendEmailJob implements ShouldQueue
      * @param string $subject
      * @param string $content
      */
-    public function __construct($user="", $sensorName="", $minValue="", $maxValue="", $actualValue="")
+    public function __construct($user="", $sensorName="", $minValue="", $maxValue="")
     {   
         $this->user = $user;
         $this->sensorName = $sensorName;
         $this->minValue = $minValue;
         $this->maxValue = $maxValue;
-        $this->actualValue = $actualValue;
     }
 
     /**
@@ -44,21 +41,8 @@ class SendEmailJob implements ShouldQueue
      */
     public function handle()
     {   
-        // $email = $this->user['email'];
-
-        $email = $this->user['email'];
-
-        // Validate the email address
-        $validator = Validator::make(['email' => $email], [
-            'email' => 'required|email:rfc'
-        ]);
-
-        if ($validator->fails()) {
-            // Handle invalid email
-            throw new \Exception("Email '{$email}' does not comply with addr-spec of RFC 2822.");
-        }
-        // echo $email; die();
-        Mail::to($email)->send(new SensorAlertEmail($this->user, $this->sensorName, $this->minValue, $this->maxValue, $this->actualValue));
+        $email = 'kdpatel1110@gmail.com';
+        Mail::to($email)->send(new SensorAlertEmail($this->user, $this->sensorName, $this->minValue, $this->maxValue));
         //$this->user->notify(new NotificationEmail($this->user, $this->sensorName, $this->minValue, $this->maxValue));
 
     }
