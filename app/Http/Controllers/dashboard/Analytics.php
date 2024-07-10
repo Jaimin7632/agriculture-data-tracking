@@ -77,6 +77,8 @@ class Analytics extends Controller
     $changetime = $post_data['changetime'];
     $changematrix = $post_data['changematrix'];
 
+    // echo "<pre>"; print_r($post_data); die();
+
     if (!empty($device_id)) {
        // echo $post_data['device_id']; die();
       if ($fromDate != '' && $toDate != '') {
@@ -90,33 +92,72 @@ class Analytics extends Controller
               ->toArray();
 
       } 
-      /*else if($changetime != '' && $changematrix != ''){
-        $aggregationFunction = 'AVG';
+      else if($changetime != '' && $changematrix != ''){
 
-        // Check the value of $changematrix and set the aggregation function accordingly
-        switch ($changematrix) {
-            case 'MIN':
-                $aggregationFunction = 'MIN';
-                break;
-            case 'MAX':
-                $aggregationFunction = 'MAX';
-                break;
-            // If $changematrix is not MIN or MAX, it defaults to AVG
+        $latestRecord = SensorData::where('device_id', $device_id)
+                    ->orderByDesc('created_at')
+                    ->first();
+
+        if (!$latestRecord) {
+            // If there are no records, return an appropriate response
+            return null;
         }
-          $sensor_data_query = SensorData::select(
-              DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d %H:") AS time_hour'),
-              DB::raw('FLOOR(MINUTE(created_at) / ' . $changetime . ') AS created_at'),
-              DB::raw($aggregationFunction . '(sensor_value) AS sensor_value')
-          )
-          ->where('device_id', $device_id)
-          ->groupBy('time_hour', 'created_at')
-          ->orderBy('time_hour', 'asc')
-          ->orderBy('time_minute', 'asc');
 
-      // Execute the query
-      $sensor_data = $sensor_data_query->get()->toArray();
-      // echo "<pre>"; print_r($sensor_data); die();
-      }*/
+        // Calculate the start time based on the last inserted record's created_at time
+        // Parse the latest record's created_at timestamp
+        $latestCreatedAt = Carbon::parse($latestRecord->created_at);
+
+        // Calculate the start time based on the last inserted record's created_at time
+        $startTime = $latestCreatedAt->subMinutes($changetime);
+        $startTimeString = $startTime->toDateTimeString();
+        // echo "<pre>"; print_r($startTimeString); die();       
+        // Build the base query
+        $query = SensorData::where('device_id', $device_id)
+                    ->where('created_at', '>=', $startTimeString)
+                    ->orderByDesc('created_at')
+                    ->limit(15);
+
+        // Apply the statistic function
+        switch ($changematrix) {
+            case 'max':
+                $sensor_data = $query->max('value'); // Replace 'value' with the actual column name
+                break;
+            case 'min':
+                $sensor_data = $query->min('value'); // Replace 'value' with the actual column name
+                break;
+            case 'avg':
+                $sensor_data = $query->avg('value'); // Replace 'value' with the actual column name
+                break;
+            default:
+                $sensor_data = $query->get()->toArray();
+                break;
+        }    
+      //   $aggregationFunction = 'AVG';
+
+      //   // Check the value of $changematrix and set the aggregation function accordingly
+      //   switch ($changematrix) {
+      //       case 'MIN':
+      //           $aggregationFunction = 'MIN';
+      //           break;
+      //       case 'MAX':
+      //           $aggregationFunction = 'MAX';
+      //           break;
+      //       // If $changematrix is not MIN or MAX, it defaults to AVG
+      //   }
+      //     $sensor_data_query = SensorData::select(
+      //         DB::raw('DATE_FORMAT(created_at, "%Y-%m-%d %H:") AS time_hour'),
+      //         DB::raw('FLOOR(MINUTE(created_at) / ' . $changetime . ') AS created_at'),
+      //         DB::raw($aggregationFunction . '(sensor_value) AS sensor_value')
+      //     )
+      //     ->where('device_id', $device_id)
+      //     ->groupBy('time_hour', 'created_at')
+      //     ->orderBy('time_hour', 'asc')
+      //     ->orderBy('time_minute', 'asc');
+
+      // // Execute the query
+      // $sensor_data = $sensor_data_query->get()->toArray();
+      // echo "<pre>"; print_r($result); die();
+      }
 
       else {
           $sensor_data = SensorData::where('device_id', $device_id)->orderByDesc('created_at')->limit(15)
