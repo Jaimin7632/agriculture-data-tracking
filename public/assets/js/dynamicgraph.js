@@ -66,6 +66,7 @@ $('.changegraphtime').on('click', function() {
     $('.append_graph_single').html("");
     $('#spinner'+device_id).show();
     $('#datefilter'+device_id).modal('hide');
+    $('#graphtimechange'+device_id).modal('hide');
 
     var changetime = document.getElementById("changetime");
     var selectedValuechangetime = changetime.value;
