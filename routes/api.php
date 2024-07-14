@@ -20,3 +20,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/sensordatastore', [SensorDataInsertApi::class, 'sensordatastore'])->name("sensordatastore");
+
+URL::forceScheme('https');
