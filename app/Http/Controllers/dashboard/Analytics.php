@@ -16,6 +16,7 @@ use App\Models\AlarmHistory;
 use App\Models\Country;
 use App\Models\Attributes;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use DB;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -58,6 +59,162 @@ class Analytics extends Controller
 
   }
 
+  public function aggregateSensorData_old(array $data, array $functions, int $intervalMinutes = 10): array
+  {
+      // Convert the data array into a collection for easier manipulation
+      $dataCollection = collect($data)->map(function ($item) {
+          return [
+              'timestamp' => Carbon::parse($item['created_at']),
+              'sensor_data' => $item['sensor_data']
+          ];
+      });
+
+      // Determine the minimum and maximum timestamps in the data
+      $minTimestamp = $dataCollection->min('timestamp');
+      $maxTimestamp = $dataCollection->max('timestamp');
+
+      // Initialize results array
+      $results = [];
+
+      // Iterate over the data in intervals
+      $currentStart = $minTimestamp;
+      while ($currentStart < $maxTimestamp) {
+          $currentEnd = $currentStart->copy()->addMinutes($intervalMinutes);
+
+          // Filter data that falls within the current timeframe
+          $filteredData = $dataCollection->filter(function ($item) use ($currentStart, $currentEnd) {
+              return $item['timestamp']->between($currentStart, $currentEnd);
+          });
+
+          // Aggregate the filtered data
+          $aggregated = [];
+          foreach ($functions as $function) {
+              foreach ($filteredData->first()['sensor_data'] as $sensor => $sensorData) {
+                  $values = $filteredData->pluck("sensor_data.$sensor.value");
+                  switch ($function) {
+                      case 'avg':
+                          $aggregated[$sensor]['avg'] = [
+                              'value' => $values->avg(),
+                              'unit' => $sensorData['unit']
+                          ];
+                          break;
+                      case 'max':
+                          $aggregated[$sensor]['max'] = [
+                              'value' => $values->max(),
+                              'unit' => $sensorData['unit']
+                          ];
+                          break;
+                      case 'min':
+                          $aggregated[$sensor]['min'] = [
+                              'value' => $values->min(),
+                              'unit' => $sensorData['unit']
+                          ];
+                          break;
+                  }
+              }
+          }
+
+          $results[] = [
+              'start' => $currentStart->toDateTimeString(),
+              'end' => $currentEnd->toDateTimeString(),
+              'aggregated' => $aggregated
+          ];
+
+          // Move to the next interval
+          $currentStart = $currentEnd;
+      }
+
+      return $results;
+  }
+
+  public function aggregateSensorData(array $data, string $function, int $intervalMinutes = 10): array
+  {
+      // Convert the data array into a collection for easier manipulation
+      $dataCollection = collect($data)->map(function ($item) {
+        
+          return [
+              'timestamp' => Carbon::parse($item['created_at']),
+              'sensor_data' => $item['sensor_data'],
+              '_id' => $item['_id'],
+              'device_id' => $item['device_id'],
+          ];
+      });
+
+
+
+      // Determine the minimum and maximum timestamps in the data
+      $minTimestamp = $dataCollection->min('timestamp');
+      $maxTimestamp = $dataCollection->max('timestamp');
+
+      // Initialize results array
+      $results = [];
+
+      // Iterate over the data in intervals
+      $currentStart = $minTimestamp;
+      while ($currentStart < $maxTimestamp) {
+          $currentEnd = $currentStart->copy()->addMinutes($intervalMinutes);
+
+          // Filter data that falls within the current timeframe
+          $filteredData = $dataCollection->filter(function ($item) use ($currentStart, $currentEnd) {
+              return $item['timestamp']->between($currentStart, $currentEnd);
+          });
+
+          // Aggregate the filtered data
+          $aggregated = [];
+          $ids = $filteredData->pluck('_id')->toArray();
+          $deviceIds = $filteredData->pluck('device_id')->toArray();
+          foreach ($filteredData->first()['sensor_data'] as $sensor => $sensorData) {
+              $values = $filteredData->pluck("sensor_data.$sensor.value");
+              $type = $sensorData['type'] ?? "";
+              switch ($function) {
+                  case 'SUM':
+                      $aggregated[$sensor] = [
+                          'value' => $values->sum(),
+                          'unit' => $sensorData['unit'],
+                          'type' => $type
+                      ];
+                      break;
+                  case 'MAX':
+                      $aggregated[$sensor] = [
+                          'value' => $values->max(),
+                          'unit' => $sensorData['unit'],
+                          'type' => $type
+                      ];
+                      break;
+                  case 'MIN':
+                      $aggregated[$sensor] = [
+                          'value' => $values->min(),
+                          'unit' => $sensorData['unit'],
+                          'type' => $type
+                      ];
+                      break;
+                  case 'AVG':
+                      $aggregated[$sensor] = [
+                          'value' => $values->avg(),
+                          'unit' => $sensorData['unit'],
+                          'type' => $type
+                      ];
+                      break;
+                  default:
+                      throw new InvalidArgumentException("Invalid function: $function");
+              }
+          }
+
+          $results[] = [
+              // '_id' => $ids, // or you can choose how you want to handle multiple IDs
+              'device_id' => $deviceIds[0], // assuming all device_ids are the same in the interval
+              'created_at' => $currentStart->toDateTimeString(),
+              'updated_at' => $currentEnd->toDateTimeString(),
+              'sensor_data' => $aggregated
+          ];
+
+          // Move to the next interval
+          $currentStart = $currentEnd;
+      }
+
+      return $results;
+  }
+
   public function getgraphdata(Request $request){
 
     $authuser = Auth::user();
@@ -93,7 +250,7 @@ class Analytics extends Controller
 
       } 
       else if($changetime != '' && $changematrix != ''){
-
+        // echo $changetime; die();
         $latestRecord = SensorData::where('device_id', $device_id)
                     ->orderByDesc('created_at')
                     ->first();
@@ -115,23 +272,47 @@ class Analytics extends Controller
         $query = SensorData::where('device_id', $device_id)
                     ->where('created_at', '>=', $startTimeString)
                     ->orderByDesc('created_at')
-                    ->limit(15);
+                    ->limit(15)->get()->toArray();
+        // echo "<pre>"; print_r($query); die();            
+        // Example usage
+        // $data = [
+        //     [
+        //         "_id" => ["\$oid" => "6613c824deaa0e547e1757f4"],
+        //         "device_id" => "1111223345",
+        //         "sensor_data" => [
+        //             "SoilWetness" => ["value" => 75.92185211, "unit" => "%"],
+        //             "AirPressure" => ["value" => 0, "unit" => "kPa"],
+        //             "Humidity" => ["value" => 59.258461, "unit" => "%"],
+        //             "AirTemperature" => ["value" => 22.77736664, "unit" => "°C"],
+        //         ],
+        //         "updated_at" => "2024-04-08 10:34:12",
+        //         "created_at" => "2024-04-08 10:34:12"
+        //     ],
+        //     // Add more data as needed
+        // ];
+
+        $functions = ['avg', 'max', 'min'];
+        $intervalMinutes = 10;
+        $sensor_data = $this->aggregateSensorData($query, $changematrix, $changetime);
+
+        // echo "<pre>"; print_r($results); die();
 
         // Apply the statistic function
-        switch ($changematrix) {
-            case 'max':
-                $sensor_data = $query->max('value'); // Replace 'value' with the actual column name
-                break;
-            case 'min':
-                $sensor_data = $query->min('value'); // Replace 'value' with the actual column name
-                break;
-            case 'avg':
-                $sensor_data = $query->avg('value'); // Replace 'value' with the actual column name
-                break;
-            default:
-                $sensor_data = $query->get()->toArray();
-                break;
-        }    
+        // switch ($changematrix) {
+        //     case 'MAX':
+        //         $sensor_data = $query->max('value'); // Replace 'value' with the actual column name
+        //         break;
+        //     case 'MIN':
+        //         $sensor_data = $query->min('value'); // Replace 'value' with the actual column name
+        //         break;
+        //     case 'AVG':
+        //         $sensor_data = $query->avg('value'); // Replace 'value' with the actual column name
+        //         break;
+        //     default:
+        //         $sensor_data = $query->get()->toArray();
+        //         break;
+        } 
+        // echo "<pre>"; print_r($sensor_data); die();    
       //   $aggregationFunction = 'AVG';
 
       //   // Check the value of $changematrix and set the aggregation function accordingly
@@ -157,19 +338,20 @@ class Analytics extends Controller
       // // Execute the query
       // $sensor_data = $sensor_data_query->get()->toArray();
       // echo "<pre>"; print_r($result); die();
-      }
+      // }
 
       else {
           $sensor_data = SensorData::where('device_id', $device_id)->orderByDesc('created_at')->limit(15)
               ->get()
               ->toArray();
       }
-      // echo "<pre>"; print_r($sensor_data); die();
+      
       $outputArray = [];
       $sensorConfig = config('global');
       $sensorValues = [];
       $sensorColors = [];
       foreach (array_reverse($sensor_data) as $item) {
+        
           $formattedDateTime = $item['created_at'];
           $dateTime = new \DateTime($formattedDateTime);
           $createdAt = $dateTime->format('Y-m-d H:i:s');
@@ -181,12 +363,6 @@ class Analytics extends Controller
           ksort($item['sensor_data']);
           foreach ($item['sensor_data'] as $sensorName => $sensorDetails) {
              
-              // $graphname = ChangeGraphName::where('original_name', 'like', '%' . $sensorName . '%')->where('device_id', $device_id)->where('user_id', $User_Id)->first();
-              // $sensorValues[$sensorName]['changename'] = $sensorName;
-              // if (!empty($graphname)) {
-              //   $sensorValues[$sensorName]['changename'] = $graphname->change_name;
-              // }
-
               $sensorValueKey = $sensorName;
               $sensorValueType = isset($sensor_data[0]['sensor_data'][$sensorValueKey]['type']) ? $sensor_data[0]['sensor_data'][$sensorValueKey]['type'] : "graph" ;
               $sensorValueColor = $sensorDetails['unit'];
@@ -250,51 +426,10 @@ class Analytics extends Controller
                 $sensorValues[$sensorName]['icon'] = '<svg viewBox="0 0 24 24" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 4H20M15 8H20M17 12H20M8 15.9998C7.44772 15.9998 7 16.4475 7 16.9998C7 17.5521 7.44772 17.9998 8 17.9998C8.55228 17.9998 9 17.5521 9 16.9998C9 16.4475 8.55228 15.9998 8 15.9998ZM8 15.9998V9M8 16.9998L8.00707 17.0069M12 16.9998C12 19.209 10.2091 20.9998 8 20.9998C5.79086 20.9998 4 19.209 4 16.9998C4 15.9854 4.37764 15.0591 5 14.354L5 6C5 4.34315 6.34315 3 8 3C9.65685 3 11 4.34315 11 6V14.354C11.6224 15.0591 12 15.9854 12 16.9998Z" stroke="#FF33C7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>';
               }
               
-              // if (strpos($sensorName, "AirTemperature") !== false) {
-              //     $temperatureValues[] = ['value' => $sensorDetails['value'], 'type' => $sensorValueType];
-              // }
               
-              // if (strpos($sensorName, "Humidity") !== false) {
-              //     $humidityValues[] = ['value' => $sensorDetails['value'], 'type' => $sensorValueType];
-              // }
               
           }
-          // echo "<pre>"; print_r($temperatureValues); die();
-          // foreach ($temperatureValues as $key => $temperatureCelsius) {
-          //     // Check if the corresponding humidity value exists
-          //     if (isset($humidityValues[$key])) {
-
-          //       $temperatureCelsiusval = $temperatureCelsius['value'];
-          //       $temperatureType = $temperatureCelsius['type'];
-
-          //       // Get the humidity value and its type
-          //       $humidityValue = $humidityValues[$key]['value'];
-          //       $humidityType = $humidityValues[$key]['type'];
-
-          //       if ($temperatureCelsiusval != '' && $humidityValue != '') {
-          //         // Calculate the DPV for the current set of temperature and humidity values
-          //         $dewPoint = $this->calculateDewPoint($temperatureCelsiusval, $humidityValue);
-          //         if ($dewPoint == '') {
-          //           $dewPoint = 10;
-          //         }
-          //         // Create a new sensor name for DPV and store its value
-          //         $dewPointSensorName = 'DewPoint_' . ($key + 1);
-          //         if (!isset($sensorValues[$dewPointSensorName])) {
-          //             $sensorValues[$dewPointSensorName] = [
-          //                 'type' => 'multi',
-          //                 'data' => [],
-          //                 'spname' => $dewPointSensorName,
-          //                 'unit' => 'MA',
-          //                 'color' => '#FF33C7',
-          //                 'icon' => '<svg viewBox="0 0 24 24" width="50" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M15 4H20M15 8H20M17 12H20M8 15.9998C7.44772 15.9998 7 16.4475 7 16.9998C7 17.5521 7.44772 17.9998 8 17.9998C8.55228 17.9998 9 17.5521 9 16.9998C9 16.4475 8.55228 15.9998 8 15.9998ZM8 15.9998V9M8 16.9998L8.00707 17.0069M12 16.9998C12 19.209 10.2091 20.9998 8 20.9998C5.79086 20.9998 4 19.209 4 16.9998C4 15.9854 4.37764 15.0591 5 14.354L5 6C5 4.34315 6.34315 3 8 3C9.65685 3 11 4.34315 11 6V14.354C11.6224 15.0591 12 15.9854 12 16.9998Z" stroke="#FF33C7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>',
-          //                 // You can add more properties here if needed
-          //             ];
-          //         }
-          //         $sensorValues[$dewPointSensorName]['data'][] = ['x' => $changedateBycountry, 'y' => number_format($dewPoint)];
-          //       }
-                  
-          //     }
-          // }
+          
       }
 
       // echo "<pre>";print_r($sensorValues);exit;
@@ -315,6 +450,8 @@ class Analytics extends Controller
       
       ksort($sensorValues);
       foreach ($sensorValues as $sensorName => $sensorData) {
+
+        // echo "<pre>"; print_r(array_reverse($sensorData['data']));
         $sensorValueType = $sensorData['type'];
         $graphname = ChangeGraphName::where('original_name', 'like', '%' . $sensorName . '%')->where('device_id', $device_id)->where('user_id', $User_Id)->first();
         $sensorValues[$sensorName]['changename'] = $sensorName;
@@ -327,13 +464,14 @@ class Analytics extends Controller
         if ($sensorValueType == 'lastvalue') {
           $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][0];
           $sensorValues[$sensorName]['type'] = 'single';
-          
-          $sensorValuetbl = $sensorData['data'][0]['y'];
-          $sensorDatetbl = $sensorData['data'][0]['x'];
+          $lastElement = end($sensorData['data']);
+          $sensorValuetbl = $lastElement['y'];
+          $sensorDatetbl = $lastElement['x'];
 
         }else if($sensorValueType == 'location'){
           $sensorValues[$sensorName]['data'] = $sensorValues[$sensorName]['data'][0];
           $sensorValues[$sensorName]['type'] = 'location';
+          // $locationData = end($sensorData['data'][0]);
           $locationData = $sensorData['data'][0];
           $xValue = $locationData['x'];
           $yValue = $locationData['y'];
@@ -370,31 +508,14 @@ class Analytics extends Controller
         $html .= '<td>' . $sensorDatetbl . '</td>';
         $html .= '</tr>';
 
-      }
+      } 
 
       $html .= '</tbody>';
       $html .= '</table>';
       $html .= '</div>';  
       // echo "<pre>";print_r($sensorValues);exit;
 
-      // Check if 'location' key exists
-      /*if (isset($sensorValues['location'])) {
-          // Accessing 'location' data
-          $locationData = $sensorValues['location']['data'];
-          $xValue = $locationData['x'];
-          $yValue = $locationData['y'];
-
-          $coordinates = explode(',', $yValue);
-          $latitude = $coordinates[0];
-          $longitude = $coordinates[1];
-          $latLongStr = 'Latitude: '.$latitude.'° N'.', Longitude: '.$longitude.'° W';
-
-          $address = $this->getAddressFromCoordinates($latitude,$longitude);
-          $LocationAddress = $address->original['address'];
-          $sensorValues['location']['data'] = ['x' => $xValue, 'y' => $latLongStr, 'address' => $LocationAddress,'Latitude' => $latitude, 'Longitude' => $longitude];
-      } else {
-          //echo "Location does not exist.\n";
-      }*/
+     
         $message = "success";
         $success = "success";
 
