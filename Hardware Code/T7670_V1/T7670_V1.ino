@@ -1,11 +1,13 @@
+#define BOARD_POWERON_PIN                   (12)
 #define LILYGO_T_A7670
+#include "utilities.h"
 #include <ArduinoJson.h>
 #include <Adafruit_AHTX0.h>
 #include <Wire.h>
 
 #define TINY_GSM_USE_GPRS true
 
-const char device_id[] = "45264015";
+const char device_id[] = "13214603";
 // set sensors details
 const int numSensors = 1;
 const int sensorPins[numSensors] = {32}; // Example sensor pins
@@ -16,7 +18,7 @@ const float pressureMaxRange = 0.2; // set pressure sensor range in MPa
 float sensorValues[numSensors] = {0};
 
 // Server details
-const char endpoint[] = "https://portal.agromolinainnova.com/api/sensordatastore";
+const char endpoint[] = "http://portal.agromolinainnova.com/api/sensordatastore";
 
 // lora code with i2c
 #define BUFFER_SIZE 6000 // Tamaño máximo del buffer para almacenar el paquete JSON
@@ -32,7 +34,6 @@ String serverJsonString = "";
 #if TINY_GSM_USE_GPRS
 
   #define TINY_GSM_RX_BUFFER          1024
-  #include "utilities.h"
   #include <TinyGsmClient.h>
 
   #ifdef DUMP_AT_COMMANDS  // if enabled it requires the streamDebugger lib
@@ -197,16 +198,24 @@ String sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument, 
   serializeJson(jsonDocument, jsonString);
 
   Serial.print("Sending JSON data: ");
-  Serial.print(server_url);
-  Serial.println(jsonString);
+  Serial.println(server_url);
 
   // Initialize HTTPS
-  modem.https_begin();
-
   // Set GET URT
-  if (!modem.https_set_url(server_url)) {
+  int attempt = 0;
+  bool success = false;
+  while (attempt < 5) {
+    modem.https_begin();
+    if (modem.https_set_url(server_url)) {
+      success = true;
+      break; // URL set successfully, exit the loop
+    }
+
+    delay(500); // Wait for 0.5 seconds before the next attempt
+    attempt++;
+  }
+  if(success == false){
     Serial.println("Failed to set the URL. Please check the validity of the URL!");
-    return "";
   }
 
   modem.https_add_header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
@@ -240,6 +249,7 @@ String sendJsonModem(const char* server_url, DynamicJsonDocument& jsonDocument, 
     }
     Serial.print("HTTP body : ");
     Serial.println(body);
+    delay(1000);
     Serial.println("Server disconnected");
     return body;
   }
@@ -253,23 +263,21 @@ void processDataAndSend() {
 
   // Enviar los datos al servidor
   sendJsonModem(endpoint, jsonDocument, "POST");
+
+  jsonDocument.clear(); // Limpiar el documento JSON para liberar la memoria utilizada
+  jsonDoc.clear();
+  String i2cJsonString = "";
+  String serverJsonString = "";
 }
 
 void setup() {
-  Serial.begin(115200);
-  // start lora code with i2c
-  Wire.begin(8); // Inicializar el dispositivo I2C con dirección 8
-  Wire.onReceive(receiveEvent); // Configurar el evento de recepción de datos por I2C
-  Wire.onRequest(requestEvent); // register event
-  // end lora code with i2c
 
-#if TINY_GSM_USE_GPRS
-  // start sim part
-  SerialAT.begin(115200, SERIAL_8N1, MODEM_RX_PIN, MODEM_TX_PIN);
-#ifdef BOARD_POWERON_PIN
   pinMode(BOARD_POWERON_PIN, OUTPUT);
   digitalWrite(BOARD_POWERON_PIN, HIGH);
-#endif
+
+  Serial.begin(115200);
+  // start sim part
+  SerialAT.begin(115200, SERIAL_8N1, MODEM_RX_PIN, MODEM_TX_PIN);
 
   // Set modem reset pin ,reset modem
   pinMode(MODEM_RESET_PIN, OUTPUT);
@@ -380,10 +388,16 @@ void setup() {
   Serial.print("Network IP:");
   Serial.println(ipAddress);
   // end sim part
-#endif
+
+  // start lora code with i2c
+  Wire.begin(8); // Inicializar el dispositivo I2C con dirección 8
+  Wire.onReceive(receiveEvent); // Configurar el evento de recepción de datos por I2C
+  Wire.onRequest(requestEvent); // register event
+  // end lora code with i2c
+
 }
 
-void loop() {
+void loop() {/*
   // Nada que hacer en el loop principal por ahora
   char google_endpoint[] = "https://www.google.com";
   int led_pin = 33;
@@ -398,5 +412,5 @@ void loop() {
   }
   Serial.println(response);
   delay(5 * 1000);
-
+*/
 }
